@@ -8,8 +8,10 @@ const Home = lazy(()=>import('./Components/Pages/Home'));
 const About = lazy(()=>import('./Components/Pages/About'));
 const Settings = lazy(()=>import('./Components/Pages/Settings'));
 const OfficeForm = lazy(()=>import('./Components/AdminPanel/OfficeForm'));
-
+const OfficeBranchPage = lazy(()=>import('./Components/AdminPanel/OfficeBranchPage'));
 import Navbar from './Components/Nav/Navbar';
+import ReuseTable from './Components/ReuseableComponents/ReuseTable';
+import OfficeTable from './Components/AdminPanel/OfficeTable';
 
 
 function App() {
@@ -22,7 +24,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/home' element={<Home />} />
         <Route path='/about' exact element={<OfficeForm/>}></Route>
-        <Route path='/setting' exact element={<Settings/>}></Route>
+        <Route path='/setting' exact element={<OfficeTable/>}></Route>
       </Route>
     </Routes>
     </BrowserRouter>

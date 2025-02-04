@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.4.2",
+    "@mui/x-data-grid": "^7.25.0",
     "axios": "^1.7.9",
     "nepali-datetime": "^1.4.0",
     "react": "^18.3.1",
