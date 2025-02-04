@@ -43,6 +43,7 @@ app.use(cors({
             'http://localhost:5173',
             'http://localhost:5174',
             'http://192.168.1.21:5173',
+            'https://kptpo.onrender.com',
         ];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
