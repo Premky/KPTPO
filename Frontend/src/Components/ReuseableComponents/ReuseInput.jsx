@@ -13,7 +13,7 @@ const ReuseInput = ({ name, label, required, control, error, placeholder,type, r
             <Controller
                 name={name}
                 control={control}
-                defaultValue=""  // Provide a default value
+                // defaultValue=""  // Provide a default value
                 render={({ field }) => (
                     <TextField
                         {...field}

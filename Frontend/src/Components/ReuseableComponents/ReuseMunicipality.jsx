@@ -1,9 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Import axios
 import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseSelect = ({ name, label, required, control, error, options }) => {
+
+const ReuseMunicipality = ({ name, label, required, control, error, options }) => {
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const token = localStorage.getItem('token');
+
+    const states = [
+        { code: '', label: 'No Options Available', phone: '', value: '' }
+    ];
+    options = options && options.length ? options : states;
+    const [municipality, setMunicipality] = useState([]);
+    
+    const fetchMunicipality = async () => {
+        try {
+            const url = `${BASE_URL}/public/get_province`;
+            const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` }, });
+            const { Status, Result, Error } = response.data;
+
+            if (Status) {
+                if (Result.length > 0) {
+                    console.log("ldksaf")
+                    setMunicipality(Result);
+                    options = options && options.length ? options : municipality;
+                } else {
+                    console.log('Record for Province Not Found');
+                }
+            } else {
+                console.log(Error || 'Failed to fetch Countries.')
+            }
+        } catch (error) {
+            console.error('Error Fetching records:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMunicipality();
+    }, []);
     return (
         <>
             <InputLabel id={name}>
@@ -20,12 +56,12 @@ const ReuseSelect = ({ name, label, required, control, error, options }) => {
                         options={options}
                         autoHighlight
                         getOptionLabel={(option) => option.label}
-                        value={options.find((option) => option.value === value) || null}  // Match using value, not label
-                        onChange={(_, newValue) => onChange(newValue ? newValue.value : '')}  // Store only value
+                        value={options.find((option) => option.label === value) || null}
+                        onChange={(_, newValue) => onChange(newValue ? newValue : null)}  // Passing full object
                         sx={{ width: '100%' }}
                         renderOption={(props, option) => (
                             <Box
-                                key={option.value}  // Ensure unique key
+                                key={option.value || option.label}  // Ensure unique key
                                 component="li"
                                 sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
                                 {...props}
@@ -53,4 +89,4 @@ const ReuseSelect = ({ name, label, required, control, error, options }) => {
     );
 };
 
-export default ReuseSelect;
+export default ReuseMunicipality;
