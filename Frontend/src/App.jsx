@@ -11,7 +11,7 @@ const OfficeForm = lazy(()=>import('./Components/AdminPanel/OfficeForm'));
 const OfficeBranchPage = lazy(()=>import('./Components/AdminPanel/OfficeBranchPage'));
 import Navbar from './Components/Nav/Navbar';
 import ReuseTable from './Components/ReuseableComponents/ReuseTable';
-import OfficeTable from './Components/AdminPanel/OfficeTable';
+import OfficeTable from './Components/AdminPanel/User/CreateUser';
 
 
 function App() {
