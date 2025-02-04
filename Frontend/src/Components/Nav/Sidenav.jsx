@@ -198,7 +198,7 @@ export default function Sidenav() {
                 <Divider />
 
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom:5, padding:0, paddingLeft:2 }}>
+            <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom:5, padding:2, paddingLeft:2 }}>
                 <DrawerHeader />
                 <Outlet />
             </Box>

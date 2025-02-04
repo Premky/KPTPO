@@ -4,7 +4,7 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseMunicipality = ({ name, label, required, control, error }) => {
+const ReuseOffice = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
@@ -12,7 +12,7 @@ const ReuseMunicipality = ({ name, label, required, control, error }) => {
     const [formattedOptions, setFormattedOptions] = useState([]);
 
 
-    const fetchMunicipality = async () => {
+    const fetchOffice = async () => {
         try {
             const url = `${BASE_URL}/public/get_countries`;
             const response = await axios.get(url, {
@@ -40,7 +40,7 @@ const ReuseMunicipality = ({ name, label, required, control, error }) => {
     };
 
     useEffect(() => {
-        fetchMunicipality();
+        fetchOffice();
     }, []);
 
     return (
@@ -87,4 +87,4 @@ const ReuseMunicipality = ({ name, label, required, control, error }) => {
     );
 };
 
-export default ReuseMunicipality;
+export default ReuseOffice;

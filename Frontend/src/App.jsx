@@ -7,7 +7,7 @@ const Sidenav = lazy(()=>import('./Components/Nav/Sidenav'));
 const Home = lazy(()=>import('./Components/Pages/Home'));
 const About = lazy(()=>import('./Components/Pages/About'));
 const Settings = lazy(()=>import('./Components/Pages/Settings'));
-
+const OfficeForm = lazy(()=>import('./Components/AdminPanel/OfficeForm'));
 
 import Navbar from './Components/Nav/Navbar';
 
@@ -21,7 +21,7 @@ function App() {
       <Route path='/' exact element={<Sidenav/>}>
         <Route index element={<Home />} />
         <Route path='/home' element={<Home />} />
-        <Route path='/about' exact element={<About/>}></Route>
+        <Route path='/about' exact element={<OfficeForm/>}></Route>
         <Route path='/setting' exact element={<Settings/>}></Route>
       </Route>
     </Routes>
