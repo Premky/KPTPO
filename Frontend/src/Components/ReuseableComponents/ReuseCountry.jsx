@@ -8,7 +8,9 @@ const ReuseCountry = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
-    const [country, setCountry] = useState([]);
+    // State to store district options
+    const [formattedOptions, setFormattedOptions] = useState([]);
+
 
     const fetchCountry = async () => {
         try {
@@ -16,11 +18,16 @@ const ReuseCountry = ({ name, label, required, control, error }) => {
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+
             const { Status, Result, Error } = response.data;
 
             if (Status) {
-                if (Result.length > 0) {
-                    setCountry(Result);
+                if (Array.isArray(Result) && Result.length > 0) {
+                    const formatted = Result.map((opt) => ({
+                        label: opt.name_np, // Use Nepali name
+                        value: opt.id, // Use ID as value
+                    }));
+                    setFormattedOptions(formatted);
                 } else {
                     console.log('No country records found.');
                 }
@@ -49,19 +56,14 @@ const ReuseCountry = ({ name, label, required, control, error }) => {
                 render={({ field: { onChange, value, ref } }) => (
                     <Autocomplete
                         id={name}
-                        options={country.length > 0 ? country : [{ code: '', label: 'No Options Available', value: '' }]} // Use `country` state dynamically
+                        options={formattedOptions} // Use fetched districts
                         autoHighlight
-                        getOptionLabel={(option) => option.label}
-                        value={country.find((option) => option.label === value) || null}
-                        onChange={(_, newValue) => onChange(newValue ? newValue : null)}
+                        getOptionLabel={(option) => option.label || ''} // Prevents crashes if `label` is missing
+                        value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
+                        onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
                         renderOption={(props, option) => (
-                            <Box
-                                key={option.value || option.label} // Ensure unique key
-                                component="li"
-                                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                                {...props}
-                            >
+                            <Box key={option.value} component="li" {...props}>
                                 {option.label}
                             </Box>
                         )}

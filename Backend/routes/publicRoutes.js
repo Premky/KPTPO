@@ -25,9 +25,7 @@ const fy_date = fy + '-04-01'
 
 
 router.get('/get_countries', async(req, res)=>{
-    console.log('country');
-    
-    const sql = `SELECT * from country ORDER BY name_np`; 
+    const sql = `SELECT * from np_country ORDER BY name_np`; 
     try{
         const result = await query(sql);
         return res.json({Status:true, Result:result})
@@ -37,4 +35,47 @@ router.get('/get_countries', async(req, res)=>{
     }
 });
 
+router.get('/get_states', async(req, res)=>{
+    const sql = `SELECT * from np_states ORDER BY name_np`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
+
+router.get('/get_districts', async(req, res)=>{
+    const sql = `SELECT * from np_districts ORDER BY name_np`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
+
+router.get('/get_vehicles', async(req, res)=>{
+    const sql = `SELECT * from vehicles ORDER BY name_np`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
+
+router.get('/get_lisence_category', async(req, res)=>{
+    const sql = `SELECT * from lisence_category ORDER BY name_en`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
 export {router as publicRouter}

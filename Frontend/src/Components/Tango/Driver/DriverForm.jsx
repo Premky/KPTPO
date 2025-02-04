@@ -12,6 +12,8 @@ import ReuseCountry from '../../ReuseableComponents/ReuseCountry'
 import ReuseState from '../../ReuseableComponents/ReuseState'
 import ReuseDistrict from '../../ReuseableComponents/ReuseDistrict'
 import ReuseMunicipality from '../../ReuseableComponents/ReuseMunicipality'
+import ReuseVehicles from '../../ReuseableComponents/ReuseVehciles'
+import ReuseLisenceCategory from '../../ReuseableComponents/ReuseLisenceCategory'
 
 
 const DriverForm = () => {
@@ -21,11 +23,12 @@ const DriverForm = () => {
     const formattedDateNp = npToday.format('YYYY-MM-DD');
     const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
 
-    //Variables 
-    const [country, setCountry] = useState([]);
-    const [province, setProvince] = useState([]);
-    const [district, setDistrict] = useState([]);
-    const [cities, setCities] = useState([]);
+    //Required Variables 
+    const [loading, setLoading] = useState(false);
+    const [editing, setEditing] = useState(false);
+
+    //Variables
+    const [currentDriver, setCurrentDriver] = useState(null);
 
     const mentalOptions = [{ label: 'ठिक', value: '1' }, { label: 'बेठिक', value: '0' }];
     const eyeOptions = [{ label: 'देख्‍ने', value: '1' }, { label: 'नदेख्‍ने', value: '0' }];
@@ -33,26 +36,54 @@ const DriverForm = () => {
     const medicineOptions = [{ label: 'गर्ने', value: '1' }, { label: 'नगर्ने', value: '0' }];
 
     //test variables
-    const onSubmit = (data) => {
-        console.log('From Data:', data)
-    }
-    //Use Effect:
-    useEffect(() => {
+    const onFormSubmit = async (data) => {
+        setLoading(true);
+        try {
+            // const formData = new FormData();
+            // formData.append('driverphoto', data.photo[0]);
+            // Object.keys(data).forEach(key => formData.append(key, data[key]));
 
-        // fetchProvince();
-    }, []);
+            // if (data.file && data.file.length > 0) {
+            //     formData.append('file', data.file[0]);
+            // }
+            const url = editing ? `${BASE_URL}/driver/update_driver/${currentDriver.id}` : `${BASE_URL}/driver/add_driver`;
+            const method = editing ? 'PUT' : 'POST';
+            const response = await axios({
+                method, url, data: data,
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+            });
+            const { Status, Result, Error } = response.data;
+            if (Status) {
+                alert(`Record ${editing ? 'updated' : 'added'} successfylly!`);
+                reset();
+                setEditing(false);
+
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to Save',err)
+        } finally {
+            setLoading(false);
+        }
+        console.log('From Data:', data)
+    };
+    //Use Effect:
+    // useEffect(() => {
+
+
+    // }, []);
 
     return (
         <>
             <Box sx={{ flexGrow: 1 }}>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onFormSubmit)}>
                     <Grid2 container spacing={1}>
                         <Grid2 size={12}>
                             सवारी साधनको विरणः
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}> {/* Use 'xs' instead of 'size' */}
-                            <ReuseSelect
-                                name='district'
+                            <ReuseDistrict
+                                name='vehicledistrict'
                                 label='जिल्ला'
                                 required
                                 control={control}
@@ -62,12 +93,12 @@ const DriverForm = () => {
                         </Grid2>
 
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
-                                name='vehicle'
+                            <ReuseVehicles
+                                name='vehicle_name'
                                 label='सवारी साधनको नाम'
                                 required
                                 control={control}
-                                error={errors.vehicle}
+                                error={errors.vehicle_name}
                                 options={''}
                             />
                         </Grid2>
@@ -81,7 +112,7 @@ const DriverForm = () => {
                             />
                         </Grid2>
                         <Grid2 container size={{ xs: 12, sm: 6, md: 3 }}>
-                            
+
                             <Grid2 size={{ xs: 6, sm: 6 }}>
                                 <ReuseInput
                                     name='start_route'
@@ -96,7 +127,7 @@ const DriverForm = () => {
                                     name='end_route'
                                     placeholder='सम्म'
                                     control={control}
-                                    error={errors.start_route}
+                                    error={errors.end_route}
                                     label='(सम्म)'
                                 />
                             </Grid2>
@@ -109,8 +140,11 @@ const DriverForm = () => {
                             <Grid2 size={9}>
                                 <ReuseDateField
                                     name='driverdob'
-                                    control={control}
                                     label='जन्म मिति'
+                                    placeholder='YYYY-MM-DD'
+                                    control={control}
+                                    required
+                                    error={errors.driverdob}
                                 />
                             </Grid2>
                             <Grid2 size={3}>
@@ -152,7 +186,7 @@ const DriverForm = () => {
                             <ReuseMunicipality
                                 name='municipality'
                                 label='गा.पा./न.पा./उ.न.पा./म.न.पा'
-                                required
+
                                 control={control}
                                 error={errors.municipality}
 
@@ -165,12 +199,12 @@ const DriverForm = () => {
                             <ReuseInput label='बुबाको नाम' name='driverfather' control={control} error={errors.driverfather} />
                         </Grid2>
                         <Grid2 container size={{ xs: 12, sm: 6, md: 3 }}>
-                            <Grid2 size={9}>
+                            <Grid2 size={8}>
                                 <ReuseInput label='सवारी चालक प्र.प्र.नं.' name='lisence_no'
                                     control={control} error={errors.lisence_no} />
                             </Grid2>
-                            <Grid2 size={3}>
-                                <ReuseSelect
+                            <Grid2 size={4}>
+                                <ReuseLisenceCategory
                                     name='lisencecategory'
                                     label='वर्ग'
                                     required
@@ -184,7 +218,7 @@ const DriverForm = () => {
                             <ReuseInput label='नागरीकता नं.' name='driverctz_no' required control={control} error={errors.driverctz_no} />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseDistrict
                                 name='ctz_iss'
                                 label='जारी जिल्ला'
                                 required
@@ -236,9 +270,21 @@ const DriverForm = () => {
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput label='फोटो' type='file' name='driverphoto' control={control} error={errors.driverphoto} />
                         </Grid2>
-                        <Grid2 size={4}>
-                            <Button size="medium" variant="contained" type="submit">Submit</Button>
 
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+                            <ReuseInput
+                                name='remarks'
+                                label='कैफियत'
+                                control={control}
+                                error={errors.remarks}
+                            />
+                        </Grid2>
+                        <Grid2 size={12}>
+                            <Grid2 size={4}>
+                                <Button size="medium" variant="contained" type="submit">
+                                    {loading ? 'Saving...' : editing ? 'Update' : 'Add'}
+                                </Button>
+                            </Grid2>
                         </Grid2>
                     </Grid2>
                 </form>

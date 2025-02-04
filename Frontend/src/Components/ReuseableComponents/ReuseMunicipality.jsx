@@ -4,42 +4,45 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-
-const ReuseMunicipality = ({ name, label, required, control, error, options }) => {
+const ReuseCountry = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
-    const states = [
-        { code: '', label: 'No Options Available', phone: '', value: '' }
-    ];
-    options = options && options.length ? options : states;
-    const [municipality, setMunicipality] = useState([]);
-    
-    const fetchMunicipality = async () => {
+    // State to store district options
+    const [formattedOptions, setFormattedOptions] = useState([]);
+
+
+    const fetchCountry = async () => {
         try {
-            const url = `${BASE_URL}/public/get_province`;
-            const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` }, });
+            const url = `${BASE_URL}/public/get_countries`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
             const { Status, Result, Error } = response.data;
 
             if (Status) {
-                if (Result.length > 0) {
-                    console.log("ldksaf")
-                    setMunicipality(Result);
-                    options = options && options.length ? options : municipality;
+                if (Array.isArray(Result) && Result.length > 0) {
+                    const formatted = Result.map((opt) => ({
+                        label: opt.name_np, // Use Nepali name
+                        value: opt.id, // Use ID as value
+                    }));
+                    setFormattedOptions(formatted);
                 } else {
-                    console.log('Record for Province Not Found');
+                    console.log('No country records found.');
                 }
             } else {
-                console.log(Error || 'Failed to fetch Countries.')
+                console.log(Error || 'Failed to fetch countries.');
             }
         } catch (error) {
-            console.error('Error Fetching records:', error);
+            console.error('Error fetching records:', error);
         }
     };
 
     useEffect(() => {
-        fetchMunicipality();
+        fetchCountry();
     }, []);
+
     return (
         <>
             <InputLabel id={name}>
@@ -53,19 +56,14 @@ const ReuseMunicipality = ({ name, label, required, control, error, options }) =
                 render={({ field: { onChange, value, ref } }) => (
                     <Autocomplete
                         id={name}
-                        options={options}
+                        options={formattedOptions} // Use fetched districts
                         autoHighlight
-                        getOptionLabel={(option) => option.label}
-                        value={options.find((option) => option.label === value) || null}
-                        onChange={(_, newValue) => onChange(newValue ? newValue : null)}  // Passing full object
+                        getOptionLabel={(option) => option.label || ''} // Prevents crashes if `label` is missing
+                        value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
+                        onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
                         renderOption={(props, option) => (
-                            <Box
-                                key={option.value || option.label}  // Ensure unique key
-                                component="li"
-                                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                                {...props}
-                            >
+                            <Box key={option.value} component="li" {...props}>
                                 {option.label}
                             </Box>
                         )}
@@ -89,4 +87,4 @@ const ReuseMunicipality = ({ name, label, required, control, error, options }) =
     );
 };
 
-export default ReuseMunicipality;
+export default ReuseCountry;

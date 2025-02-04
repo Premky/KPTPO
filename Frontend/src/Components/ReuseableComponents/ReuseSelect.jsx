@@ -3,7 +3,11 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseSelect = ({ name, label, required, control, error, options }) => {
+const ReuseSelect = ({ name, label, required, control, error, options = [] }) => {
+    const defaultOptions = [
+        { code: '', label: 'No Options Available', phone: '', value: '' }
+    ];
+    options = options && options.length ? options : defaultOptions;
     return (
         <>
             <InputLabel id={name}>
@@ -17,10 +21,10 @@ const ReuseSelect = ({ name, label, required, control, error, options }) => {
                 render={({ field: { onChange, value, ref } }) => (
                     <Autocomplete
                         id={name}
-                        options={options}
+                        options={Array.isArray(options) ? options : []}  // Ensure options is always an array
                         autoHighlight
                         getOptionLabel={(option) => option.label}
-                        value={options.find((option) => option.value === value) || null}  // Match using value, not label
+                        value={options.find((option) => option.value === value) || null}  // Match using value
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')}  // Store only value
                         sx={{ width: '100%' }}
                         renderOption={(props, option) => (

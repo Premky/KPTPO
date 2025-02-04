@@ -4,7 +4,7 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseState = ({ name, label, required, control, error }) => {
+const ReuseVehicles = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
@@ -12,9 +12,9 @@ const ReuseState = ({ name, label, required, control, error }) => {
     const [formattedOptions, setFormattedOptions] = useState([]);
 
 
-    const fetchState = async () => {
+    const fetchVehicles = async () => {
         try {
-            const url = `${BASE_URL}/public/get_states`;
+            const url = `${BASE_URL}/public/get_vehicles`;
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -40,7 +40,7 @@ const ReuseState = ({ name, label, required, control, error }) => {
     };
 
     useEffect(() => {
-        fetchState();
+        fetchVehicles();
     }, []);
 
     return (
@@ -87,4 +87,4 @@ const ReuseState = ({ name, label, required, control, error }) => {
     );
 };
 
-export default ReuseState;
+export default ReuseVehicles;

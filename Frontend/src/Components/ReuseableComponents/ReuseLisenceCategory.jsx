@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseState = ({ name, label, required, control, error }) => {
+const ReuseLisenceCategory = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
     // State to store district options
     const [formattedOptions, setFormattedOptions] = useState([]);
 
-
-    const fetchState = async () => {
+    // Fetch district data
+    const fetchLisenceCategory = async () => {
         try {
-            const url = `${BASE_URL}/public/get_states`;
+            const url = `${BASE_URL}/public/get_lisence_category`;
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -24,15 +24,15 @@ const ReuseState = ({ name, label, required, control, error }) => {
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
                     const formatted = Result.map((opt) => ({
-                        label: opt.name_np, // Use Nepali name
+                        label: opt.name_en, // Use Nepali name
                         value: opt.id, // Use ID as value
                     }));
                     setFormattedOptions(formatted);
                 } else {
-                    console.log('No country records found.');
+                    console.log('No district records found.');
                 }
             } else {
-                console.log(Error || 'Failed to fetch countries.');
+                console.log(Error || 'Failed to fetch districts.');
             }
         } catch (error) {
             console.error('Error fetching records:', error);
@@ -40,7 +40,7 @@ const ReuseState = ({ name, label, required, control, error }) => {
     };
 
     useEffect(() => {
-        fetchState();
+        fetchLisenceCategory();
     }, []);
 
     return (
@@ -87,4 +87,4 @@ const ReuseState = ({ name, label, required, control, error }) => {
     );
 };
 
-export default ReuseState;
+export default ReuseLisenceCategory;
