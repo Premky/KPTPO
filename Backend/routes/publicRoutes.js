@@ -78,4 +78,15 @@ router.get('/get_lisence_category', async(req, res)=>{
         res.status(500).json({Status:false, Error:"Internal Server Error"})
     }
 });
+
+router.get('/get_usertypes', async(req, res)=>{
+    const sql = `SELECT * from usertypes ORDER BY id`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
 export {router as publicRouter}

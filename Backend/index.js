@@ -19,6 +19,7 @@ import errorHandler from './middlewares/errorHandler.js';
 
 import {publicRouter} from './routes/publicRoutes.js';
 import { driverRouter } from './routes/driverRoute.js';
+import { authRouter } from './routes/authRoute.js';
 
 dotenv.config();
 
@@ -67,6 +68,7 @@ app.use(express.static('Public'));
 app.use('/Uploads', express.static(path.join(__dirname, 'Public', 'Uploads')));
 
 // Routes
+app.use('/auth', authRouter);
 app.use('/public', publicRouter);
 app.use('/driver', driverRouter);
 
