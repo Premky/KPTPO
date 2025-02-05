@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Button } from "@mui/material";
 
-const ReusableTable = ({ columns, rows, height, showEdit, showDelete, onEdit, onDelete }) => {
+const ReusableTable = ({ columns, rows, height, showEdit, showDelete, onEdit, onDelete, export:enableExport }) => {
   
   // 🔹 Export to Excel
   const handleExportExcel = async () => {
@@ -42,15 +42,16 @@ const ReusableTable = ({ columns, rows, height, showEdit, showDelete, onEdit, on
 
   return (
     <div style={{ height, width: "100%" }}>
-      {/* Export Buttons */}
-      <div style={{ marginBottom: 10 }}>
-        <Button variant="contained" color="primary" onClick={handleExportExcel} style={{ marginRight: 10 }}>
-          Export to Excel
-        </Button>
-        {/* <Button variant="contained" color="secondary" onClick={handleExportPDF}>
-          Export to PDF
-        </Button> */}
-      </div>
+      {enableExport && (
+        <div style={{ marginBottom: 10 }}>
+          <Button variant="contained" color="primary" onClick={handleExportExcel} style={{ marginRight: 10 }}>
+            Export to Excel
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleExportPDF}>
+            Export to PDF
+          </Button>
+        </div>
+      )}
 
       {/* Data Table */}
       <DataGrid

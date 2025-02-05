@@ -20,6 +20,7 @@ import errorHandler from './middlewares/errorHandler.js';
 import {publicRouter} from './routes/publicRoutes.js';
 import { driverRouter } from './routes/driverRoute.js';
 import { authRouter } from './routes/authRoute.js';
+import { adminRouter } from './routes/adminRoute.js';
 
 dotenv.config();
 
@@ -34,8 +35,8 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(morgan('tiny')); // Logs HTTP requests 
 app.use(compression());
-app.use(express.urlencoded());
-app.use(bodyParser());
+// app.use(express.urlencoded());
+// app.use(bodyParser());
 
 // CORS setup
 app.use(cors({
@@ -69,6 +70,7 @@ app.use('/Uploads', express.static(path.join(__dirname, 'Public', 'Uploads')));
 
 // Routes
 app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 app.use('/public', publicRouter);
 app.use('/driver', driverRouter);
 

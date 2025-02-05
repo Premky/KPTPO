@@ -37,9 +37,17 @@ router.post("/create_user", async (req, res) => {
         const sql = `
             INSERT INTO users (name, username, usertype, password, office_id, branch_id, is_active) 
             VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        await query(sql, [name_np, username, usertype, hashedPassword, office, branch, is_active]);
+        // await query(sql, [name_np, username, usertype, hashedPassword, office, branch, is_active]);
 
-        res.status(201).json({ message: "प्रयोगकर्ता सफलतापूर्वक सिर्जना गरियो।" });
+        try {
+            const result = await query(sql,[name_np, username, usertype, hashedPassword, office, branch, is_active]);
+            return res.json({ Status: true, Result: result })
+        } catch (err) {
+            console.error("Database Query Error:", err);
+            res.status(500).json({ Status: false, Error: "Internal Server Error" })
+        }
+
+        // res.status(201).json({ message: "प्रयोगकर्ता सफलतापूर्वक सिर्जना गरियो।" });
     } catch (error) {
         console.error("User creation error:", error);
         res.status(500).json({ message: "सर्भर त्रुटि भयो।" });
@@ -50,8 +58,8 @@ router.get('/get_users', async (req, res) => {
     const sql = `SELECT 
     u.*, 
     ut.name_en AS en_usertype, 
-    o.name_np AS office, 
-    b.name_np AS branch
+    o.name_np AS office_name, 
+    b.name_np AS branch_name
     FROM 
         users u
     LEFT JOIN 
@@ -72,6 +80,32 @@ router.get('/get_users', async (req, res) => {
     }
 });
 
+router.delete('/delete_user/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log(id)
+    // Validate the ID to ensure it's a valid format (e.g., an integer)
+    if (!Number.isInteger(parseInt(id))) {
+        return res.status(400).json({ Status: false, Error: 'Invalid ID format' });
+    }
 
+    try {
+        const sql = "DELETE FROM users WHERE id = ?";
+        con.query(sql, [id], (err, result) => {
+            if (err) {
+                console.error('Database query error:', err); // Log the error for internal debugging
+                return res.status(500).json({ Status: false, Error: 'Internal server error' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ Status: false, Error: 'Record not found' });
+            }
+
+            return res.status(200).json({ Status: true, Result: result });
+        });
+    } catch (error) {
+        console.error('Unexpected error:', error); // Log unexpected errors for internal debugging
+        return res.status(500).json({ Status: false, Error: 'Unexpected error occurred' });
+    }
+});
 
 export { router as authRouter };

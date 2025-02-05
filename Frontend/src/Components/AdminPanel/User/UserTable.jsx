@@ -37,7 +37,7 @@ const UserTable = () => {
             id: index + 1,
             name: opt.name,
             username: opt.username,
-            usertype: opt.usertype,
+            usertype: opt.en_usertype,
             office_id: opt.office,
             branch_id: opt.branch,
             is_active: opt.is_active ? 'छ' : 'छैन',
@@ -89,7 +89,7 @@ const UserTable = () => {
       alert('Error deleting user');
     }
   };
-  const ram=()=>{console.log('a')}
+
 
   const deleteDialog = async (id) => {
     Swal.fire({
@@ -102,7 +102,7 @@ const UserTable = () => {
       confirmButtonText: "Yes, delete it!"
     }).then((result) => {
       if (result.isConfirmed) {
-        handleDelete();
+        handleDelete(id);
       }
     });
   }

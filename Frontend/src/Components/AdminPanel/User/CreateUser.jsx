@@ -10,6 +10,7 @@ import ReuseInput from '../../ReuseableComponents/ReuseInput';
 import ReuseOffice from '../../ReuseableComponents/ReuseOffice';
 import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
 import UserTable from './UserTable';
+import ReusableTable from '../../ReuseableComponents/ReuseTable';
 
 const CreateUser = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -30,7 +31,7 @@ const CreateUser = () => {
 
     const fetchUsertype = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/public/get_usertypes`);            
+            const response = await axios.get(`${BASE_URL}/public/get_usertypes`);
             const { Status, Result, Error } = response.data;
             if (Status) {
                 const formatted = Result.map((opt) => ({
@@ -45,11 +46,10 @@ const CreateUser = () => {
             console.error("Error fetching user types:", error);
         }
     };
-    
+
 
     const onFormSubmit = async (data) => {
         setLoading(true);
-        console.log(data)
         try {
             if (!data.password || !data.repassword || data.password !== data.repassword) {
                 Swal.fire({
@@ -62,8 +62,8 @@ const CreateUser = () => {
             const hashedPassword = sha256(data.password).toString();
             const hashedrePassword = sha256(data.repassword).toString();
             const userData = {
-                name_np: data.name_np, usertype:data.usertype,  username: data.username, password: hashedPassword,repassword:hashedrePassword,
-                office: data.office, branch:data.branch, is_active: data.is_active
+                name_np: data.name_np, usertype: data.usertype, username: data.username, password: hashedPassword, repassword: hashedrePassword,
+                office: data.office, branch: data.branch, is_active: data.is_active
             };
             const url = editing ? `${BASE_URL}/auth/update_user` : `${BASE_URL}/auth/create_user`;
             const method = editing ? 'PUT' : 'POST';
@@ -78,29 +78,145 @@ const CreateUser = () => {
             const { Status, Result, Error } = response.data;
             if (Status) {
                 Swal.fire({
-                    title: `User ${editing?'updated':'created'} successfully!`,
+                    title: `User ${editing ? 'updated' : 'created'} successfully!`,
                     icon: "success",
                     draggable: true
-                  });
-                  reset();
-                  setEditing(false);
-
+                });
+                reset();
+                setEditing(false);
+                fetchUsers();
             }
         } catch (err) {
             console.error(err);
             Swal.fire({
-                title:err.response.data.message,
-                icon:'error',
-                draggable:true
+                title: err.response.data.Error,
+                icon: 'error',
+                draggable: true
             });
         } finally {
             setLoading(false);
         }
     }
 
-    useEffect(()=>{
+    const [formattedOptions, setFormattedOptions] = useState([]);
+    const fetchUsers = async () => {
+        try {
+            const url = `${BASE_URL}/auth/get_users`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Result, Error } = response.data;
+
+            if (Status) {
+                if (Array.isArray(Result) && Result.length > 0) {
+                    const formatted = Result.map((opt, index) => ({
+                        id: index + 1,
+                        name: opt.name,
+                        username: opt.username,
+                        usertype: opt.en_usertype,
+                        office: opt.office_name,
+                        office_id: opt.office_id,
+                        branch: opt.branch_name,
+                        branch_id: opt.branch_id,
+                        is_active: opt.is_active ? 'छ' : 'छैन',
+                    }));
+                    setFormattedOptions(formatted);
+                } else {
+                    console.log('No records found.');
+                }
+            } else {
+                console.log(Error || 'Failed to fetch.');
+            }
+        } catch (error) {
+            console.error('Error fetching records:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle edit action
+    const handleEdit = (row) => {
+        console.log("Editing user:", row);
+        // You can navigate to a different page or open a modal to edit the user
+        // Example: You can pass the row data to a form for editing
+    };
+
+    // Handle delete action
+    const handleDelete = async (id) => {
+        console.log("Deleting user with id:", id);
+        try {
+            const url = `${BASE_URL}/auth/delete_user/${id}`;
+            const response = await axios.delete(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Error } = response.data;
+            if (Status) {
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "User has been deleted.",
+                    icon: "success"
+                });
+                // Refresh the table data after successful deletion
+                fetchUsers();
+            } else {
+                Swal.fire({
+                    title: "Failed to delete the user",
+                    text: Error,
+                    icon: "error"
+                });
+
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Error deleting user');
+        }
+    };
+
+    const deleteDialog = async (id) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDelete(id);
+            }
+        });
+    }
+
+    const clear = () => {
+        reset({
+            name_np: "",
+            username: "",
+            password: "",
+            repassword: "",
+            office: "",
+            branch: "",
+            is_active: "",
+            usertype: "",
+        });
+        
+    }
+    const columns = [
+        { field: "id", headerName: "सि.नं." },
+        { field: "name", headerName: "नाम" },
+        { field: "username", headerName: "प्रयोगकर्ता नाम" },
+        { field: "usertype", headerName: "प्रकार" },
+        { field: "office_id", headerName: "कार्यालय" },
+        { field: "branch_id", headerName: "शाखा" },
+        { field: "is_active", headerName: "सक्रय" },
+    ];
+
+    useEffect(() => {
         fetchUsertype();
-    },[])
+        fetchUsers();
+    }, [])
 
     return (
         <>
@@ -121,12 +237,13 @@ const CreateUser = () => {
                             <ReuseInput
                                 name='username'
                                 label='Username'
+                                length={10}
                                 control={control}
                                 error={errors.username}
                                 required
                             />
                         </Grid2>
-                        <Grid2 size={{xs:12, sm:4, md:3}}>
+                        <Grid2 size={{ xs: 12, sm: 4, md: 3 }}>
                             <ReuseSelect
                                 name='usertype'
                                 label='प्रयोगकर्ताको प्रकार'
@@ -168,7 +285,7 @@ const CreateUser = () => {
                         <Grid2 size={{ xs: 12, sm: 4, md: 3 }}>
                             <ReuseInput
                                 name='repassword'
-                                type='repassword'
+                                type='password'
                                 label='Re-Password'
                                 control={control}
                                 error={errors.repassword}
@@ -190,14 +307,22 @@ const CreateUser = () => {
                                 <Button variant='contained' type='submit'>Save</Button>
                             </Grid2>
                             <Grid2 size={{ xs: 3 }}>
-                                <Button variant='contained' color='error'>Clear</Button>
+                                <Button variant='contained' color='error' onClick={clear}>Clear</Button>
                             </Grid2>
                         </Grid2>
                     </Grid2>
                 </form>
             </Box>
             <Box>
-                <UserTable/>
+                <ReusableTable
+                    columns={columns}
+                    rows={formattedOptions}
+                    height="800"
+                    showEdit={true}
+                    showDelete={true}
+                    onEdit={handleEdit}
+                    onDelete={deleteDialog}
+                />
             </Box>
         </>
     )

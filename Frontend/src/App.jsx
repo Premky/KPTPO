@@ -12,7 +12,8 @@ const OfficeBranchPage = lazy(()=>import('./Components/AdminPanel/OfficeBranchPa
 import Navbar from './Components/Nav/Navbar';
 import ReuseTable from './Components/ReuseableComponents/ReuseTable';
 import OfficeTable from './Components/AdminPanel/User/CreateUser';
-
+import OfficeBranchForm from './Components/AdminPanel/OfficeBranchForm';
+import BranchForm from './Components/AdminPanel/BranchForm';
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/home' element={<Home />} />
         <Route path='/about' exact element={<OfficeForm/>}></Route>
-        <Route path='/setting' exact element={<OfficeTable/>}></Route>
+        <Route path='/setting' exact element={<OfficeBranchPage/>}></Route>
       </Route>
     </Routes>
     </BrowserRouter>

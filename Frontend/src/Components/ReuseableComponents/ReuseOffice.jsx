@@ -4,7 +4,7 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseOffice = ({ name, label, required, control, error, setValue }) => {
+const ReuseOffice = ({ name, label, required, control, error }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
@@ -59,18 +59,14 @@ const ReuseOffice = ({ name, label, required, control, error, setValue }) => {
                 <Controller
                     name={name}
                     control={control}
-                    render={({ field: { value, ref } }) => (
+                    render={({ field: { onChange, value, ref } }) => (
                         <Autocomplete
                             id={name}
-                            options={formattedOptions}
+                            options={formattedOptions} // Use fetched districts
                             autoHighlight
-                            getOptionLabel={(option) => option.label || ''}
-                            value={formattedOptions.find((option) => option.value === value) || null}
-                            onChange={(_, newValue) => {
-                                // Store only the value in react-hook-form
-                                setValue(name, newValue ? newValue.value : ''); // Use setValue to store the value in the form state
-                                console.log('Selected Value:', newValue ? newValue.value : ''); // Log the selected value
-                            }}
+                            getOptionLabel={(option) => option.label || ''} // Prevents crashes if `label` is missing
+                            value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
+                            onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                             sx={{ width: '100%' }}
                             renderOption={(props, option) => (
                                 <Box key={option.value} component="li" {...props}>
@@ -86,11 +82,12 @@ const ReuseOffice = ({ name, label, required, control, error, setValue }) => {
                                     fullWidth
                                     margin="normal"
                                     error={!!error}
-                                    helperText={error?.message || ''}
+                                    helperText={error?.message || ""}
                                     required={required}
                                 />
                             )}
                         />
+
                     )}
                 />
             )}
