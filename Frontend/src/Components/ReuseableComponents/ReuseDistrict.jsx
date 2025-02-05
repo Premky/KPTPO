@@ -4,12 +4,15 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseDistrict = ({ name, label, required, control, error }) => {
+const ReuseDistrict = ({ name, label, required, control, error, selectedState }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
     // State to store district options
     const [formattedOptions, setFormattedOptions] = useState([]);
+
+    const [districts, setDistricts] = useState([]);
+    const [filteredDistricts, setFilteredDistricts] = useState([]);
 
     // Fetch district data
     const fetchDistrict = async () => {
@@ -26,8 +29,9 @@ const ReuseDistrict = ({ name, label, required, control, error }) => {
                     const formatted = Result.map((opt) => ({
                         label: opt.name_np, // Use Nepali name
                         value: opt.id, // Use ID as value
+                        state_id: opt.state_id, // Store state_id to filter
                     }));
-                    setFormattedOptions(formatted);
+                    setDistricts(formatted);
                 } else {
                     console.log('No district records found.');
                 }
@@ -43,6 +47,15 @@ const ReuseDistrict = ({ name, label, required, control, error }) => {
         fetchDistrict();
     }, []);
 
+    // Filter districts when selectedState changes
+    useEffect(() => {
+        if (selectedState) {
+            setFilteredDistricts(districts.filter(d => d.state_id === selectedState));
+        } else {
+            setFilteredDistricts([]);
+        }
+    }, [selectedState, districts]);
+
     return (
         <>
             <InputLabel id={name}>
@@ -56,17 +69,17 @@ const ReuseDistrict = ({ name, label, required, control, error }) => {
                 render={({ field: { onChange, value, ref } }) => (
                     <Autocomplete
                         id={name}
-                        options={formattedOptions} // Use fetched districts
+                        options={filteredDistricts} // Use fetched districts
                         autoHighlight
                         getOptionLabel={(option) => option.label || ''} // Prevents crashes if `label` is missing
-                        value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
+                        value={filteredDistricts.find((option) => option.value === value) || null} // Ensure selected value matches
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
-                        renderOption={(props, option) => (
-                            <Box key={option.value} component="li" {...props}>
-                                {option.label}
-                            </Box>
-                        )}
+                        // renderOption={(props, option) => (
+                        //     <Box key={option.value} component="li" {...props}>
+                        //         {option.label}
+                        //     </Box>
+                        // )}
                         renderInput={(params) => (
                             <TextField
                                 {...params}

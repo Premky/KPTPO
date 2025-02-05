@@ -13,9 +13,9 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
     const [loading, setLoading] = useState(true);
 
     // Fetch office data
-    const fetchOffice = async () => {
+    const fetchOffices = async() => {
         try {
-            const url = `${BASE_URL}/public/get_countries`;
+            const url = `${BASE_URL}/admin/get_offices`;
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -24,26 +24,27 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
 
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
-                    const formatted = Result.map((opt) => ({
-                        label: opt.name_np,
-                        value: opt.id,
+                    const formatted = Result.map((opt, index) => ({
+                        id: index + 1,
+                        name_np: opt.name_np,
+                        name_en: opt.name_en,
                     }));
                     setFormattedOptions(formatted);
                 } else {
-                    console.log('No country records found.');
+                    console.log('No records found.');
                 }
             } else {
-                console.log(Error || 'Failed to fetch countries.');
+                console.log(Error || 'Failed to fetch.');
             }
         } catch (error) {
             console.error('Error fetching records:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     useEffect(() => {
-        fetchOffice();
+        fetchOffices();
     }, []);
 
     return (
@@ -68,11 +69,11 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
                             value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
                             onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                             sx={{ width: '100%' }}
-                            renderOption={(props, option) => (
-                                <Box key={option.value} component="li" {...props}>
-                                    {option.label}
-                                </Box>
-                            )}
+                            // renderOption={(props, option) => (
+                            //     <Box key={option.value} component="li" {...props}>
+                            //         {option.label}
+                            //     </Box>
+                            // )}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}

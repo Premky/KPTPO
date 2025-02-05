@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useEffect, useState, useTransition } from 'react
 import axios from 'axios'
 import { useForm, Controller } from 'react-hook-form'
 import { Box, Button, Divider, Grid2 } from '@mui/material';
-
+import Swal from 'sweetalert2';
 
 import ReuseDistrict from '../ReuseableComponents/ReuseDistrict';
 import ReuseInput from '../ReuseableComponents/ReuseInput';
@@ -10,10 +10,92 @@ import ReuseState from '../ReuseableComponents/ReuseState';
 import ReuseMunicipality from '../ReuseableComponents/ReuseMunicipality';
 import ReuseOffice from '../ReuseableComponents/ReuseOffice';
 const OfficeForm = () => {
-    const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const token = localStorage.getItem('token');
 
-    const onFormSubmit = () => {
-        console.log('submit is working')
+    //Required Variables 
+    const [loading, setLoading] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [editableData, setEditableData] = useState();
+
+
+    const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
+    const selectedState = watch("state"); // Get the selected state value
+    const selectedDistrict = watch("district"); // Get the selected district value
+
+
+    const onFormSubmit = async (data) => {
+        setLoading(true);
+        try {
+            const url = editing ? `${BASE_URL}/admin/update_office/${editableData.id}` : `${BASE_URL}/admin/add_office`;
+            const method = editing ? 'PUT' : 'POST';
+            const response = await axios({
+                method, url, data: data,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true
+            })
+            const { Status, Result, Error } = response.data;
+            // console.log(response.data.message)
+            if (Status) {
+                Swal.fire({
+                    title: `Office ${editing ? 'updated' : 'created'} successfully!`,
+                    icon: "success",
+                    draggable: true
+                });
+                reset();
+                setEditing(false);
+                fetchOffices();
+            }else{
+                Swal.fire({
+                    title: response.data.message,
+                    icon: 'error',
+                    draggable: true
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire({
+                title: err.response.message,
+                icon: 'error',
+                draggable: true
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const [office, setOffice]=useState([]);
+    const fetchOffices = async() => {
+        try {
+            const url = `${BASE_URL}/admin/get_offices`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Result, Error } = response.data;
+
+            if (Status) {
+                if (Array.isArray(Result) && Result.length > 0) {
+                    const formatted = Result.map((opt, index) => ({
+                        id: index + 1,
+                        name_np: opt.name_np,
+                        name_en: opt.name_en,
+                    }));
+                    setFormattedOptions(formatted);
+                } else {
+                    console.log('No records found.');
+                }
+            } else {
+                console.log(Error || 'Failed to fetch.');
+            }
+        } catch (error) {
+            console.error('Error fetching records:', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -59,16 +141,18 @@ const OfficeForm = () => {
                                 control={control}
                                 error={errors.district}
                                 options={''}
+                                selectedState={selectedState}
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}> {/* Use 'xs' instead of 'size' */}
                             <ReuseMunicipality
                                 required
                                 name='municipality'
-                                label='जिल्ला'
+                                label='गा.पा./न.पा./उ.न.पा./म.न.पा.'
                                 control={control}
                                 error={errors.municipality}
                                 options={''}
+                                selectedDistrict={selectedDistrict}
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
@@ -109,7 +193,7 @@ const OfficeForm = () => {
                         </Grid2>
                         <Grid2 container size={12}>
                             <Grid2 size={6}>
-                                <Button variant='contained'>Submit</Button>
+                                <Button variant='contained' type='submit'>Submit</Button>
                             </Grid2>
                             <Grid2 size={6}>
                                 <Button variant='contained' color="error">Clear</Button>

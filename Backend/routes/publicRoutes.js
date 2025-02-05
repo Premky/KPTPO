@@ -57,6 +57,17 @@ router.get('/get_districts', async(req, res)=>{
     }
 });
 
+router.get('/get_municipalities', async(req, res)=>{
+    const sql = `SELECT * from np_municipalities ORDER BY name_np`; 
+    try{
+        const result = await query(sql);
+        return res.json({Status:true, Result:result})
+    } catch(err){
+        console.error("Database Query Error:", err);
+        res.status(500).json({Status:false, Error:"Internal Server Error"})
+    }
+});
+
 router.get('/get_vehicles', async(req, res)=>{
     const sql = `SELECT * from vehicles ORDER BY name_np`; 
     try{
@@ -89,4 +100,6 @@ router.get('/get_usertypes', async(req, res)=>{
         res.status(500).json({Status:false, Error:"Internal Server Error"})
     }
 });
+
+
 export {router as publicRouter}
