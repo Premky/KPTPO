@@ -1,106 +1,74 @@
 import express from 'express';
-import con from '../utils/db.js';
-import con2 from '../utils/db2.js';
 import { promisify } from 'util';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import NepaliDate from 'nepali-datetime';
-
-import verifyToken from '../middlewares/verifyToken.js';
-// import upload from '../middlewares/upload.js';
+import con from '../utils/db.js';
+import { v2 as cloudinary } from 'cloudinary';
+import { upload, cloudinaryUpload } from '../middlewares/cloudinaryUpload.js';
+import NepaliDateConverter from 'nepali-date-converter';
 
 const router = express.Router();
 const query = promisify(con.query).bind(con);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-import NepaliDateConverter from 'nepali-date-converter';
-
-const current_date = new NepaliDate().format('YYYY-MM-DD');
-const fy = new NepaliDate().format('YYYY'); //Support for filter
-const fy_date = fy + '-04-01'
-// console.log(current_date);
-
-//image upload (Logic)
-const sanitizeFilename = (filename) => {
-    return filename.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-};
-
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        const uploadDir = 'public/Uploads';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        callback(null, uploadDir);
-    },
-    filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now();
-        const sanitizedFilename = sanitizeFilename(file.originalname);
-        callback(null, `${uniqueSuffix}_${sanitizedFilename}`);
-    }
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const upload = multer({ storage: storage });
-
-//end image upload
-
-function converttoad(bsdate) {
+// Convert BS date to AD
+function convertToAD(bsdate) {
     try {
         const dobAD = NepaliDateConverter.parse(bsdate);
         const ad = dobAD.getAD();
-        // console.log('DOB_AD', ad);
-        // Accessing year, month, and day using methods
-        const year = ad.year;
-        const month = ad.month + 1;
-        const date = ad.date;
-        const day = ad.day + 1;
-        const formattedDobAD = `${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
-        // console.log('Formatted DOB_AD:', formattedDobAD);
-        return formattedDobAD;
-    }
-    catch (err) {
+        return `${ad.year}-${(ad.month + 1).toString().padStart(2, '0')}-${ad.date.toString().padStart(2, '0')}`;
+    } catch (err) {
         console.error(err);
+        return null;
     }
 }
 
-router.post("/add_driver", upload.single("image"), async (req, res) => {
+// ADD Driver API
+router.post("/add_driver", upload.single("image"), cloudinaryUpload, async (req, res) => {
     try {
         const {
             vehicledistrict, drivername, driverdob, vehicle_no, vehicle_name, state, district,
             municipality, driverward, country, driverfather, lisence_no, lisencecategory, driverctz_no,
             ctz_iss, mentalhealth, drivereye, driverear, drivermedicine, start_route, end_route, remarks,
         } = req.body;
-        const dobad = converttoad(driverdob)
-        const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-        const created_by = '0'
+
+        const driverdobAD = convertToAD(driverdob);
+        console.log(req.file); // Cloudinary response will be available here
+
+        // Cloudinary image URL is now available as req.file.secure_url
+        const imageUrl = req.file ? req.file.secure_url : null;  // Use the secure_url from Cloudinary
+
+        const created_by = '0';
+
         const sql = `
             INSERT INTO tango_driver 
             (vehicledistrict, drivername, driverdob, driverdob_ad, vehicle_no, vehicle_name, state, district, municipality, 
             driverward, country, driverfather, lisence_no, lisencecategory, driverctz_no, ctz_iss, mentalhealth, 
-            drivereye, driverear,drivermedicine, start_route, end_route,remarks, driverphoto, created_by) 
+            drivereye, driverear, drivermedicine, start_route, end_route, remarks, driverphoto, created_by) 
             VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const values = [
-            vehicledistrict, drivername, driverdob, dobad, vehicle_no, vehicle_name, state, district, municipality,
+            vehicledistrict, drivername, driverdob, driverdobAD, vehicle_no, vehicle_name, state, district, municipality,
             driverward, country, driverfather, lisence_no, lisencecategory, driverctz_no, ctz_iss, mentalhealth,
-            drivereye, driverear, drivermedicine, start_route, end_route, remarks, imagePath, created_by
+            drivereye, driverear, drivermedicine, start_route, end_route, remarks, imageUrl, created_by
         ];
 
-        await query(sql, values);
-
-        res.json({ Status: true, message: "Driver added successfully" });
+        const result = await query(sql, values);
+        res.json({ Status: true, message: "Driver added successfully", driverId: result.insertId, imageUrl });
     } catch (error) {
         console.error("Error adding driver:", error);
         res.status(500).json({ Status: false, message: "Database error", error });
     }
 });
 
+
+
+// GET All Drivers API
 router.get("/get_drivers", async (req, res) => {
     const sql = `SELECT 
                 td.id,
@@ -135,60 +103,45 @@ router.get("/get_drivers", async (req, res) => {
     }
 });
 
-router.put("/update_driver/:id", upload.single("image"), async (req, res) => {
+
+// Update Driver API
+router.put("/update_driver/:id", upload.single("image"), cloudinaryUpload, async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params;  // Driver ID from URL params
         const {
-            drivername, driverdob, vehicle_no, vehicle_name, state, district,
-            municipality, country, driverfather, lisence_no, lisencecategory, driverctz_no,
-            ctz_iss, mentalhealth, drivereye, driverear, start_route, end_route
+            vehicledistrict, drivername, driverdob, vehicle_no, vehicle_name, state, district,
+            municipality, driverward, country, driverfather, lisence_no, lisencecategory, driverctz_no,
+            ctz_iss, mentalhealth, drivereye, driverear, drivermedicine, start_route, end_route, remarks,
         } = req.body;
 
-        let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+        const driverdobAD = convertToAD(driverdob);
+        console.log(req.file);  // Cloudinary response will be available here
 
-        // Fetch existing image path
-        const existingDriver = await query(`SELECT image FROM drivers WHERE id = ?`, [id]);
+        // Get current image URL from Cloudinary (if no new image, keep the old image URL)
+        const imageUrl = req.file ? req.file.secure_url : null;
 
-        if (!existingDriver.length) {
-            return res.status(404).json({ Status: false, message: "Driver not found" });
-        }
-
-        let oldImagePath = existingDriver[0].image;
-
-        let sql = `
-            UPDATE drivers SET
-            drivername = ?, driverdob = ?, vehicle_no = ?, vehicle_name = ?, 
-            state = ?, district = ?, municipality = ?, country = ?, driverfather = ?, 
-            lisence_no = ?, lisencecategory = ?, driverctz_no = ?, ctz_iss = ?, 
-            mentalhealth = ?, drivereye = ?, driverear = ?, start_route = ?, end_route = ?
+        const sql = `
+            UPDATE tango_driver SET
+                vehicledistrict = ?, drivername = ?, driverdob = ?, driverdob_ad = ?, vehicle_no = ?, vehicle_name = ?, 
+                state = ?, district = ?, municipality = ?, driverward = ?, country = ?, driverfather = ?, 
+                lisence_no = ?, lisencecategory = ?, driverctz_no = ?, ctz_iss = ?, mentalhealth = ?, drivereye = ?, 
+                driverear = ?, drivermedicine = ?, start_route = ?, end_route = ?, remarks = ?, driverphoto = ?
+            WHERE id = ?
         `;
 
-        let values = [
-            drivername, driverdob, vehicle_no, vehicle_name, state, district, municipality, country,
-            driverfather, lisence_no, lisencecategory, driverctz_no, ctz_iss, mentalhealth, drivereye, driverear,
-            start_route, end_route
+        const values = [
+            vehicledistrict, drivername, driverdob, driverdobAD, vehicle_no, vehicle_name, state, district, municipality,
+            driverward, country, driverfather, lisence_no, lisencecategory, driverctz_no, ctz_iss, mentalhealth,
+            drivereye, driverear, drivermedicine, start_route, end_route, remarks, imageUrl, id
         ];
 
-        // If a new image is uploaded, update the image field
-        if (imagePath) {
-            sql += ", image = ?";
-            values.push(imagePath);
-
-            // Delete old image if it exists
-            if (oldImagePath) {
-                const oldImageFullPath = path.join(__dirname, "..", "public", oldImagePath);
-                if (fs.existsSync(oldImageFullPath)) {
-                    fs.unlinkSync(oldImageFullPath);
-                }
-            }
+        const result = await query(sql, values);
+        
+        if (result.affectedRows > 0) {
+            res.json({ Status: true, message: "Driver updated successfully", driverId: id, imageUrl });
+        } else {
+            res.status(404).json({ Status: false, message: "Driver not found" });
         }
-
-        sql += " WHERE id = ?";
-        values.push(id);
-
-        await query(sql, values);
-
-        res.json({ Status: true, message: "Driver updated successfully" });
     } catch (error) {
         console.error("Error updating driver:", error);
         res.status(500).json({ Status: false, message: "Database error", error });
@@ -196,5 +149,36 @@ router.put("/update_driver/:id", upload.single("image"), async (req, res) => {
 });
 
 
+// DELETE Driver API
+router.delete("/delete_driver/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const existingDriver = await query("SELECT driverphoto FROM tango_driver WHERE id = ?", [id]);
+        
+        if (!existingDriver.length) {
+            return res.status(404).json({ Status: false, message: "Driver not found" });
+        }
 
-export { router as driverRouter }
+        // Extract the public ID from the Cloudinary URL
+        const driverPhotoUrl = existingDriver[0].driverphoto;
+        
+        if (driverPhotoUrl) {
+            const oldImagePublicId = driverPhotoUrl.split('/').pop().split('.')[0];  // Get public ID from the URL
+            
+            // Cloudinary destroy API to delete the image using the public ID
+            const result = await cloudinary.uploader.destroy(oldImagePublicId);
+            console.log("Image deleted from Cloudinary:", result);
+        }
+
+        // Delete the driver record from the database
+        await query("DELETE FROM tango_driver WHERE id = ?", [id]);
+        
+        res.json({ Status: true, message: "Driver and image deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting driver:", error);
+        res.status(500).json({ Status: false, message: "Database error", error });
+    }
+});
+
+
+export { router as driverRouter };

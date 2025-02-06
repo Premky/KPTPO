@@ -1,7 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState, useTransition } from 'react'
-import { useTheme } from '@emotion/react'
 import axios from 'axios'
-import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import NepaliDate from 'nepali-datetime'
 import { Box, Button, Divider, Grid2, InputLabel, TextField, Typography } from '@mui/material';
@@ -16,10 +14,10 @@ import ReuseDistrict from '../../ReuseableComponents/ReuseDistrict'
 import ReuseMunicipality from '../../ReuseableComponents/ReuseMunicipality'
 import ReuseVehicles from '../../ReuseableComponents/ReuseVehciles'
 import ReuseLisenceCategory from '../../ReuseableComponents/ReuseLisenceCategory'
-import DriverTable from './DriverTable'
+import ReusableTable from '../../ReuseableComponents/ReuseTable'
+import ReuseMedical from '../../ReuseableComponents/ReuseMedical';
 
-
-const DriverForm = (editableData) => {
+const DriverForm = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
@@ -55,6 +53,138 @@ const DriverForm = (editableData) => {
             reader.readAsDataURL(file);
         }
     };
+
+    const columns = [
+        { field: "sn", headerName: "सि.नं." },
+        { field: "vehicledistrict", headerName: "जिल्ला" },
+        { field: "vehicle_name", headerName: "सवारी साधन", hide: true },
+        { field: "vehicle_no", headerName: "गाडी नं." },
+        { field: "start_route", headerName: "देखी" },
+        { field: "end_route", headerName: "सम्म" },
+        { field: "drivername", headerName: "चालक" },
+        { field: "driverdob", headerName: "जन्म मिति" },
+        { field: "country", headerName: "देश" },
+        { field: "state", headerName: "प्रदेश" },
+        { field: "district", headerName: "जिल्ला" },
+        { field: "municipality", headerName: "स्थानिय तह" },
+        { field: "driverward", headerName: "वडा नं." },
+        { field: "driverfather", headerName: "चालकको बाबुको नाम" },
+        { field: "lisence_no", headerName: "स.चा. अनुमती पत्र नं." },
+        { field: "lisencecategory", headerName: "वर्ग" },
+        { field: "driverctz_no", headerName: "नागरिकता नं." },
+        { field: "ctz_iss", headerName: "जारी जिल्ला" },
+        { field: "mentalhealth", headerName: "मानसिक स्वास्थ्य" },
+        { field: "drivereye", headerName: "आँखा" },
+        { field: "driverear", headerName: "कान" },
+        { field: "drivermedicine", headerName: "औषधी सेवन कर्ता" },
+        { field: "driverphoto", headerName: "फोटो" },
+        { field: "remarks", headerName: "कैफियत" },
+    ];
+
+    const [formattedOptions, setFormattedOptions] = useState([]);
+    const fetchDrivers = async () => {
+        try {
+            const url = `${BASE_URL}/driver/get_drivers`;
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Result, Error } = response.data;
+
+            if (Status) {
+                if (Array.isArray(Result) && Result.length > 0) {
+                    setFormattedOptions(Result);
+                } else {
+                    console.log('No records found.');
+                }
+            } else {
+                console.log(Error || 'Failed to fetch.');
+            }
+        } catch (error) {
+            console.error('Error fetching records:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [editableData, setEditableData] = useState(null);
+    const handleEdit = (row) => {
+        setEditing(true)
+        // console.log("Editing row:", row);
+        const values = {
+            country: row.country_id,
+            ctz_iss: row.ctziss_id,
+            district: row.district_id,
+            driverctz_no: row.driverctz_no,
+            driverdob: row.driverdob,
+            driverear: row.driverear,
+            drivereye: row.drivereye,
+            driverfather: row.driverfather,
+            drivermedicine: row.drivermedicine,
+            drivername: row.drivername,
+            driverphoto: row.driverphoto,
+            driverward: row.driverward,
+            end_route: row.end_route,
+            id: row.id,
+            lisence_no: row.lisence_no,
+            lisencecategory: row.category_id,
+            mentalhealth: row.mentalhealth,
+            municipality: row.municipality_id,
+            remarks: row.remarks,
+            start_route: row.start_route,
+            state: row.state_id,
+            vehicle_name: row.vehiclename_id,
+            vehicle_no: row.vehicle_no,
+            vehicledistrict: row.vehicledistrict_id,
+        };
+        setEditableData(values);
+        reset(values);
+        console.log(values)
+    };
+
+    const handleDelete = async (id) => {
+        console.log("Deleting row with id:", id);
+
+        try {
+            const url = `${BASE_URL}/driver/delete_driver/${id}`;
+            const response = await axios.delete(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Error } = response.data;
+            if (Status) {
+                // alert("Driver record deleted successfully.");
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Driver record deleted successfully.",
+                    icon: "success"
+                });
+                fetchDrivers(); // Re-fetch the drivers after deletion
+            } else {
+                console.log(Error || 'Failed to delete.');
+            }
+        } catch (error) {
+            console.error('Error deleting record:', error);
+        }
+    };
+    
+
+    const deleteDialog = async (id) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDelete(id);
+            }
+        });
+    }
+
 
     const onFormSubmit = async (data) => {
         setLoading(true);
@@ -132,39 +262,12 @@ const DriverForm = (editableData) => {
         }
     };
 
-    //Use Effect:
     useEffect(() => {
-        if(editableData){
-            console.log('editiable',editableData)
-            console.log('editiable ID',editableData.id)
-            setValue('country', editableData.country_id);
-            setValue('ctz_iss', editableData.ctziss_id);
-            setValue('district', editableData.district_id);
-            setValue('driverctz_no', editableData.driverctz_no);
-            setValue('driverdob', editableData.driverdob);
-            setValue('driverear', editableData.driverear);
-            setValue('drivereye', editableData.drivereye);
-            setValue('driverfather', editableData.driverfather);
-            setValue('drivermedicine', editableData.drivermedicine);
-            setValue('drivername', editableData.drivername);
-            setValue('driverphoto', editableData.driverphoto);
-            setValue('driverward', editableData.driverward);
-            setValue('end_route', editableData.end_route);
-            setValue('id', editableData.id);
-            setValue('lisence_no', editableData.lisence_no);
-            setValue('lisencecategory', editableData.category_id);
-            setValue('mentalhealth', editableData.mentalhealth);
-            setValue('municipality', editableData.municipality_id);
-            setValue('remarks', editableData.remarks);
-            setValue('start_route', editableData.start_route);
-            setValue('state', editableData.state_id);
-            setValue('vehicle_name', editableData.vehicle_name);
-            setValue('vehicle_no', editableData.vehicle_no);
-            setValue('vehicledistrict', editableData.vehicledistrict_id);
-            setValue('vehiclename', editableData.vehiclename_id);
-        }
+        fetchDrivers();
+    }, []);
 
-    }, [editableData]);
+   
+   
 
     return (
         <>
@@ -180,7 +283,7 @@ const DriverForm = (editableData) => {
                                 label='जिल्ला'
                                 required
                                 control={control}
-                                error={errors.district}
+                                error={errors.vehicledistrict}
                                 options={''}
                             />
                         </Grid2>
@@ -322,7 +425,8 @@ const DriverForm = (editableData) => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseMedical
+                                medicaltype='mental'
                                 name='mentalhealth'
                                 label='मानसिक/शारीरिक अवस्था'
                                 required
@@ -332,17 +436,18 @@ const DriverForm = (editableData) => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseMedical
+                                medicaltype='eye'
                                 name='drivereye'
                                 label='आँखा देख्‍ने/नदेख्‍ने'
                                 required
                                 control={control}
                                 error={errors.drivereye}
-                                options={eyeOptions}
-                            />
+                                options={eyeOptions} />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseMedical
+                                medicaltype='ear'
                                 name='driverear'
                                 label='कान सुन्ने/नसुन्ने'
                                 required
@@ -352,7 +457,8 @@ const DriverForm = (editableData) => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseMedical
+                                medicaltype='medicine'
                                 name='drivermedicine'
                                 label='औषधि सेवा गर्ने/नगर्ने'
                                 required
@@ -372,7 +478,7 @@ const DriverForm = (editableData) => {
                                 rules={{ required: "फोटो आवश्यक छ" }} // Validation
                                 render={({ field: { onChange, value, ref } }) => (
                                     <input
-                                    
+
                                         type="file"
                                         accept="image/*"
                                         ref={ref}
@@ -409,9 +515,17 @@ const DriverForm = (editableData) => {
                         </Grid2>
                     </Grid2>
                 </form>
-            <Box>
-                <DriverTable/>
-            </Box>
+                <Box>
+                    <ReusableTable
+                        columns={columns}
+                        rows={formattedOptions}
+                        height="800"
+                        showEdit={true}
+                        showDelete={true}
+                        onEdit={handleEdit}
+                        onDelete={deleteDialog}
+                    />
+                </Box>
             </Box>
         </>
     )
