@@ -107,6 +107,10 @@ router.get("/get_drivers", async (req, res) => {
                 td.vehicle_no, td.start_route, td.end_route, td.drivername, td.driverdob, 
                 td.driverward, td.driverfather, td.lisence_no, td.driverctz_no, td.mentalhealth, 
                 td.drivereye, td.driverear, td.drivermedicine, td.driverphoto, td.remarks,
+                td.vehicledistrict AS vehicledistrict_id, td.vehicle_name AS vehiclename_id, 
+                td.country AS country_id, td.state AS state_id, td.district AS district_id, 
+                td.municipality AS municipality_id, td.lisencecategory AS category_id, 
+                td. ctz_iss AS ctziss_id,
                 nd1.name_np AS vehicledistrict, v.name_np AS vehicle_name, nc.name_np AS country, 
                 ns.name_np AS state, nd2.name_np AS district, nm.name_np AS municipality, 
                 lc.name_en AS lisencecategory, nd3.name_np AS ctz_iss, u.name AS created_by
@@ -124,7 +128,7 @@ router.get("/get_drivers", async (req, res) => {
                 `;
     try {
         const result = await query(sql);
-        return res.json({ Status: true, Result: result })
+        return res.json({ Status: true, Result: result, message:'Records fetched successfully.' })
     } catch (err) {
         console.error("Database Query Error:", err);
         res.status(500).json({ Status: false, Error: "Internal Server Error" })

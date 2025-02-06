@@ -19,7 +19,7 @@ import ReuseLisenceCategory from '../../ReuseableComponents/ReuseLisenceCategory
 import DriverTable from './DriverTable'
 
 
-const DriverForm = () => {
+const DriverForm = (editableData) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
@@ -132,13 +132,39 @@ const DriverForm = () => {
         }
     };
 
-    
-
     //Use Effect:
-    // useEffect(() => {
+    useEffect(() => {
+        if(editableData){
+            console.log('editiable',editableData)
+            console.log('editiable ID',editableData.id)
+            setValue('country', editableData.country_id);
+            setValue('ctz_iss', editableData.ctziss_id);
+            setValue('district', editableData.district_id);
+            setValue('driverctz_no', editableData.driverctz_no);
+            setValue('driverdob', editableData.driverdob);
+            setValue('driverear', editableData.driverear);
+            setValue('drivereye', editableData.drivereye);
+            setValue('driverfather', editableData.driverfather);
+            setValue('drivermedicine', editableData.drivermedicine);
+            setValue('drivername', editableData.drivername);
+            setValue('driverphoto', editableData.driverphoto);
+            setValue('driverward', editableData.driverward);
+            setValue('end_route', editableData.end_route);
+            setValue('id', editableData.id);
+            setValue('lisence_no', editableData.lisence_no);
+            setValue('lisencecategory', editableData.category_id);
+            setValue('mentalhealth', editableData.mentalhealth);
+            setValue('municipality', editableData.municipality_id);
+            setValue('remarks', editableData.remarks);
+            setValue('start_route', editableData.start_route);
+            setValue('state', editableData.state_id);
+            setValue('vehicle_name', editableData.vehicle_name);
+            setValue('vehicle_no', editableData.vehicle_no);
+            setValue('vehicledistrict', editableData.vehicledistrict_id);
+            setValue('vehiclename', editableData.vehiclename_id);
+        }
 
-
-    // }, []);
+    }, [editableData]);
 
     return (
         <>
@@ -346,6 +372,7 @@ const DriverForm = () => {
                                 rules={{ required: "फोटो आवश्यक छ" }} // Validation
                                 render={({ field: { onChange, value, ref } }) => (
                                     <input
+                                    
                                         type="file"
                                         accept="image/*"
                                         ref={ref}

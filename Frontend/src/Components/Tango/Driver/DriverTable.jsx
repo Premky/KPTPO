@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReusableTable from "../../ReuseableComponents/ReuseTable";
-
+import { useForm, Controller } from 'react-hook-form';
 
 const DriverTable = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
     const [formattedOptions, setFormattedOptions] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
 
     const columns = [
         { field: "sn", headerName: "सि.नं." },
@@ -46,23 +48,7 @@ const DriverTable = () => {
             const { Status, Result, Error } = response.data;
 
             if (Status) {
-                
                 if (Array.isArray(Result) && Result.length > 0) {
-                    const formatted = Result.map((opt, index) => ({
-                        id: index + 1, // Adding a unique id property
-                        sn: index + 1,
-                        country: opt.country,
-                        name_en: opt.name_en,
-
-                        state_id: opt.state_id,
-                        district_id: opt.district_id,
-                        municipality_id: opt.municipality_id,
-                        ward: opt.ward,
-                        email: opt.email,
-                        contact: opt.contact,
-                        headoffice: opt.headoffice,
-                    }));
-
                     setFormattedOptions(Result);
                 } else {
                     console.log('No records found.');
@@ -75,33 +61,136 @@ const DriverTable = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         fetchDrivers();
     }, []);
 
-    // Functions for edit and delete
-    const handleEdit = (row) => {
+    const handleEdit1 = (row) => {
         console.log("Editing row:", row);
-        // Add edit logic here
+
+        // Reset the form with the row data
+        reset({
+            country: row.country_id,
+            ctz_iss: row.ctziss_id,
+            district: row.district_id,
+            driverctz_no: row.driverctz_no,
+            driverdob: row.driverdob,
+            drivereye: row.drivereye,
+            drivermedicine: row.drivermedicine,
+            driverfather: row.driverfather,
+            drivername: row.drivername,
+            driverphoto: row.driverphoto,
+            driverward: row.driverward,
+            end_route: row.end_route,
+            id: row.id,
+            lisence_no: row.lisence_no,
+            lisencecategory: row.category_id,
+            mentalhealth: row.mentalhealth,
+            municipality: row.municipality_id,
+            remarks: row.remarks,
+            start_route: row.start_route,
+            state: row.state_id,
+            vehicle_name: row.vehicle_name,
+            vehicle_no: row.vehicle_no,
+            vehicledistrict: row.vehicledistrict_id,
+            vehiclename: row.vehiclename_id,
+        });
     };
 
-    const handleDelete = (id) => {
+    const [editableData, setEditableData] = useState(null);
+    const handleEdit = (row) => {
+        console.log("Editing row:", row);
+        console.log(row.driverctz_no)
+        const values = {
+            country: row.country_id,
+            ctz_iss: row.ctziss_id,
+            district: row.district_id,
+            driverctz_no: row.driverctz_no,
+            driverdob: row.driverdob,
+            driverear: row.driverear,
+            drivereye: row.drivereye,
+            driverfather: row.driverfather,
+            drivermedicine: row.drivermedicine,
+            drivername: row.drivername,
+            driverphoto: row.driverphoto,
+            driverward: row.driverward,
+            end_route: row.end_route,
+            id: row.id,
+            lisence_no: row.lisence_no,
+            lisencecategory: row.category_id,
+            mentalhealth: row.mentalhealth,
+            municipality: row.municipality_id,
+            remarks: row.remarks,
+            start_route: row.start_route,
+            state: row.state_id,
+            vehicle_name: row.vehicle_name,
+            vehicle_no: row.vehicle_no,
+            vehicledistrict: row.vehicledistrict_id,
+            vehiclename: row.vehiclename_id
+        };
+        setEditableData(values);
+        
+    };
+
+    const handleDelete = async (id) => {
         console.log("Deleting row with id:", id);
-        // Add delete logic here
+
+        try {
+            const url = `${BASE_URL}/driver/delete_driver/${id}`;
+            const response = await axios.delete(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Error } = response.data;
+            if (Status) {
+                alert("Driver record deleted successfully.");
+                fetchDrivers(); // Re-fetch the drivers after deletion
+            } else {
+                console.log(Error || 'Failed to delete.');
+            }
+        } catch (error) {
+            console.error('Error deleting record:', error);
+        }
+    };
+
+    const handleUpdate = async (data) => {
+        console.log("Updating driver data:", data);
+
+        try {
+            const url = `${BASE_URL}/driver/update_driver/${data.id}`;
+            const response = await axios.put(url, data, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { Status, Error } = response.data;
+            if (Status) {
+                alert("Driver record updated successfully.");
+                fetchDrivers(); // Re-fetch the drivers after update
+            } else {
+                console.log(Error || 'Failed to update.');
+            }
+        } catch (error) {
+            console.error('Error updating record:', error);
+        }
     };
 
     return (
-        <ReusableTable
-            columns={columns}
-            rows={formattedOptions}
-            height="800"
-            showEdit={true}
-            showDelete={true}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-        />
+        <div>
+            <form onSubmit={handleSubmit(handleUpdate)}>
+                {/* Form fields here for driver update */}
+                <ReusableTable
+                    columns={columns}
+                    rows={formattedOptions}
+                    height="800"
+                    showEdit={true}
+                    showDelete={true}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            </form>
+        </div>
     );
 };
 
