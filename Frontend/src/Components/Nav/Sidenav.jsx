@@ -16,8 +16,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import HomeIcon from '@mui/icons-material/Home';
+import PeopleIcon from '@mui/icons-material/People';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import BusinessIcon from '@mui/icons-material/Business';
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
@@ -115,12 +119,12 @@ export default function Sidenav() {
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar>
-                    
+
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
                         // onClick={handleDrawerOpen}
-                        onClick={()=>setOpen(!open)}
+                        onClick={() => setOpen(!open)}
                         edge="start"
                         sx={[
                             {
@@ -134,7 +138,7 @@ export default function Sidenav() {
                     {/* <Typography variant="h6" noWrap component="div">
                         Office Name
                     </Typography> */}
-                    <Navbar/>
+                    <Navbar />
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>
@@ -144,61 +148,95 @@ export default function Sidenav() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
+
                 <List>
-                    {['Home', 'About', 'Setting'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }} onClick={()=>{navigate(`/${text}`)}}>
-                            <ListItemButton
-                                sx={[
-                                    {
-                                        minHeight: 48,
-                                        px: 2.5,
-                                    },
-                                    open
-                                        ? {
-                                            justifyContent: 'initial',
-                                        }
-                                        : {
-                                            justifyContent: 'center',
-                                        },
-                                ]}
-                            >
-                                <ListItemIcon
-                                    sx={[
-                                        {
-                                            minWidth: 0,
-                                            justifyContent: 'center',
-                                        },
-                                        open
-                                            ? {
-                                                mr: 3,
-                                            }
-                                            : {
-                                                mr: 'auto',
-                                            },
-                                    ]}
-                                >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={text}
-                                    sx={[
-                                        open
-                                            ? {
-                                                opacity: 1,
-                                            }
-                                            : {
-                                                opacity: 0,
-                                            },
-                                    ]}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
+                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
+                        <ListItemButton
+                            sx={[
+                                { minHeight: 48, px: 2.5, },
+                                open ? { justifyContent: 'initial', } : {
+                                    justifyContent: 'center',
+                                },
+                            ]}>
+                            <ListItemIcon
+                                sx={[{
+                                    minWidth: 0, justifyContent: 'center',
+                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary='Home'
+                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+
+                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/users`) }}>
+                        <ListItemButton
+                            sx={[
+                                { minHeight: 48, px: 2.5, },
+                                open ? { justifyContent: 'initial', } : {
+                                    justifyContent: 'center',
+                                },
+                            ]}>
+                            <ListItemIcon
+                                sx={[{
+                                    minWidth: 0, justifyContent: 'center',
+                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
+                                <PeopleIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary='Users'
+                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+
+                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/office`) }}>
+                        <ListItemButton
+                            sx={[
+                                { minHeight: 48, px: 2.5, },
+                                open ? { justifyContent: 'initial', } : {
+                                    justifyContent: 'center',
+                                },
+                            ]}>
+                            <ListItemIcon
+                                sx={[{
+                                    minWidth: 0, justifyContent: 'center',
+                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
+                                <BusinessIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary='Office'
+                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/branch`) }}>
+                        <ListItemButton
+                            sx={[
+                                { minHeight: 48, px: 2.5, },
+                                open ? { justifyContent: 'initial', } : {
+                                    justifyContent: 'center',
+                                },
+                            ]}>
+                            <ListItemIcon
+                                sx={[{
+                                    minWidth: 0, justifyContent: 'center',
+                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
+                                <RoomPreferencesIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary='Branch'
+                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
                 </List>
                 <Divider />
 
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom:5, padding:2, paddingLeft:2 }}>
+            <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom: 5, padding: 2, paddingLeft: 2 }}>
                 <DrawerHeader />
                 <Outlet />
             </Box>
