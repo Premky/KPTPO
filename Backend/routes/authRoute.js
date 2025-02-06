@@ -64,7 +64,7 @@ router.get('/get_users', async (req, res) => {
         users u
     LEFT JOIN 
         usertypes ut ON u.usertype = ut.id
-    LEFT JOIN 
+    LEFT JOIN cd
         office o ON u.office_id = o.id
     LEFT JOIN 
         branch b ON u.branch_id = b.id

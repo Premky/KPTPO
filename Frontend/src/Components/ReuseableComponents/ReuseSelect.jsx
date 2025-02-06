@@ -27,16 +27,16 @@ const ReuseSelect = ({ name, label, required, control, error, options = [] }) =>
                         value={options.find((option) => option.value === value) || null}  // Match using value
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')}  // Store only value
                         sx={{ width: '100%' }}
-                        renderOption={(props, option) => (
-                            <Box
-                                key={option.value}  // Ensure unique key
-                                component="li"
-                                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                                {...props}
-                            >
-                                {option.label}
-                            </Box>
-                        )}
+                        // renderOption={(props, option) => (
+                        //     <Box
+                        //         key={option.value}  // Ensure unique key
+                        //         component="li"
+                        //         sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
+                        //         {...props}
+                        //     >
+                        //         {option.label}
+                        //     </Box>
+                        // )}
                         renderInput={(params) => (
                             <TextField
                                 {...params}

@@ -4,7 +4,7 @@ import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
-const ReuseCountry = ({ name, label, required, control, error }) => {
+const ReuseCountry = ({ name, label, required, control, error, defaultvalue }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
 
@@ -62,11 +62,11 @@ const ReuseCountry = ({ name, label, required, control, error }) => {
                         value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
-                        renderOption={(props, option) => (
-                            <Box key={option.value} component="li" {...props}>
-                                {option.label}
-                            </Box>
-                        )}
+                        // renderOption={(props, option) => (
+                        //     <Box key={option.value} component="li" {...props}>
+                        //         {option.label}
+                        //     </Box>
+                        // )}
                         renderInput={(params) => (
                             <TextField
                                 {...params}

@@ -4,12 +4,12 @@ import { useForm, Controller } from 'react-hook-form'
 import { Box, Button, Divider, Grid2 } from '@mui/material';
 import Swal from 'sweetalert2'
 
-import ReuseDistrict from '../ReuseableComponents/ReuseDistrict';
-import ReuseInput from '../ReuseableComponents/ReuseInput';
-import ReuseState from '../ReuseableComponents/ReuseState';
-import ReuseMunicipality from '../ReuseableComponents/ReuseMunicipality';
-import ReuseOffice from '../ReuseableComponents/ReuseOffice';
-import ReusableTable from '../ReuseableComponents/ReuseTable';
+import ReuseDistrict from '../../ReuseableComponents/ReuseDistrict';
+import ReuseInput from '../../ReuseableComponents/ReuseInput';
+import ReuseState from '../../ReuseableComponents/ReuseState';
+import ReuseMunicipality from '../../ReuseableComponents/ReuseMunicipality';
+import ReuseOffice from '../../ReuseableComponents/ReuseOffice';
+import ReusableTable from '../../ReuseableComponents/ReuseTable';
 
 
 const BranchForm = () => {

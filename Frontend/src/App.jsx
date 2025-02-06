@@ -7,13 +7,13 @@ const Sidenav = lazy(()=>import('./Components/Nav/Sidenav'));
 const Home = lazy(()=>import('./Components/Pages/Home'));
 const About = lazy(()=>import('./Components/Pages/About'));
 const Settings = lazy(()=>import('./Components/Pages/Settings'));
-const OfficeForm = lazy(()=>import('./Components/AdminPanel/OfficeForm'));
-const OfficeBranchPage = lazy(()=>import('./Components/AdminPanel/OfficeBranchPage'));
+const OfficeForm = lazy(()=>import('./Components/AdminPanel/Office/OfficeForm'));
+const OfficeBranchPage = lazy(()=>import('./Components/AdminPanel/Office/OfficeBranchPage'));
 import Navbar from './Components/Nav/Navbar';
 import ReuseTable from './Components/ReuseableComponents/ReuseTable';
 import OfficeTable from './Components/AdminPanel/User/CreateUser';
-import OfficeBranchForm from './Components/AdminPanel/OfficeBranchForm';
-import BranchForm from './Components/AdminPanel/BranchForm';
+import OfficeBranchForm from './Components/AdminPanel/Office/OfficeBranchForm';
+import BranchForm from './Components/AdminPanel/Office/BranchForm';
 
 function App() {
   return (

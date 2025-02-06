@@ -62,11 +62,11 @@ const ReuseVehicles = ({ name, label, required, control, error }) => {
                         value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
-                        renderOption={(props, option) => (
-                            <Box key={option.value} component="li" {...props}>
-                                {option.label}
-                            </Box>
-                        )}
+                        // renderOption={(props, option) => (
+                        //     <Box key={option.value} component="li" {...props}>
+                        //         {option.label}
+                        //     </Box>
+                        // )}
                         renderInput={(params) => (
                             <TextField
                                 {...params}

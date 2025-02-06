@@ -13,7 +13,7 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
     const [loading, setLoading] = useState(true);
 
     // Fetch office data
-    const fetchOffices = async() => {
+    const fetchOffices = async () => {
         try {
             const url = `${BASE_URL}/admin/get_offices`;
             const response = await axios.get(url, {
@@ -25,9 +25,9 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
                     const formatted = Result.map((opt, index) => ({
-                        id: index + 1,
-                        name_np: opt.name_np,
-                        name_en: opt.name_en,
+                        sn: index + 1,
+                        label: opt.name_np,
+                        value: opt.id,
                     }));
                     setFormattedOptions(formatted);
                 } else {
@@ -76,6 +76,7 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
                             // )}
                             renderInput={(params) => (
                                 <TextField
+                                    defaultValue=''
                                     {...params}
                                     inputRef={ref}
                                     variant="outlined"

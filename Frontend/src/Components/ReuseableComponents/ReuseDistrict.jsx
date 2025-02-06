@@ -52,7 +52,7 @@ const ReuseDistrict = ({ name, label, required, control, error, selectedState })
         if (selectedState) {
             setFilteredDistricts(districts.filter(d => d.state_id === selectedState));
         } else {
-            setFilteredDistricts([]);
+            setFilteredDistricts(districts);
         }
     }, [selectedState, districts]);
 

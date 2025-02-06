@@ -4,7 +4,9 @@ import axios from 'axios'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import NepaliDate from 'nepali-datetime'
-import { Box, Button, Divider, Grid2 } from '@mui/material';
+import { Box, Button, Divider, Grid2, InputLabel, TextField, Typography } from '@mui/material';
+import Swal from 'sweetalert2'
+
 import ReuseInput from '../../ReuseableComponents/ReuseInput'
 import ReuseSelect from '../../ReuseableComponents/ReuseSelect'
 import ReuseDateField from '../../ReuseableComponents/ReuseDateField'
@@ -14,6 +16,7 @@ import ReuseDistrict from '../../ReuseableComponents/ReuseDistrict'
 import ReuseMunicipality from '../../ReuseableComponents/ReuseMunicipality'
 import ReuseVehicles from '../../ReuseableComponents/ReuseVehciles'
 import ReuseLisenceCategory from '../../ReuseableComponents/ReuseLisenceCategory'
+import DriverTable from './DriverTable'
 
 
 const DriverForm = () => {
@@ -34,39 +37,103 @@ const DriverForm = () => {
     const eyeOptions = [{ label: 'देख्‍ने', value: '1' }, { label: 'नदेख्‍ने', value: '0' }];
     const earOptions = [{ label: 'सुन्ने', value: '1' }, { label: 'नसुन्ने', value: '0' }];
     const medicineOptions = [{ label: 'गर्ने', value: '1' }, { label: 'नगर्ने', value: '0' }];
+    const selectedState = watch("state"); // Get the selected state value
+    const selectedDistrict = watch("district"); // Get the selected district value
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
-    //test variables
+
+    const handleImageChange = (event) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log(file)
+            setSelectedImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const onFormSubmit = async (data) => {
         setLoading(true);
         try {
-            // const formData = new FormData();
-            // formData.append('driverphoto', data.photo[0]);
-            // Object.keys(data).forEach(key => formData.append(key, data[key]));
-
-            // if (data.file && data.file.length > 0) {
-            //     formData.append('file', data.file[0]);
+            const formData = new FormData();
+            formData.append("vehicledistrict", data.vehicledistrict);
+            formData.append("drivername", data.drivername);
+            formData.append("driverdob", data.driverdob);
+            formData.append("driverage", data.driverage);
+            formData.append("vehicle_no", data.vehicle_no);
+            formData.append("vehicle_name", data.vehicle_name);
+            formData.append("state", data.state);
+            formData.append("district", data.district);
+            formData.append("municipality", data.municipality);
+            formData.append("driverward", data.driverward);
+            formData.append("country", data.country);
+            formData.append("driverfather", data.driverfather);
+            formData.append("lisence_no", data.lisence_no);
+            formData.append("lisencecategory", data.lisencecategory);
+            formData.append("driverctz_no", data.driverctz_no);
+            formData.append("ctz_iss", data.ctz_iss);
+            formData.append("mentalhealth", data.mentalhealth);
+            formData.append("drivereye", data.drivereye);
+            formData.append("driverear", data.driverear);
+            formData.append("drivermedicine", data.drivermedicine);
+            formData.append("start_route", data.start_route);
+            formData.append("end_route", data.end_route);
+            formData.append("remarks", data.remarks);
+            formData.append("image", selectedImage)
+            console.log(selectedImage)
+            // Append the image if it exists
+            // if (data.driverphoto) {
+            //     formData.append("image", data.driverphoto);
             // }
-            const url = editing ? `${BASE_URL}/driver/update_driver/${currentDriver.id}` : `${BASE_URL}/driver/add_driver`;
-            const method = editing ? 'PUT' : 'POST';
+
+            const url = editing ? `${BASE_URL}/driver/update_driver/${data.id}` : `${BASE_URL}/driver/add_driver`;
+            const method = editing ? "PUT" : "POST";
+
             const response = await axios({
-                method, url, data: data,
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+                method,
+                url,
+                data: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true
             });
-            const { Status, Result, Error } = response.data;
-            if (Status) {
-                alert(`Record ${editing ? 'updated' : 'added'} successfylly!`);
+
+            if (response.data.Status) {
+                Swal.fire({
+                    title: `Driver ${editing ? "updated" : "added"} successfully!`,
+                    icon: "success",
+                    draggable: true
+                });
                 reset();
                 setEditing(false);
-
+                fetchDrivers(); // Refresh the driver list
+            } else {
+                Swal.fire({
+                    title: response.data.message,
+                    icon: "error",
+                    draggable: true
+                });
             }
         } catch (err) {
-            console.error(err);
-            alert('Failed to Save',err)
+            console.log(err)
+            Swal.fire({
+                title: err.response?.data?.message || "An error occurred",
+                icon: "error",
+                draggable: true
+            });
         } finally {
             setLoading(false);
         }
-        console.log('From Data:', data)
     };
+
+    
+
     //Use Effect:
     // useEffect(() => {
 
@@ -179,17 +246,18 @@ const DriverForm = () => {
                                 required
                                 control={control}
                                 error={errors.district}
-
+                                selectedState={selectedState}
                             />
                         </Grid2>
-                        <Grid2 size={{ xs: 6, sm: 6, md: 3 }}>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}> {/* Use 'xs' instead of 'size' */}
                             <ReuseMunicipality
+                                required
                                 name='municipality'
-                                label='गा.पा./न.पा./उ.न.पा./म.न.पा'
-
+                                label='गा.पा./न.पा./उ.न.पा./म.न.पा.'
                                 control={control}
                                 error={errors.municipality}
-
+                                options={''}
+                                selectedDistrict={selectedDistrict}
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
@@ -268,8 +336,34 @@ const DriverForm = () => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseInput label='फोटो' type='file' name='driverphoto' control={control} error={errors.driverphoto} />
+                            <InputLabel id="driverphoto">
+                                चालकको फोटो <span style={{ color: "red" }}>*</span>
+                            </InputLabel>
+
+                            <Controller
+                                name="driverphoto"
+                                control={control}
+                                rules={{ required: "फोटो आवश्यक छ" }} // Validation
+                                render={({ field: { onChange, value, ref } }) => (
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={ref}
+                                        onChange={(e) => {
+                                            onChange(e.target.files[0]); // Store file in react-hook-form
+                                            handleImageChange(e); // Call your custom function
+                                        }}
+                                        style={{ display: "block", marginTop: "8px" }}
+                                    />
+                                )}
+                            />
+                            {errors.driverphoto && (
+                                <Typography color="error" variant="caption">
+                                    {errors.driverphoto.message}
+                                </Typography>
+                            )}
                         </Grid2>
+
 
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput
@@ -288,6 +382,9 @@ const DriverForm = () => {
                         </Grid2>
                     </Grid2>
                 </form>
+            <Box>
+                <DriverTable/>
+            </Box>
             </Box>
         </>
     )

@@ -4,11 +4,12 @@ import { useForm, Controller } from 'react-hook-form'
 import { Box, Button, Divider, Grid2 } from '@mui/material';
 import Swal from 'sweetalert2';
 
-import ReuseDistrict from '../ReuseableComponents/ReuseDistrict';
-import ReuseInput from '../ReuseableComponents/ReuseInput';
-import ReuseState from '../ReuseableComponents/ReuseState';
-import ReuseMunicipality from '../ReuseableComponents/ReuseMunicipality';
-import ReuseOffice from '../ReuseableComponents/ReuseOffice';
+import ReuseDistrict from '../../ReuseableComponents/ReuseDistrict';
+import ReuseInput from '../../ReuseableComponents/ReuseInput';
+import ReuseState from '../../ReuseableComponents/ReuseState';
+import ReuseMunicipality from '../../ReuseableComponents/ReuseMunicipality';
+import ReuseOffice from '../../ReuseableComponents/ReuseOffice';
+import OfficeTable from './OfficeTable';
 const OfficeForm = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const token = localStorage.getItem('token');
@@ -27,6 +28,7 @@ const OfficeForm = () => {
     const onFormSubmit = async (data) => {
         setLoading(true);
         try {
+            console.log(data)
             const url = editing ? `${BASE_URL}/admin/update_office/${editableData.id}` : `${BASE_URL}/admin/add_office`;
             const method = editing ? 'PUT' : 'POST';
             const response = await axios({
@@ -201,6 +203,9 @@ const OfficeForm = () => {
                         </Grid2>
                     </Grid2>
                 </form>
+            </Box>
+            <Box>
+                <OfficeTable/>
             </Box>
         </>
     )
