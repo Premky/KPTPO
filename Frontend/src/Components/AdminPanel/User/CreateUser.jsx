@@ -11,6 +11,7 @@ import ReuseOffice from '../../ReuseableComponents/ReuseOffice';
 import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
 import UserTable from './UserTable';
 import ReusableTable from '../../ReuseableComponents/ReuseTable';
+import ReuseBranch from '../../ReuseableComponents/ReuseBranch';
 
 const CreateUser = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -59,10 +60,9 @@ const CreateUser = () => {
                 });
                 return;
             }
-            const hashedPassword = sha256(data.password).toString();
-            const hashedrePassword = sha256(data.repassword).toString();
+
             const userData = {
-                name_np: data.name_np, usertype: data.usertype, username: data.username, password: hashedPassword, repassword: hashedrePassword,
+                name_np: data.name_np, usertype: data.usertype, username: data.username, password: data.password, repassword: data.repassword,
                 office: data.office, branch: data.branch, is_active: data.is_active
             };
             const url = editing ? `${BASE_URL}/auth/update_user` : `${BASE_URL}/auth/create_user`;
@@ -263,7 +263,7 @@ const CreateUser = () => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 4, md: 3 }}>
-                            <ReuseSelect
+                            <ReuseBranch
                                 name='branch'
                                 label='शाखा'
                                 control={control}

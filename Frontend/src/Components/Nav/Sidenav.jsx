@@ -150,27 +150,6 @@ export default function Sidenav() {
                 <Divider />
 
                 <List>
-                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
-                        <ListItemButton
-                            sx={[
-                                { minHeight: 48, px: 2.5, },
-                                open ? { justifyContent: 'initial', } : {
-                                    justifyContent: 'center',
-                                },
-                            ]}>
-                            <ListItemIcon
-                                sx={[{
-                                    minWidth: 0, justifyContent: 'center',
-                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
-                                <HomeIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary='Home'
-                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-
                     <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/users`) }}>
                         <ListItemButton
                             sx={[
@@ -234,7 +213,30 @@ export default function Sidenav() {
                     </ListItem>
                 </List>
                 <Divider />
-
+                <List>
+                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
+                        <ListItemButton
+                            sx={[
+                                { minHeight: 48, px: 2.5, },
+                                open ? { justifyContent: 'initial', } : {
+                                    justifyContent: 'center',
+                                },
+                            ]}>
+                            <ListItemIcon
+                                sx={[{
+                                    minWidth: 0, justifyContent: 'center',
+                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary='Home'
+                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+                <Divider />
+                
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom: 5, padding: 2, paddingLeft: 2 }}>
                 <DrawerHeader />
