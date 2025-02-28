@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from './middlewares/AuthContext';
+import { useAuth } from '../../Context/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 
 import sha256 from "crypto-js/sha256";
@@ -16,14 +16,14 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Button } from '@mui/material';
-import { set } from 'react-hook-form';
 import Swal from 'sweetalert2';
 //Close Item from MaterialUI
 
 // import './LoginStyle.css'
 
 const Login = (onLogin) => {
-    const {token, setToken} = useAuth();
+    // const {token, setToken} = useAuth();
+    const {dispatch} = useAuth();
     const BASE_URL = import.meta.env.VITE_API_BASE_URL
     const navigate = useNavigate();
 
@@ -54,14 +54,22 @@ const Login = (onLogin) => {
             Swal.showLoading(Swal.getDenyButton());
             if (response.data.loginStatus) {
                 // Save necessary data in localStorage
-                setToken(response.data.token);
+                // setToken(response.data.token);
                 // localStorage.setItem("token", response.data.token);
-                localStorage.setItem("valid", true);
-                localStorage.setItem("type", response.data.usertype);
-                localStorage.setItem("branch", response.data.branch);
-                localStorage.setItem("office_np", response.data.office_np);
-                localStorage.setItem("office_id", response.data.office_id);
-                localStorage.setItem("main_office_id", response.data.main_office_id);
+                console.log(response.data);
+                dispatch({
+                    type: "LOGIN",
+                    payload: {
+                        user: response.data.username,
+                        token: response.data.token,
+                        role: response.data.usertype,
+                        office_np: response.data.office_np,
+                        branch_np: response.data.branch,
+                        office_id: response.data.office_id,
+                        main_office_id: response.data.main_office_id,
+                        valid: response.data.loginStatus,
+                    },
+                });
                 // Redirect to home page
                 Swal.fire({
                     title: "Login Success",
@@ -70,9 +78,9 @@ const Login = (onLogin) => {
                     timer: 2000,
                     showConfirmButton: false
                 });
-                navigate('/sadmin');
+                navigate('/home');
             } else {
-                setError(response.data.Error);
+                Swal.fire({ title: "Login Failed", text: response.data.error, icon: "error" });
             }
         } catch (err) {            
             console.error("Login Error:", err);

@@ -127,87 +127,102 @@ const fetchUserQuery = `
 `;
 
 // Route to login
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    // const password = hashedPasswordpassword;
-    // console.log('username:',username,'password:',password)
+// const password = hashedPasswordpassword;
+// console.log('username:',username,'password:',password)
 
-    //Validte input
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    // Validate input
     const validation = validateLoginInput(username, password);
     if (!validation.isValid) {
         return res.status(400).json({ loginStatus: false, Error: validation.message });
     }
 
     try {
-        //Query database for user
-        con.query(fetchUserQuery, [username], (err, result) => {
+        // Query database for user
+        con.query(fetchUserQuery, [username], async (err, result) => {
             if (err) {
-                console.log("Database error:", err);
+                console.error("Database error:", err);
                 return res.status(500).json({ loginStatus: false, Error: "Database error" });
             }
+
             if (result.length === 0) {
-                return res.status(401).json({ loginStatus: false, Error: "Invalid username" })
+                return res.status(401).json({ loginStatus: false, Error: "Invalid username or password" });
             }
+
             const user = result[0];
-            // console.log(user);
-            //Compare password
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if (err) {
-                    console.error("Password matching error:", err);
-                    return res.status(500).json({ loginStatus: false, Error: "Server Error" });
-                }
 
-                if (!isMatch) {
-                    return res.status(401).json({ loginStatus: false, Error: "Invalid Username or Password" })
-                }
+            // Compare password
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ loginStatus: false, Error: "Invalid username or password" });
+            }
 
-                //Generate JWT token
-                const token = jwt.sign({
-                    uid: user.uid,
-                    role: user.usertype,
-                    username: user.username,
-                    office: user.office_id,
-                    // main_office: user.main_office_id,
-                    branch: user.branch
-                },
-                    process.env.JWT_SECRET,
-                    { expiresIn: '3d' }
-                );
-                //Send response with token and user details
-                res.cookie('token', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'none',
-                    path: '/',
-                    maxAge: 3 * 24 * 60 * 60 * 1000, // Expire after 3 days
-                });
+            // Generate JWT token
+            const token = jwt.sign({
+                uid: user.uid,
+                role: user.role_en,
+                username: user.username,
+                office: user.office_id,
+                branch: user.branch
+            },
+                process.env.JWT_SECRET,
+                { expiresIn: '3d' }
+            );
 
-                // console.log(user.branch_name)
-                return res.json({
-                    loginStatus: true,
-                    token,
-                    username: user.username,
-                    branch: user.branch_name,
-                    usertype: user.usertype,
-                    office_np: user.office_name,
-                    office_id: user.office_id,
-                    main_office_id: user.main_office_id,
-                });
+            // Set token in HTTP-only cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+            });
+
+            // Send user details (without token)
+            return res.json({
+                loginStatus: true,
+                username: user.username,
+                branch: user.branch_name,
+                usertype: user.role_en,
+                office_np: user.office_name,
+                office_id: user.office_id,
+                main_office_id: user.main_office_id,
             });
         });
+
     } catch (err) {
         console.error("Unexpected error:", err);
         return res.status(500).json({ loginStatus: false, Error: "Server error" });
     }
 });
 
+
 router.post('/logout', (req, res) => {
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: true, // Set to true in production
-        sameSite: 'strict',
-    });
-    res.json({ logoutStatus: true, message: 'Logged out successfully' });
+    console.log('Logging out');
+    try {
+        res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'Strict' });
+        return res.status(200).json({ success: true, message: 'Logout successful' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Logout failed' });
+    }
+});
+
+router.get('/session', (req, res) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'No active session' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        res.status(200).json({ success: true, role: decoded.role, 
+                                token, user: decoded.username, office_id:decoded.office });
+    } catch (error) {
+        res.status(401).json({ success: false, message: 'Invalid session' });
+    }
 });
 
 

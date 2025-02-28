@@ -18,13 +18,14 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import BusinessIcon from '@mui/icons-material/Business';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
+import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { useAuth } from '../../Context/AuthContext';
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -53,7 +54,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
 }));
 
@@ -102,10 +102,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
                 },
             },
         ],
-    }),
+    })
 );
 
 export default function Sidenav() {
+    const { state } = useAuth();
+    const currentRole = state.role;
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const navigate = useNavigate();
@@ -119,11 +121,9 @@ export default function Sidenav() {
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar>
-
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
-                        // onClick={handleDrawerOpen}
                         onClick={() => setOpen(!open)}
                         edge="start"
                         sx={[
@@ -135,9 +135,6 @@ export default function Sidenav() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    {/* <Typography variant="h6" noWrap component="div">
-                        Office Name
-                    </Typography> */}
                     <Navbar />
                 </Toolbar>
             </AppBar>
@@ -148,95 +145,66 @@ export default function Sidenav() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
+                {currentRole === "Superuser" && (
+                    <>
+                        <List>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/users`) }}>
+                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                        <PeopleIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
 
-                <List>
-                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/users`) }}>
-                        <ListItemButton
-                            sx={[
-                                { minHeight: 48, px: 2.5, },
-                                open ? { justifyContent: 'initial', } : {
-                                    justifyContent: 'center',
-                                },
-                            ]}>
-                            <ListItemIcon
-                                sx={[{
-                                    minWidth: 0, justifyContent: 'center',
-                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
-                                <PeopleIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary='Users'
-                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
-                            />
-                        </ListItemButton>
-                    </ListItem>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/office`) }}>
+                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                        <BusinessIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Office" sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
 
-                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/office`) }}>
-                        <ListItemButton
-                            sx={[
-                                { minHeight: 48, px: 2.5, },
-                                open ? { justifyContent: 'initial', } : {
-                                    justifyContent: 'center',
-                                },
-                            ]}>
-                            <ListItemIcon
-                                sx={[{
-                                    minWidth: 0, justifyContent: 'center',
-                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
-                                <BusinessIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary='Office'
-                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/branch`) }}>
-                        <ListItemButton
-                            sx={[
-                                { minHeight: 48, px: 2.5, },
-                                open ? { justifyContent: 'initial', } : {
-                                    justifyContent: 'center',
-                                },
-                            ]}>
-                            <ListItemIcon
-                                sx={[{
-                                    minWidth: 0, justifyContent: 'center',
-                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
-                                <RoomPreferencesIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary='Branch'
-                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/branch`) }}>
+                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                        <RoomPreferencesIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Branch" sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </>
+                )}
                 <Divider />
-                <List>
-                    <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
-                        <ListItemButton
-                            sx={[
-                                { minHeight: 48, px: 2.5, },
-                                open ? { justifyContent: 'initial', } : {
-                                    justifyContent: 'center',
-                                },
-                            ]}>
-                            <ListItemIcon
-                                sx={[{
-                                    minWidth: 0, justifyContent: 'center',
-                                }, open ? { mr: 3, } : { mr: 'auto', },]}>
-                                <HomeIcon />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary='Home'
-                                sx={[open ? { opacity: 1, } : { opacity: 0, },]}
-                            />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                {currentRole === "Admin" || currentRole === "Superuser" && (
+                    <>
+                        <List>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
+                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                        <AirportShuttleIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Vehicle & Driver" sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </>
+                )}
                 <Divider />
-                
+                {currentRole === "User" || currentRole === "Admin" || currentRole === "Superuser" && (
+                    <List>
+                        <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/userpage`) }}>
+                            <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                    <HomeIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                )}
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom: 5, padding: 2, paddingLeft: 2 }}>
                 <DrawerHeader />

@@ -14,9 +14,9 @@ const SuperAdmin = () => {
     if (!state.valid) return <Navigate to="/login" replace />;
 
     // Redirect if user is not Superuser
-    if (userRole !== "Superuser") return <Navigate to="/login" replace />;
+    if (userRole == "Admin" || userRole == "Superuser") return <Outlet /> ;
 
-    return <Outlet />;
+    return <Navigate to="/login" replace />;
 };
 
 export default SuperAdmin;

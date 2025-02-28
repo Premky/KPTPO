@@ -13,13 +13,19 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { useAuth } from '../../Context/AuthContext';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
+import Logout from '../Auth/Logout';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Navbar() {
+  const { dispatch } = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,13 +42,32 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
+  const handleLogout = async() => {
+    
+    console.log("Logged out");
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
+        withCredentials: true, // Ensures token is sent in cookies
+      });
+      console.log(response);
+      if (response.data.success) {
+        dispatch({ type: "LOGOUT" });
+      }
+      navigate('/login');
+    } catch (error) {
+      console.error("Session fetch failed:", error);
+    }
+    // handleCloseUserMenu();
+  };
+  
   return (
     <AppBar position="static" >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          
+
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'block' } }}>
-          <IconButton
+            <IconButton
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -52,26 +77,26 @@ function Navbar() {
             >
               <MenuIcon />
             </IconButton>
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            Office Name
-          </Typography>
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'flex', md: 'none' },
+                flexGrow: 1,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              Office Name
+            </Typography>
 
-            
+
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -95,8 +120,8 @@ function Navbar() {
               ))}
             </Menu>
           </Box>
-          
-          
+
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
@@ -130,11 +155,14 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
+              <MenuItem onClick={handleCloseUserMenu}>
+                <Typography sx={{ textAlign: 'center' }} ><Logout/></Typography>
+              </MenuItem>
+              {/* {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
-              ))}
+              ))} */}
             </Menu>
           </Box>
         </Toolbar>

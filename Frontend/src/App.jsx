@@ -1,6 +1,8 @@
 import { useState, Suspense, lazy } from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import { Atom } from 'react-loading-indicators';
+import { AuthProvider } from './Context/AuthContext';
+import ProtectedRoute from './Context/ProtectedRoute';
+// import { Atom } from 'react-atomic-molecule';
 //For Components
 
 const Login = lazy(() => import('./Components/Auth/Login'));
@@ -19,43 +21,56 @@ const Office = lazy(() => import('./Components/AdminPanel/Office/OfficeForm'));
 import Navbar from './Components/Nav/Navbar';
 import OfficeBranchForm from './Components/AdminPanel/Office/OfficeBranchForm';
 import BranchForm from './Components/AdminPanel/Office/BranchForm';
-import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
-import LoggedIn from './Components/Auth/middlewares/loggedIn';
 const DriverForm = lazy(() => import('./Components/Tango/Driver/DriverForm'));
+
+import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
+import AdminCheck from './Components/Auth/middlewares/AdminCheck';
+import UserCheck from './Components/Auth/middlewares/UserCheck';
+import LoggedIn from './Components/Auth/middlewares/loggedIn';
 
 function App() {
   return (
     <>
-      <Suspense fallback={<div><Atom color="#3184cc" size="medium" text="" textColor="#0640ff" /></div>}>
+      <Suspense fallback={
+        <div>
+          {/* <Atom color="#3184cc" size="medium" text="" textColor="#0640ff" /> */}
+        </div>}
+      >
         {/* <Navbar/> */}
         <BrowserRouter>
-          <Routes>
+          <AuthProvider>
+            <Routes>
 
-            <Route element={<LoggedIn />}>
-              <Route path="/login" element={<Login />} />
-              {/* <Route path="/register" element={<RegisterPage />} /> */}
-            </Route>
+              <Route element={<LoggedIn />}>
+                <Route path="/login" element={<Login />} />
+                {/* <Route path="/register" element={<RegisterPage />} /> */}
+              </Route>
 
 
-            <Route path='/' element={<Sidenav />}>
-              <Route index element={<Home />} />
-              <Route path='users' element={<Users />} />
-              <Route path='office' element={<Office />} />
-              <Route path='driver' element={<DriverForm />} />
-              <Route path='home' element={<Home />} />
-            </Route>
+              <Route path='/' element={<Sidenav />}>
 
-            <Route path='/sadmin' element={<SuperAdmin />}>
-              <Route index element={<OfficeBranchForm />} />
-              <Route path='branch' element={<OfficeBranchPage />} />
-            </Route>
+                <Route path='home' element={<Home />} />
 
-            <Route path='/admin' element={<SuperAdmin />}>
-              <Route index element={<OfficeBranchForm />} />
-              <Route path='branch' element={<OfficeBranchPage />} />
-            </Route>
-            
-          </Routes>
+
+                {/* All protected routes are here */}
+
+                <Route path='/sadmin' element={<SuperAdmin />}>
+                  <Route index element={<OfficeBranchForm />} />
+                  <Route path='users' element={<Users />} />
+                  <Route path='office' element={<Office />} />
+                  <Route path='branch' element={<OfficeBranchPage />} />
+                </Route>
+
+                <Route path='/admin' element={<AdminCheck />}>
+                  <Route index element={<DriverForm />} />
+                </Route>
+
+                <Route path='/user' element={<UserCheck />}>
+                  <Route index element={<Home />} />
+                </Route>
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </Suspense>
     </>
