@@ -516,15 +516,16 @@ const DriverForm = () => {
                     </Grid2>
                 </form>
                 <Box>
-                    <ReusableTable
+                    {/* <ReusableTable
                         columns={columns}
                         rows={formattedOptions}
                         height="800"
+                        width="10%"
                         showEdit={true}
                         showDelete={true}
                         onEdit={handleEdit}
                         onDelete={deleteDialog}
-                    />
+                    /> */}
                 </Box>
             </Box>
         </>

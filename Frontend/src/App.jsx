@@ -46,27 +46,29 @@ function App() {
                 {/* <Route path="/register" element={<RegisterPage />} /> */}
               </Route>
 
+              <Route path='/' element={<ProtectedRoute />}>
 
-              <Route path='/' element={<Sidenav />}>
+                <Route path='/' element={<Sidenav />}>
 
-                <Route path='home' element={<Home />} />
+                  <Route path='home' element={<Home />} />
 
 
-                {/* All protected routes are here */}
+                  {/* All protected routes are here */}
 
-                <Route path='/sadmin' element={<SuperAdmin />}>
-                  <Route index element={<OfficeBranchForm />} />
-                  <Route path='users' element={<Users />} />
-                  <Route path='office' element={<Office />} />
-                  <Route path='branch' element={<OfficeBranchPage />} />
-                </Route>
+                  <Route path='/sadmin' element={<SuperAdmin />}>
+                    <Route index element={<OfficeBranchForm />} />
+                    <Route path='users' element={<Users />} />
+                    <Route path='office' element={<Office />} />
+                    <Route path='branch' element={<OfficeBranchPage />} />
+                  </Route>
 
-                <Route path='/admin' element={<AdminCheck />}>
-                  <Route index element={<DriverForm />} />
-                </Route>
+                  <Route path='/admin' element={<AdminCheck />}>
+                    <Route index element={<DriverForm />} />
+                  </Route>
 
-                <Route path='/user' element={<UserCheck />}>
-                  <Route index element={<Home />} />
+                  <Route path='/user' element={<UserCheck />}>
+                    <Route index element={<Home />} />
+                  </Route>
                 </Route>
               </Route>
             </Routes>

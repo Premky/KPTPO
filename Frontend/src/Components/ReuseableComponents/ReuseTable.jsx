@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Button, Paper } from "@mui/material";
 
-const ReusableTable = ({ columns, rows, height, showEdit, showDelete, onEdit, onDelete, export: enableExport }) => {
+const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onEdit, onDelete, export: enableExport }) => {
 
   // 🔹 Export to Excel
   const handleExportExcel = async () => {
@@ -41,7 +41,7 @@ const ReusableTable = ({ columns, rows, height, showEdit, showDelete, onEdit, on
   };
 
   return (
-    <div style={{ height, width: "100%" }}>
+    <div style={{ height, width }}>
       {enableExport && (
         <div style={{ marginBottom: 10 }}>
           <Button variant="contained" color="primary" onClick={handleExportExcel} style={{ marginRight: 10 }}>

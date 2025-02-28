@@ -75,7 +75,7 @@ const Login = (onLogin) => {
                     title: "Login Success",
                     text: "Redirecting to Home Page",
                     icon: "success",
-                    timer: 2000,
+                    timer: 1000,
                     showConfirmButton: false
                 });
                 navigate('/home');
