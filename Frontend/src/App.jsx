@@ -22,6 +22,7 @@ import Navbar from './Components/Nav/Navbar';
 import OfficeBranchForm from './Components/AdminPanel/Office/OfficeBranchForm';
 import BranchForm from './Components/AdminPanel/Office/BranchForm';
 const DriverForm = lazy(() => import('./Components/Tango/Driver/DriverForm'));
+const DriverTable = lazy(() => import('./Components/Tango/Driver/DriverTable'));
 
 import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
 import AdminCheck from './Components/Auth/middlewares/AdminCheck';
@@ -50,7 +51,7 @@ function App() {
 
                 <Route path='/' element={<Sidenav />}>
 
-                  <Route path='home' element={<Home />} />
+                  {/* <Route path='home' element={<Home />} /> */}
 
 
                   {/* All protected routes are here */}
@@ -63,7 +64,8 @@ function App() {
                   </Route>
 
                   <Route path='/admin' element={<AdminCheck />}>
-                    <Route index element={<DriverForm />} />
+                    <Route index element={<DriverTable />} />
+                    <Route path='driver' element={<DriverForm />} />
                   </Route>
 
                   <Route path='/user' element={<UserCheck />}>

@@ -21,6 +21,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import BusinessIcon from '@mui/icons-material/Business';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
+import CarCrashIcon from '@mui/icons-material/CarCrash';
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
@@ -181,7 +182,17 @@ export default function Sidenav() {
                 {currentRole === "Admin" || currentRole === "Superuser" && (
                     <>
                         <List>
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/home`) }}>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/admin/driver`) }}>
+                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
+                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
+                                        <CarCrashIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Vehicle & Driver" sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                        <List>
+                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/admin`) }}>
                                 <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
                                     <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
                                         <AirportShuttleIcon />

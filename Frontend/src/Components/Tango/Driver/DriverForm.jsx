@@ -57,28 +57,28 @@ const DriverForm = () => {
     const columns = [
         { field: "sn", headerName: "सि.नं." },
         { field: "vehicledistrict", headerName: "जिल्ला" },
-        { field: "vehicle_name", headerName: "सवारी साधन", hide: true },
+        { field: "vehicle_name", headerName: "सवारी साधन", isVisible: false },
         { field: "vehicle_no", headerName: "गाडी नं." },
         { field: "start_route", headerName: "देखी" },
         { field: "end_route", headerName: "सम्म" },
         { field: "drivername", headerName: "चालक" },
-        { field: "driverdob", headerName: "जन्म मिति" },
-        { field: "country", headerName: "देश" },
-        { field: "state", headerName: "प्रदेश" },
-        { field: "district", headerName: "जिल्ला" },
-        { field: "municipality", headerName: "स्थानिय तह" },
-        { field: "driverward", headerName: "वडा नं." },
-        { field: "driverfather", headerName: "चालकको बाबुको नाम" },
+        // { field: "driverdob", headerName: "जन्म मिति" },
+        // { field: "country", headerName: "देश" },
+        // { field: "state", headerName: "प्रदेश" },
+        // { field: "district", headerName: "जिल्ला" },
+        // { field: "municipality", headerName: "स्थानिय तह" },
+        // { field: "driverward", headerName: "वडा नं." },
+        // { field: "driverfather", headerName: "चालकको बाबुको नाम" },
         { field: "lisence_no", headerName: "स.चा. अनुमती पत्र नं." },
         { field: "lisencecategory", headerName: "वर्ग" },
-        { field: "driverctz_no", headerName: "नागरिकता नं." },
-        { field: "ctz_iss", headerName: "जारी जिल्ला" },
-        { field: "mentalhealth", headerName: "मानसिक स्वास्थ्य" },
-        { field: "drivereye", headerName: "आँखा" },
-        { field: "driverear", headerName: "कान" },
-        { field: "drivermedicine", headerName: "औषधी सेवन कर्ता" },
+        // { field: "driverctz_no", headerName: "नागरिकता नं." },
+        // { field: "ctz_iss", headerName: "जारी जिल्ला" },
+        // { field: "mentalhealth", headerName: "मानसिक स्वास्थ्य" },
+        // { field: "drivereye", headerName: "आँखा" },
+        // { field: "driverear", headerName: "कान" },
+        // { field: "drivermedicine", headerName: "औषधी सेवन कर्ता" },
         { field: "driverphoto", headerName: "फोटो" },
-        { field: "remarks", headerName: "कैफियत" },
+        // { field: "remarks", headerName: "कैफियत" },
     ];
 
     const [formattedOptions, setFormattedOptions] = useState([]);
@@ -516,16 +516,16 @@ const DriverForm = () => {
                     </Grid2>
                 </form>
                 <Box>
-                    {/* <ReusableTable
+                    <ReusableTable
                         columns={columns}
                         rows={formattedOptions}
                         height="800"
-                        width="10%"
+                        width="100%"
                         showEdit={true}
                         showDelete={true}
                         onEdit={handleEdit}
                         onDelete={deleteDialog}
-                    /> */}
+                    />
                 </Box>
             </Box>
         </>

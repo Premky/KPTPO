@@ -15,7 +15,7 @@ const SuperAdmin = () => {
 
     // Redirect if user is not Superuser
     if (userRole == "Admin" || userRole == "Superuser") return <Outlet /> ;
-
+console.log("User Role:", userRole); // Debugging
     return <Navigate to="/login" replace />;
 };
 
