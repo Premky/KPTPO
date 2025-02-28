@@ -48,9 +48,12 @@ const Login = (onLogin) => {
     const [error, setError] = useState();
     // axios.defaults.withCredentials = true;
 
-        const isValidUser = !!state?.valid; // Ensure boolean check
-
-        return isValidUser ? <Navigate to="/" replace /> : <Outlet />;
+        // 🔹 Redirect after login
+    useEffect(() => {
+        if (state.valid) {
+            navigate('/');  // Navigate only if the user is logged in
+        }
+    }, [state.valid, navigate]);
 
 
     const handleLogin = async (event) => {

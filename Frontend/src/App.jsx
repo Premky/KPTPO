@@ -42,8 +42,8 @@ function App() {
           <AuthProvider>
             <Routes>
 
-              {/* <Route element={<LoggedIn />}> */}
                 <Route path="/login" element={<Login />} />
+              {/* <Route element={<LoggedIn />}> */}
                 {/* <Route path="/register" element={<RegisterPage />} /> */}
               {/* </Route> */}
 
