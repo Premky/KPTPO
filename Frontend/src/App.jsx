@@ -27,7 +27,7 @@ const DriverTable = lazy(() => import('./Components/Tango/Driver/DriverTable'));
 import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
 import AdminCheck from './Components/Auth/middlewares/AdminCheck';
 import UserCheck from './Components/Auth/middlewares/UserCheck';
-import LoggedIn from './Components/Auth/middlewares/loggedIn';
+// import LoggedIn from './Components/Auth/middlewares/loggedIn';
 
 function App() {
   return (
@@ -42,10 +42,10 @@ function App() {
           <AuthProvider>
             <Routes>
 
-              <Route element={<LoggedIn />}>
+              {/* <Route element={<LoggedIn />}> */}
                 <Route path="/login" element={<Login />} />
                 {/* <Route path="/register" element={<RegisterPage />} /> */}
-              </Route>
+              {/* </Route> */}
 
               <Route path='/' element={<ProtectedRoute />}>
 

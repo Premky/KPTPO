@@ -1,10 +1,10 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../Context/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 
-import sha256 from "crypto-js/sha256";
+
 //Items from Material UI
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -17,15 +17,17 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Button } from '@mui/material';
 import Swal from 'sweetalert2';
+
 //Close Item from MaterialUI
 
 // import './LoginStyle.css'
 
 const Login = (onLogin) => {
     // const {token, setToken} = useAuth();
-    const {dispatch} = useAuth();
+    const { dispatch } = useAuth();
     const BASE_URL = import.meta.env.VITE_API_BASE_URL
     const navigate = useNavigate();
+    const { state } = useAuth();
 
     const branch = localStorage.getItem("branch")
 
@@ -40,15 +42,20 @@ const Login = (onLogin) => {
 
     const [values, setValues] = useState({
         username: '',
-        password: '',        
+        password: '',
     })
 
     const [error, setError] = useState();
     // axios.defaults.withCredentials = true;
 
+        const isValidUser = !!state?.valid; // Ensure boolean check
+
+        return isValidUser ? <Navigate to="/" replace /> : <Outlet />;
+
+
     const handleLogin = async (event) => {
         event.preventDefault();
-        
+
         try {
             const response = await axios.post(`${BASE_URL}/auth/login`, values, { withCredentials: true });
             Swal.showLoading(Swal.getDenyButton());
@@ -82,9 +89,9 @@ const Login = (onLogin) => {
             } else {
                 Swal.fire({ title: "Login Failed", text: response.data.error, icon: "error" });
             }
-        } catch (err) {            
+        } catch (err) {
             console.error("Login Error:", err);
-            
+
             const errorMessage =
                 err.response?.data?.Error || "An unexpected error occurred.";
             setError(errorMessage);
@@ -92,7 +99,7 @@ const Login = (onLogin) => {
                 title: "Login Error",
                 text: errorMessage,
                 icon: "error"
-              });
+            });
         }
     };
 
@@ -105,10 +112,10 @@ const Login = (onLogin) => {
                     marginTop: "5%",
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center",                    
+                    alignItems: "center",
                 }}
             >
-                <img src='/np_police_logo.png' alt='Nepal Police Logo' height={'150px'}/>
+                <img src='/np_police_logo.png' alt='Nepal Police Logo' height={'150px'} />
             </Box>
             <Box sx={{
                 display: "flex",
@@ -155,7 +162,7 @@ const Login = (onLogin) => {
                                 {error}
                             </div> */}
                             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                                <Button variant="contained" 
+                                <Button variant="contained"
                                     onClick={() => {
                                         notify(setNotification('Loging in...'));
                                     }}
