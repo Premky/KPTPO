@@ -12,6 +12,7 @@ import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
 import UserTable from './UserTable';
 import ReusableTable from '../../ReuseableComponents/ReuseTable';
 import ReuseBranch from '../../ReuseableComponents/ReuseBranch';
+import { Navigate } from 'react-router-dom';
 
 const CreateUser = () => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -85,6 +86,7 @@ const CreateUser = () => {
                 reset();
                 setEditing(false);
                 fetchUsers();
+                Navigate('/sadmin/users');
             }
         } catch (err) {
             console.error(err);
