@@ -66,6 +66,8 @@ const Login = (onLogin) => {
                 // Save necessary data in localStorage
                 // setToken(response.data.token);
                 // localStorage.setItem("token", response.data.token);
+                localStorage.setItem("office_np", response.data.office_np);
+                localStorage.setItem("branch", response.data.branch);
                 console.log(response.data);
                 dispatch({
                     type: "LOGIN",

@@ -178,6 +178,7 @@ const DriverTable = () => {
 
     return (
         <div>
+            <div><h1>Driver Details</h1></div>
             <form onSubmit={handleSubmit(handleUpdate)}>
                 {/* Form fields here for driver update */}
                 <ReusableTable
@@ -188,6 +189,7 @@ const DriverTable = () => {
                     showDelete={true}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    enableExport={true}
                 />
             </form>
         </div>

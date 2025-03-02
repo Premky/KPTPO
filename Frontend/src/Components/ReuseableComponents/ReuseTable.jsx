@@ -7,7 +7,7 @@ import "jspdf-autotable";
 import { Button, Paper } from "@mui/material";
 import Swal from "sweetalert2";
 
-const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onEdit, onDelete, export: enableExport }) => {
+const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onEdit, onDelete, enableExport }) => {
 
   // 🔹 Export to Excel
   const handleExportExcel = async () => {
@@ -81,9 +81,9 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
           <Button variant="contained" color="primary" onClick={handleExportExcel} style={{ marginRight: 10 }}>
             Export to Excel
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleExportPDF}>
+          {/* <Button variant="contained" color="secondary" onClick={handleExportPDF}>
             Export to PDF
-          </Button>
+          </Button> */}
         </div>
       )}
 

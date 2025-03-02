@@ -42,8 +42,8 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
-  const handleLogout = async() => {
-    
+  const handleLogout = async () => {
+
     console.log("Logged out");
 
     try {
@@ -60,14 +60,14 @@ function Navbar() {
     }
     // handleCloseUserMenu();
   };
-  
+
   return (
     <AppBar position="static" >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'block' } }}>
-            <IconButton
+            {/* <IconButton
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -76,7 +76,7 @@ function Navbar() {
               color="inherit"
             >
               <MenuIcon />
-            </IconButton>
+            </IconButton> */}
             <Typography
               variant="h5"
               noWrap
@@ -84,7 +84,7 @@ function Navbar() {
               href="/"
               sx={{
                 mr: 2,
-                display: { xs: 'flex', md: 'none' },
+                // display: { xs: 'flex', md: 'none' },
                 flexGrow: 1,
                 fontFamily: 'monospace',
                 fontWeight: 700,
@@ -93,7 +93,7 @@ function Navbar() {
                 textDecoration: 'none',
               }}
             >
-              Office Name
+              {localStorage.getItem('office_np') }, {localStorage.getItem('branch')}
             </Typography>
 
 
@@ -119,6 +119,32 @@ function Navbar() {
                 </MenuItem>
               ))}
             </Menu>
+
+            <IconButton
+              variant="h5"
+              noWrap
+              component="a"
+              
+              sx={{
+                mr: 2,
+                display: { xs: 'flex', md: 'none' },
+                flexGrow: 1,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
           </Box>
 
 
@@ -156,7 +182,7 @@ function Navbar() {
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={handleCloseUserMenu}>
-                <Typography sx={{ textAlign: 'center' }} ><Logout/></Typography>
+                <Typography sx={{ textAlign: 'center' }} ><Logout /></Typography>
               </MenuItem>
               {/* {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
