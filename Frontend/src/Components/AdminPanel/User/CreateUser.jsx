@@ -41,6 +41,7 @@ const CreateUser = () => {
                     value: opt.id, // Use ID as value
                 }));
                 setUsertypes(formatted);
+                // console.log(formatted)
             } else {
                 console.log(Error);
             }
@@ -66,7 +67,7 @@ const CreateUser = () => {
                 name_np: data.name_np, usertype: data.usertype, username: data.username, password: data.password, repassword: data.repassword,
                 office: data.office, branch: data.branch, is_active: data.is_active
             };
-            const url = editing ? `${BASE_URL}/auth/update_user` : `${BASE_URL}/auth/create_user`;
+            const url = editing ? `${BASE_URL}/auth/update_user/${userData.username}` : `${BASE_URL}/auth/create_user`;
             const method = editing ? 'PUT' : 'POST';
             const response = await axios({
                 method, url, data: userData,
@@ -138,9 +139,21 @@ const CreateUser = () => {
     };
 
     // Handle edit action
-    const handleEdit = (row) => {
-        console.log("Editing user:", row);
-        // You can navigate to a different page or open a modal to edit the user
+    const handleEdit = (row) => {        
+        // console.log("Editing user:", row);
+        // You can navigate to a different page or open a modal to edit the user        
+        setValue('name_np', row.name);
+        setValue('username', row.username);
+        const matchedUsertype = usertypes.find(ut => ut.label === row.usertype);
+        if (matchedUsertype) {
+            setValue('usertype', matchedUsertype.value);
+            // console.log(matchedUsertype);
+        }
+        // setValue('usertype', row.usertype);
+        setValue('office', row.office_id);
+        setValue('branch', row.branch_id);  
+        setValue('is_active', row.is_active === 'छ' ? '1' : '0');
+        setEditing(true);
         // Example: You can pass the row data to a form for editing
     };
 
