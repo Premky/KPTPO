@@ -15,7 +15,9 @@ import ReuseBranch from '../../ReuseableComponents/ReuseBranch';
 import { Navigate } from 'react-router-dom';
 
 const CreateUser = () => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = localStorage.getItem('BASE_URL');
+    
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

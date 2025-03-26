@@ -259,5 +259,8 @@ router.get('/session', (req, res) => {
     }
 });
 
+router.get('/health', (req, res) => {
+    res.status(200).send("OK");
+});
 
 export { router as authRouter };

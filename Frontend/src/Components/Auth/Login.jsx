@@ -1,9 +1,10 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../Context/AuthContext';
+import Swal from 'sweetalert2';
 import toast, { Toaster } from 'react-hot-toast';
-
+import { getAvailableBaseUrl } from './middlewares/getBaseUrl';
 
 //Items from Material UI
 import Box from '@mui/material/Box';
@@ -16,22 +17,55 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Button } from '@mui/material';
-import Swal from 'sweetalert2';
+
 
 //Close Item from MaterialUI
 
-// import './LoginStyle.css'
 
-const Login = (onLogin) => {
+const useApiBaseUrl = () => {
+    const [baseUrl, setBaseUrl] = useState(null);
+
+    useEffect(() => {
+        const fetchBaseUrl = async () => {
+            const url = await getAvailableBaseUrl();
+            setBaseUrl(url);
+        };
+        fetchBaseUrl();
+    }, []);
+
+    return baseUrl;
+};
+
+// import './LoginStyle.css'
+// if (!BASE_URL) return;
+// const Login = ({onLogin}) => {
+const Login = () => {
     // const {token, setToken} = useAuth();
-    const { dispatch } = useAuth();
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL
+    const BASE_URL = useApiBaseUrl();
     const navigate = useNavigate();
-    const { state } = useAuth();
+    const { state, dispatch } = useAuth();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [values, setValues] = useState({
+        username: '',
+        password: '',
+    });
+    const [error, setError] = useState();
+
+    // 🔹 Redirect after login
+    useEffect(() => {
+        if (state.valid) {
+            navigate('/');  // Navigate only if the user is logged in
+        }
+    }, [state.valid, navigate]);
+
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+
 
     const branch = localStorage.getItem("branch")
 
-    const [showPassword, setShowPassword] = useState(false);
+
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
@@ -40,24 +74,18 @@ const Login = (onLogin) => {
         event.preventDefault();
     };
 
-    const [values, setValues] = useState({
-        username: '',
-        password: '',
-    })
 
-    const [error, setError] = useState();
+
+
     // axios.defaults.withCredentials = true;
-
-        // 🔹 Redirect after login
-    useEffect(() => {
-        if (state.valid) {
-            navigate('/');  // Navigate only if the user is logged in
-        }
-    }, [state.valid, navigate]);
 
 
     const handleLogin = async (event) => {
         event.preventDefault();
+        if (!BASE_URL) {
+            console.error("🚨 No backend available!");
+            return;
+        }        
 
         try {
             const response = await axios.post(`${BASE_URL}/auth/login`, values, { withCredentials: true });
@@ -68,6 +96,7 @@ const Login = (onLogin) => {
                 // localStorage.setItem("token", response.data.token);
                 localStorage.setItem("office_np", response.data.office_np);
                 localStorage.setItem("branch", response.data.branch);
+                localStorage.setItem("BASE_URL", BASE_URL);
                 console.log(response.data);
                 dispatch({
                     type: "LOGIN",
@@ -109,7 +138,7 @@ const Login = (onLogin) => {
     };
 
     const [notification, setNotification] = useState('');
-    const notify = () => toast(notification);
+    const notify = (message) => toast(message);
     return (
         <>
             <Box
@@ -169,7 +198,7 @@ const Login = (onLogin) => {
                             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                                 <Button variant="contained"
                                     onClick={() => {
-                                        notify(setNotification('Loging in...'));
+                                        notify('Logging in...');
                                     }}
                                     type='submit'>
                                     Login

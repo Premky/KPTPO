@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect, useState } from "react";
 import axios from "axios";
+import { getAvailableBaseUrl } from "../Components/Auth/middlewares/getBaseUrl";
 
 const AuthContext = createContext();
 
@@ -13,6 +14,8 @@ const initialState = {
     main_office_id: null,
     valid: false,
 };
+
+
 
 // Reducer function to handle login/logout actions
 const authReducer = (state, action) => {
@@ -52,6 +55,8 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
+    // const BASE_URL = useApiBaseUrl();
+    // console.log("Auth Context Base URL:", BASE_URL);
     // Persist user session using cookies (HTTP-only) or sessionStorage
     useEffect(() => {
         const fetchSession = async () => {

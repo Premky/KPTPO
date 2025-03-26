@@ -13,7 +13,8 @@ import ReusableTable from '../../ReuseableComponents/ReuseTable';
 
 
 const BranchForm = () => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = localStorage.getItem('BASE_URL');
     const token = localStorage.getItem('token');
 
     //Required Variables 

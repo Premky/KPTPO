@@ -4,7 +4,8 @@ import { InputLabel, TextField, Autocomplete, Box } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
 const ReuseMedical = ({ name, label, required, control, error, medicaltype }) => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const BASE_URL = localStorage.getItem('BASE_URL');
     const token = localStorage.getItem('token');
 
     // State to store medical options

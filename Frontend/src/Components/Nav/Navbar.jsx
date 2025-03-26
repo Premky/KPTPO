@@ -41,13 +41,15 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+// const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = localStorage.getItem('BASE_URL');
 
   const handleLogout = async () => {
 
     console.log("Logged out");
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
+      const response = await axios.post(`${BASE_URL}/auth/logout`, {
         withCredentials: true, // Ensures token is sent in cookies
       });
       console.log(response);

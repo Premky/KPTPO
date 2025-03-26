@@ -5,7 +5,8 @@ import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
 const ReuseLisenceCategory = ({ name, label, required, control, error }) => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const BASE_URL = localStorage.getItem('BASE_URL');
     const token = localStorage.getItem('token');
 
     // State to store district options

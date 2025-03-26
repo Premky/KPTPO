@@ -4,7 +4,8 @@ import Swal from 'sweetalert2'
 import ReusableTable from '../../ReuseableComponents/ReuseTable';
 
 const UserTable = () => {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const BASE_URL = localStorage.getItem('BASE_URL');
   const token = localStorage.getItem('token');
   const [formattedOptions, setFormattedOptions] = useState([]);
   const [loading, setLoading] = useState(true);
