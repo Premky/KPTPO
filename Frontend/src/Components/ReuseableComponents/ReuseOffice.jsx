@@ -77,7 +77,7 @@ const ReuseOffice = ({ name, label, required, control, error }) => {
                             // )}
                             renderInput={(params) => (
                                 <TextField
-                                    defaultValue=''
+                                    // defaultValue=''
                                     {...params}
                                     inputRef={ref}
                                     variant="outlined"

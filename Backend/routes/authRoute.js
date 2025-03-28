@@ -28,8 +28,8 @@ router.post("/create_user", async (req, res) => {
             return res.status(400).json({ message: "पासवर्डहरू मिलेन।" });
         }
         // Check if the username already exists
-        const existingUser = await query("SELECT id FROM users WHERE username = ?", [username]);
-        if (existingUser.length > 0) {
+        const existingUser = await query("SELECT id FROM users WHERE username = ?", [userid]);
+        if (existingUser.length === 0) {
             return res.status(400).json({ message: "यो प्रयोगकर्ता नाम पहिल्यै अवस्थित छ।" });
         }
         // Hash the password
@@ -123,7 +123,8 @@ router.delete('/delete_user/:id', async (req, res) => {
 
     try {
         const sql = "DELETE FROM users WHERE id = ?";
-        con.query(sql, [id], (err, result) => {
+        const result = await query(sql, [id]);
+        // con.query(sql, [id], (err, result) => {
             if (err) {
                 console.error('Database query error:', err); // Log the error for internal debugging
                 return res.status(500).json({ Status: false, Error: 'Internal server error' });
@@ -134,7 +135,7 @@ router.delete('/delete_user/:id', async (req, res) => {
             }
 
             return res.status(200).json({ Status: true, Result: result });
-        });
+        // });
     } catch (error) {
         console.error('Unexpected error:', error); // Log unexpected errors for internal debugging
         return res.status(500).json({ Status: false, Error: 'Unexpected error occurred' });
@@ -198,8 +199,7 @@ router.post('/login', async (req, res) => {
                 uid: user.uid,
                 role: user.role_en,
                 username: user.username,
-                office: user.office_id,
-                branch: user.branch
+                office: user.office_id
             },
                 process.env.JWT_SECRET,
                 { expiresIn: '3d' }
@@ -220,7 +220,8 @@ router.post('/login', async (req, res) => {
                 username: user.username,
                 branch: user.branch_name,
                 usertype: user.role_en,
-                office_np: user.office_name,
+                // office_np: user.office_name,
+                office_np: user.office_np,
                 office_id: user.office_id,
                 main_office_id: user.main_office_id,
             });
@@ -245,7 +246,7 @@ router.post('/logout', (req, res) => {
 
 router.get('/session', (req, res) => {
     const token = req.cookies.token;
-
+    console.log(token)
     if (!token) {
         return res.status(401).json({ success: false, message: 'No active session' });
     }

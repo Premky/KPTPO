@@ -15,7 +15,6 @@ const About = lazy(() => import('./Components/Pages/About'));
 const Settings = lazy(() => import('./Components/Pages/Settings'));
 
 const Users = lazy(() => import('./Components/AdminPanel/User/CreateUser'));
-const OfficeForm = lazy(() => import('./Components/AdminPanel/Office/OfficeForm'));
 const OfficeBranchPage = lazy(() => import('./Components/AdminPanel/Office/OfficeBranchPage'));
 const Office = lazy(() => import('./Components/AdminPanel/Office/OfficeForm'));
 import Navbar from './Components/Nav/Navbar';

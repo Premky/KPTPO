@@ -1,6 +1,5 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
-import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -12,14 +11,12 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { useAuth } from '../../Context/AuthContext';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import Logout from '../Auth/Logout';
 
 const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Navbar() {
   const { dispatch } = useAuth();
@@ -41,52 +38,34 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-// const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const BASE_URL = localStorage.getItem('BASE_URL');
+
+  const BASE_URL = localStorage.getItem('BASE_URL');
 
   const handleLogout = async () => {
-
     console.log("Logged out");
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/logout`, {
-        withCredentials: true, // Ensures token is sent in cookies
-      });
+      const response = await axios.post(`${BASE_URL}/auth/logout`, {}, { withCredentials: true });
       console.log(response);
       if (response.data.success) {
-        dispatch({ type: "LOGOUT" });
+        dispatch({ type: 'LOGOUT' });
       }
       navigate('/login');
     } catch (error) {
-      console.error("Session fetch failed:", error);
+      console.error("Logout failed:", error);
     }
-    // handleCloseUserMenu();
   };
 
   return (
-    <AppBar position="static" >
+    <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'block' } }}>
-            {/* <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton> */}
             <Typography
               variant="h5"
-              noWrap
               component="a"
-              // href="/"
               sx={{
                 mr: 2,
-                // display: { xs: 'flex', md: 'none' },
                 flexGrow: 1,
                 fontFamily: 'monospace',
                 fontWeight: 700,
@@ -95,9 +74,8 @@ const BASE_URL = localStorage.getItem('BASE_URL');
                 textDecoration: 'none',
               }}
             >
-              {localStorage.getItem('office_np') }, {localStorage.getItem('branch')}
+              {localStorage.getItem('office_np')}, {localStorage.getItem('branch')}
             </Typography>
-
 
             <Menu
               id="menu-appbar"
@@ -123,21 +101,6 @@ const BASE_URL = localStorage.getItem('BASE_URL');
             </Menu>
 
             <IconButton
-              variant="h5"
-              noWrap
-              component="a"
-              
-              sx={{
-                mr: 2,
-                display: { xs: 'flex', md: 'none' },
-                flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -148,7 +111,6 @@ const BASE_URL = localStorage.getItem('BASE_URL');
               <MenuIcon />
             </IconButton>
           </Box>
-
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
@@ -161,11 +123,11 @@ const BASE_URL = localStorage.getItem('BASE_URL');
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                
-                <Avatar alt="Remy Sharp" src="/icons/male_icon-1.png" />
+                <Avatar alt="User Avatar" src="/icons/male_icon-1.png" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -185,13 +147,8 @@ const BASE_URL = localStorage.getItem('BASE_URL');
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={handleCloseUserMenu}>
-                <Typography sx={{ textAlign: 'center' }} ><Logout /></Typography>
+                <Logout />
               </MenuItem>
-              {/* {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-                </MenuItem>
-              ))} */}
             </Menu>
           </Box>
         </Toolbar>
@@ -199,4 +156,5 @@ const BASE_URL = localStorage.getItem('BASE_URL');
     </AppBar>
   );
 }
+
 export default Navbar;

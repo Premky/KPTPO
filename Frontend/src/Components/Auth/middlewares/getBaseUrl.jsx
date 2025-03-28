@@ -7,7 +7,7 @@ const API_OPTIONS = [
 export const getAvailableBaseUrl = async () => {
     for (const url of API_OPTIONS) {
         try {
-            const response = await fetch(`${url}/auth/health`, { method: "GET", timeout: 300 });
+            const response = await fetch(`${url}/auth/health`, { method: "GET", timeout: 100 });
             if (response.ok) {
                 console.log(`✅ Using API: ${url}`);
                 return url;

@@ -41,6 +41,7 @@ const useApiBaseUrl = () => {
 // const Login = ({onLogin}) => {
 const Login = () => {
     // const {token, setToken} = useAuth();
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL
     const BASE_URL = useApiBaseUrl();
     const navigate = useNavigate();
     const { state, dispatch } = useAuth();
@@ -53,13 +54,13 @@ const Login = () => {
     const [error, setError] = useState();
 
     // 🔹 Redirect after login
-    useEffect(() => {
-        if (state.valid) {
-            navigate('/');  // Navigate only if the user is logged in
-        }
-    }, [state.valid, navigate]);
+    // useEffect(() => {
+    //     if (state.valid) {
+    //         navigate('/');  // Navigate only if the user is logged in
+    //     }
+    // }, [state.valid, navigate]);
 
-    // const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 
 
 
@@ -85,11 +86,19 @@ const Login = () => {
         if (!BASE_URL) {
             console.error("🚨 No backend available!");
             return;
-        }        
+        }
 
         try {
             const response = await axios.post(`${BASE_URL}/auth/login`, values, { withCredentials: true });
-            Swal.showLoading(Swal.getDenyButton());
+            // Swal.showLoading(Swal.getDenyButton());
+            Swal.fire({
+                title: "Logging in...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+            
             if (response.data.loginStatus) {
                 // Save necessary data in localStorage
                 // setToken(response.data.token);
@@ -97,7 +106,7 @@ const Login = () => {
                 localStorage.setItem("office_np", response.data.office_np);
                 localStorage.setItem("branch", response.data.branch);
                 localStorage.setItem("BASE_URL", BASE_URL);
-                console.log(response.data);
+                // console.log(response.data);
                 dispatch({
                     type: "LOGIN",
                     payload: {
@@ -119,7 +128,7 @@ const Login = () => {
                     timer: 1000,
                     showConfirmButton: false
                 });
-                navigate('/home');
+                navigate('/');
             } else {
                 Swal.fire({ title: "Login Failed", text: response.data.error, icon: "error" });
             }
@@ -196,11 +205,12 @@ const Login = () => {
                                 {error}
                             </div> */}
                             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                                <Button variant="contained"
-                                    onClick={() => {
-                                        notify('Logging in...');
-                                    }}
-                                    type='submit'>
+                                <Button
+                                    variant="contained"
+                                    disabled={!BASE_URL}
+                                    onClick={() => notify('Logging in...')}
+                                    type='submit'
+                                >
                                     Login
                                 </Button>
                             </FormControl>
