@@ -16,7 +16,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logout from '../Auth/Logout';
 
-const pages = ['Products', 'Pricing', 'Blog'];
+// const pages = ['Products', 'Pricing', 'Blog'];
 
 function Navbar() {
   const { dispatch } = useAuth();
@@ -77,7 +77,7 @@ function Navbar() {
               {localStorage.getItem('office_np')}, {localStorage.getItem('branch')}
             </Typography>
 
-            <Menu
+            {/* <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
@@ -98,9 +98,9 @@ function Navbar() {
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
-            </Menu>
+            </Menu> */}
 
-            <IconButton
+            {/* <IconButton
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -109,10 +109,10 @@ function Navbar() {
               color="inherit"
             >
               <MenuIcon />
-            </IconButton>
+            </IconButton> */}
           </Box>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
                 key={page}
@@ -122,7 +122,7 @@ function Navbar() {
                 {page}
               </Button>
             ))}
-          </Box>
+          </Box> */}
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">

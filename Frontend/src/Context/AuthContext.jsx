@@ -34,7 +34,7 @@ const authReducer = (state, action) => {
             };
         case "LOGOUT":
             sessionStorage.removeItem("authData"); // Remove auth data from session storage
-            localStorage.removeItem("BASE_URL"); // Remove BASE_URL from local storage
+            // localStorage.removeItem("BASE_URL"); // Remove BASE_URL from local storage
             localStorage.removeItem("branch"); // Remove branch from local storage
             localStorage.removeItem("main_office_id"); // Remove main_office_id from local storage
             localStorage.removeItem("office_id"); // Remove office_id from local storage
