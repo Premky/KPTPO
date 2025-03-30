@@ -14,7 +14,7 @@ import XportKasurReport from '../XportKasurReport';
 const KasurReport = () => {
     const { pmis } = useParams();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL') 
+    const BASE_URL = localStorage.getItem('BASE_URL')
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');
@@ -35,9 +35,10 @@ const KasurReport = () => {
 
     const fetchCurrentOffice = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/display/currentoffice/${localStorage.getItem('oid')}`, 
-            {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-        });
+            const result = await axios.get(`${BASE_URL}/display/currentoffice/${localStorage.getItem('oid')}`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) setCurrentOffice(result.data.Result[0]);
             else console.error(result.data.Error);
         } catch (err) {
@@ -63,9 +64,10 @@ const KasurReport = () => {
 
     const fetchPunishment = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/tango/search_kasur`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/tango/search_kasur`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 const groupedData = result.data.Result.reduce((acc, item) => {
                     if (!acc[item.office_name]) acc[item.office_name] = { office_name: item.office_name, vehicles: {} };
@@ -86,9 +88,10 @@ const KasurReport = () => {
         setLoading(true);
         try {
             const queryString = new URLSearchParams(data).toString();
-            const result = await axios.get(`${BASE_URL}/tango/search_kasur?${queryString}`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/tango/search_kasur?${queryString}`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 const groupedData = result.data.Result.reduce((acc, item) => {
                     if (!acc[item.office_name]) acc[item.office_name] = { office_name: item.office_name, vehicles: {} };

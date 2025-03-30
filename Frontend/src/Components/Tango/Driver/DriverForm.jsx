@@ -18,7 +18,8 @@ import ReusableTable from '../../ReuseableComponents/ReuseTable'
 import ReuseMedical from '../../ReuseableComponents/ReuseMedical';
 
 const DriverForm = () => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = localStorage.getItem('BASE_URL') 
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

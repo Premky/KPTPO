@@ -3,6 +3,7 @@ const API_OPTIONS = [
     "http://192.168.192.250:3003",
     "http://localhost:3003"  // VPN IP
 ];
+const BASE_URL = localStorage.getItem('BASE_URL') || API_OPTIONS[0]; // Fallback URL
 
 export const getAvailableBaseUrl = async () => {
     for (const url of API_OPTIONS) {

@@ -2,7 +2,8 @@ import { createContext, useContext, useReducer, useEffect, useState } from "reac
 import axios from "axios";
 
 // Get the BASE_URL from localStorage or use a default value
-const BASE_URL = localStorage.getItem('BASE_URL') || 'http://localhost:3001'; // Fallback URL
+// const BASE_URL = localStorage.getItem('BASE_URL') || 'http://localhost:3001'; // Fallback URL
+const BASE_URL = localStorage.getItem('BASE_URL') || 'http://192.168.165.250:3003'; // Fallback URL
 
 const AuthContext = createContext();
 

@@ -115,7 +115,7 @@ router.put('/update_user/:userid', async (req, res) => {
 
 router.delete('/delete_user/:id', async (req, res) => {
     const { id } = req.params;
-    console.log(id)
+    console.log('id',id)
     // Validate the ID to ensure it's a valid format (e.g., an integer)
     if (!Number.isInteger(parseInt(id))) {
         return res.status(400).json({ Status: false, Error: 'Invalid ID format' });
@@ -123,8 +123,9 @@ router.delete('/delete_user/:id', async (req, res) => {
 
     try {
         const sql = "DELETE FROM users WHERE id = ?";
-        const result = await query(sql, [id]);
-        // con.query(sql, [id], (err, result) => {
+        // const result = await query(sql, [id]);
+        // console.log(result)
+        con.query(sql, id, (err, result) => {
             if (err) {
                 console.error('Database query error:', err); // Log the error for internal debugging
                 return res.status(500).json({ Status: false, Error: 'Internal server error' });
@@ -135,7 +136,7 @@ router.delete('/delete_user/:id', async (req, res) => {
             }
 
             return res.status(200).json({ Status: true, Result: result });
-        // });
+        });
     } catch (error) {
         console.error('Unexpected error:', error); // Log unexpected errors for internal debugging
         return res.status(500).json({ Status: false, Error: 'Unexpected error occurred' });

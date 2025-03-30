@@ -147,6 +147,9 @@ function Navbar() {
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={handleCloseUserMenu}>
+                {sessionStorage.getItem('user')}
+              </MenuItem>
+              <MenuItem onClick={handleCloseUserMenu}>
                 <Logout />
               </MenuItem>
             </Menu>
