@@ -225,6 +225,7 @@ router.post('/login', async (req, res) => {
                 office_np: user.office_np,
                 office_id: user.office_id,
                 main_office_id: user.main_office_id,
+                token: token,
             });
         });
 
@@ -247,7 +248,7 @@ router.post('/logout', (req, res) => {
 
 router.get('/session', (req, res) => {
     const token = req.cookies.token;
-    console.log(token)
+    console.log("Session:", token)
     if (!token) {
         return res.status(401).json({ success: false, message: 'No active session' });
     }

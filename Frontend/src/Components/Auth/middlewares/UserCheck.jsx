@@ -5,7 +5,7 @@ import { useAuth } from "../../../Context/AuthContext";
 const UserCheck = () => {
     const { state } = useAuth();
     
-    // console.log("Auth State:", state); // Debugging
+    console.log("Auth State:", state); // Debugging
 
     // Ensure user exists before checking role
     const userRole = state.user?.role || state.role || state.usertype; 

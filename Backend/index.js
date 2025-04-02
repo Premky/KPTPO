@@ -21,6 +21,7 @@ import {publicRouter} from './routes/publicRoutes.js';
 import { driverRouter } from './routes/driverRoute.js';
 import { authRouter } from './routes/authRoute.js';
 import { adminRouter } from './routes/adminRoute.js';
+import { arrestedVehicleRouter } from './routes/arrestedVehiclesRuoute.js';
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/public', publicRouter);
 app.use('/driver', driverRouter);
+app.use('/av', arrestedVehicleRouter);
 
 // Global error handler
 app.use(errorHandler);

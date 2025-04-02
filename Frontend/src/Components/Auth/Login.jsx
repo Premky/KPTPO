@@ -53,19 +53,7 @@ const Login = () => {
     });
     const [error, setError] = useState();
 
-    // 🔹 Redirect after login
-    // useEffect(() => {
-    //     if (state.valid) {
-    //         navigate('/');  // Navigate only if the user is logged in
-    //     }
-    // }, [state.valid, navigate]);
-
-
-
-
-
     const branch = localStorage.getItem("branch")
-
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
@@ -75,13 +63,7 @@ const Login = () => {
         event.preventDefault();
     };
 
-
-
-
-    // axios.defaults.withCredentials = true;
-
-
-    const handleLogin = async (event) => {
+   const handleLogin = async (event) => {
         event.preventDefault();
         if (!BASE_URL) {
             console.error("🚨 No backend available!");
@@ -102,11 +84,12 @@ const Login = () => {
             if (response.data.loginStatus) {
                 // Save necessary data in localStorage
                 // setToken(response.data.token);
-                // localStorage.setItem("token", response.data.token);
+                localStorage.setItem("token", response.data.token);
                 localStorage.setItem("office_np", response.data.office_np);
                 localStorage.setItem("branch", response.data.branch);
                 localStorage.setItem("BASE_URL", BASE_URL);
-                // console.log(response.data);
+                sessionStorage.setItem("token", response.data.token);
+                console.log(response.data);
                 dispatch({
                     type: "LOGIN",
                     payload: {

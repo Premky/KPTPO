@@ -53,25 +53,42 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
   
 
    // 🔹 Updated Columns with Sorting, Image Display, and Hidden Fields
-   const updatedColumns = columns.map(col => ({
-    ...col,
-    flex: 1, // Makes columns responsive
-    sortable: true, // Enables sorting
-    hideable: true, // Allows hiding via UI
-    hide: col.hide || false, // Hides default columns
-    renderCell: col.field === "driverphoto" ? (params) => (
-      params.value ? (
-        <img
-          src={params.value} // Ensure this is a valid URL or base64
-          alt="Driver"
-          style={{ width: 50, height: 50, borderRadius: "5px", objectFit: "cover" }}
-          onClick={() => previewImage(params.value)}
-        />
-      ) : (
-        "No Image"
-      )
-    ) : undefined, // Only apply renderCell to the driverphoto column
-  }));
+   const updatedColumns = [
+    // Add "sn" column only if it does not already exist
+    ...(!columns.some(col => col.field === "sn")
+      ? [{
+          field: "sn",
+          headerName: "S.No",
+          width: 70,
+          renderCell: (params) => params.api.getRowIndex(params.id) + 1, // Dynamic row number
+        }]
+      : []),
+    
+    ...columns.map(col => ({
+      ...col,
+      flex: 1,
+      sortable: true,
+      hideable: true,
+      hide: col.hide || false,
+      renderCell: col.field === "driverphoto" ? (params) => (
+        params.value ? (
+          <img
+            src={params.value}
+            alt="Driver"
+            style={{ width: 50, height: 50, borderRadius: "5px", objectFit: "cover" }}
+            onClick={() => previewImage(params.value)}
+          />
+        ) : (
+          "No Image"
+        )
+      ) : undefined,
+    })),
+  ];
+  
+  
+
+  
+  
 
   // console.log("columns", columns);
   return (

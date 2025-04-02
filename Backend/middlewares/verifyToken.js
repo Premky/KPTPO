@@ -22,8 +22,8 @@ const verifyToken = (req, res, next) => {
         }
 
         // console.log('Decoded token:', decoded);
-        
         req.user = decoded; // Attach the decoded user data to the request
+        // console.log('Office ID:', req.user.office);
         next();
     });
 };

@@ -17,9 +17,10 @@ import XportKasur from '../XportKasur';
 
 const ArrestedVehicleForm = () => {
     const { pmis } = useParams();
-        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL') 
-    const token = localStorage.getItem("token");
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = localStorage.getItem('BASE_URL')
+    const token = sessionStorage.getItem("token");
+
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');
@@ -52,9 +53,10 @@ const ArrestedVehicleForm = () => {
 
     const fetchCurrentOffice = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/display/currentoffice/${exp_office_name}`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/display/currentoffice/${exp_office_name}`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 setCurrentOffice(result.data.Result[0]);
                 // console.log(result.data.Result);
@@ -70,9 +72,10 @@ const ArrestedVehicleForm = () => {
     const [fetchedRank, setFetchedRank] = useState([]);
     const fetchRank = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/display/ranks`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/display/ranks`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 const options = result.data.Result.map(opt => ({
                     value: opt.id,
@@ -87,9 +90,10 @@ const ArrestedVehicleForm = () => {
 
     const fetchKasur = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/tango/kashurs`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/tango/kashurs`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 const options = result.data.Result.map(opt => ({
                     value: opt.id,
@@ -230,7 +234,7 @@ const ArrestedVehicleForm = () => {
             const filteredData = Object.fromEntries(
                 Object.entries(data).filter(([_, value]) => value != null && value !== '')
             );
-            
+
             // Convert filtered data to query string
             const queryString = new URLSearchParams(filteredData).toString();
             console.log(queryString)
@@ -294,14 +298,14 @@ const ArrestedVehicleForm = () => {
                         </div>
 
                         <div className="d-flex flex-column px-3 pt-0">
-                            
+
                             <div className='bg-warning'>नया रेकर्ड थप्नुहोस्</div>
 
                             <form className='row mt-1 g-3'>
-                                
+
                                 <div className="col-xl-3 col-md-4 col-sm-12">
                                     <label htmlFor="date">मिति<span>*</span></label>
-                                     <Controller
+                                    <Controller
                                         name="date"
                                         control={controlCrud}
                                         rules={{ required: "This field is required" }}

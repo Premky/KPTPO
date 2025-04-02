@@ -6,6 +6,9 @@ const API_OPTIONS = [
 const BASE_URL = localStorage.getItem('BASE_URL') || API_OPTIONS[0]; // Fallback URL
 
 export const getAvailableBaseUrl = async () => {
+    if(BASE_URL) {
+        return BASE_URL; // Return the stored URL if available
+    }
     for (const url of API_OPTIONS) {
         try {
             const response = await fetch(`${url}/auth/health`, { method: "GET", timeout: 100 });
