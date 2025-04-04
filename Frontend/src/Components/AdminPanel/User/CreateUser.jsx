@@ -110,20 +110,18 @@ const CreateUser = () => {
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+    
             const { Status, Result, Error } = response.data;
-
+    
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
                     const formatted = Result.map((opt, index) => ({
-                        id: index + 1,
+                        id: index + 1, // MUI DataGrid requires a unique id                        
                         name: opt.name,
                         username: opt.username,
                         usertype: opt.en_usertype,
-                        office: opt.office_name,
-                        office_id: opt.office_id,
-                        branch: opt.branch_name,
-                        branch_id: opt.branch_id,
+                        office_id: opt.office,
+                        branch_id: opt.branch,
                         is_active: opt.is_active ? 'छ' : 'छैन',
                     }));
                     setFormattedOptions(formatted);
@@ -139,7 +137,7 @@ const CreateUser = () => {
             setLoading(false);
         }
     };
-
+    
     // Handle edit action
     const handleEdit = (row) => {        
         // console.log("Editing user:", row);

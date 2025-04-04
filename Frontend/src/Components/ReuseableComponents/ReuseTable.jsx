@@ -57,7 +57,7 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
     // Add "sn" column only if it does not already exist
     ...(!columns.some(col => col.field === "sn")
       ? [{
-          field: "sn",
+          field: "id",
           headerName: "S.No",
           width: 70,
           renderCell: (params) => params.api.getRowIndex(params.id) + 1, // Dynamic row number
@@ -85,11 +85,6 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
     })),
   ];
   
-  
-
-  
-  
-
   // console.log("columns", columns);
   return (
     <div style={{ height, width }}>

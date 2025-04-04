@@ -35,7 +35,7 @@ const UserTable = () => {
       if (Status) {
         if (Array.isArray(Result) && Result.length > 0) {
           const formatted = Result.map((opt, index) => ({
-            id: index + 1,
+            sn: index + 1,
             name: opt.name,
             username: opt.username,
             usertype: opt.en_usertype,
