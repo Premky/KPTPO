@@ -15,7 +15,7 @@ import { useAuth } from '../../Context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logout from '../Auth/Logout';
-
+import LogoutIcon from '@mui/icons-material/Logout';
 // const pages = ['Products', 'Pricing', 'Blog'];
 
 function Navbar() {
@@ -55,7 +55,10 @@ function Navbar() {
       console.error("Logout failed:", error);
     }
   };
-
+  const changeappoptions = async (data) => {
+    localStorage.setItem('app', data);
+    
+  }
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -76,53 +79,7 @@ function Navbar() {
             >
               {localStorage.getItem('office_np')}, {localStorage.getItem('branch')}
             </Typography>
-
-            {/* <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu> */}
-
-            {/* <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton> */}
           </Box>
-
-          {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box> */}
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
@@ -149,8 +106,17 @@ function Navbar() {
               <MenuItem onClick={handleCloseUserMenu}>
                 {sessionStorage.getItem('user')}
               </MenuItem>
+
+              <MenuItem onClick={() => changeappoptions('driver')}>
+                Driver & Vehicle
+              </MenuItem>
+
+              <MenuItem onClick={() => changeappoptions('av')}>
+                Arrested Vehicle
+              </MenuItem>
+
               <MenuItem onClick={handleCloseUserMenu}>
-                <Logout />
+                <Logout /> &nbsp; <LogoutIcon />
               </MenuItem>
             </Menu>
           </Box>

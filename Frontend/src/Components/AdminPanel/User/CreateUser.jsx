@@ -116,7 +116,8 @@ const CreateUser = () => {
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
                     const formatted = Result.map((opt, index) => ({
-                        id: index + 1, // MUI DataGrid requires a unique id                        
+                        sn: `${opt.id ?? `branch-${index}`}`,  // Unique key generation
+                        id: index + 1,
                         name: opt.name,
                         username: opt.username,
                         usertype: opt.en_usertype,
@@ -124,6 +125,7 @@ const CreateUser = () => {
                         branch_id: opt.branch,
                         is_active: opt.is_active ? 'छ' : 'छैन',
                     }));
+                    
                     setFormattedOptions(formatted);
                 } else {
                     console.log('No records found.');

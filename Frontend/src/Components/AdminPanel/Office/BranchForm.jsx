@@ -68,13 +68,14 @@ const BranchForm = () => {
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+    
             const { Status, Result, Error } = response.data;
-
+    
             if (Status) {
                 if (Array.isArray(Result) && Result.length > 0) {
                     const formatted = Result.map((opt, index) => ({
-                        id: index + 1,
+                        id: opt.id ?? `branch-${index}`,  // Ensure each row has a unique id
+                        sn: index+1,  // Ensure each row has a unique id
                         name_np: opt.name_np,
                         name_en: opt.name_en,
                     }));
@@ -91,6 +92,7 @@ const BranchForm = () => {
             setLoading(false);
         }
     };
+    
 
     // Handle edit action
     const handleEdit = (row) => {
@@ -108,7 +110,7 @@ const BranchForm = () => {
     }, [])
 
     const columns = [
-        { field: "id", headerName: "सि.नं." },
+        { field: "sn", headerName: "सि.नं." },        
         { field: "name_np", headerName: "शाखा" },
         { field: "name_en", headerName: "Branch" },
     ];

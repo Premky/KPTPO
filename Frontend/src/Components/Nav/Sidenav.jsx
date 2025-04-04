@@ -26,7 +26,9 @@ import CarCrashIcon from '@mui/icons-material/CarCrash';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useAuth } from '../../Context/AuthContext';
-
+import DriverMenu from './DriverMenu';
+import { use } from 'react';
+import { useEffect } from 'react';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -108,10 +110,22 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function Sidenav() {
     const { state } = useAuth();
-    const currentRole = state.role;
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [apptype, setApptype] = React.useState(localStorage.getItem('app') || ""); // Use state
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setApptype(localStorage.getItem('app') || ""); // Update state when localStorage changes
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
 
     const handleDrawerClose = () => {
         setOpen(false);
@@ -146,76 +160,18 @@ export default function Sidenav() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
-                {currentRole === "Superuser" && (
-                    <>
-                        <List>
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/users`) }}>
-                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                        <PeopleIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/office`) }}>
-                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                        <BusinessIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Office" sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/sadmin/branch`) }}>
-                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                        <RoomPreferencesIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Branch" sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </>
-                )}
-                <Divider />
-                {currentRole === "Admin" || currentRole === "Superuser" && (
-                    <>
-                        <List>
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/admin/driver`) }}>
-                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                        <CarCrashIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Vehicle & Driver" sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                        <List>
-                            <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/admin`) }}>
-                                <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                    <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                        <AirportShuttleIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Vehicle & Driver" sx={{ opacity: open ? 1 : 0 }} />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </>
-                )}
-                <Divider />
-                {currentRole === "User" || currentRole === "Admin" || currentRole === "Superuser" && (
+                {apptype.toLowerCase() === "driver" ? (
+                    <DriverMenu />
+                ) : apptype.toLowerCase() === "av" ? (
                     <List>
-                        <ListItem disablePadding sx={{ display: 'block' }} onClick={() => { navigate(`/userpage`) }}>
-                            <ListItemButton sx={{ minHeight: 48, px: 2.5, justifyContent: open ? 'initial' : 'center' }}>
-                                <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', mr: open ? 3 : 'auto' }}>
-                                    <HomeIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
+                        <ListItemButton onClick={() => navigate('/av/home')}>
+                            <ListItemIcon>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="AV Dashboard" />
+                        </ListItemButton>
                     </List>
-                )}
+                ) : null}
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3, marginBottom: 5, padding: 2, paddingLeft: 2 }}>
                 <DrawerHeader />

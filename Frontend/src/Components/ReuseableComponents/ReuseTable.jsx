@@ -50,17 +50,16 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
       showConfirmButton: false, // Hides "OK" button for a cleaner preview
     });
   };
-  
 
-   // 🔹 Updated Columns with Sorting, Image Display, and Hidden Fields
-   const updatedColumns = [
+  // 🔹 Updated Columns with Sorting, Image Display, and Hidden Fields
+  const updatedColumns = [
     // Add "sn" column only if it does not already exist
     ...(!columns.some(col => col.field === "sn")
       ? [{
           field: "id",
           headerName: "S.No",
           width: 70,
-          renderCell: (params) => params.api.getRowIndex(params.id) + 1, // Dynamic row number
+          renderCell: (params) => params.rowIndex + 1, // Dynamic row number
         }]
       : []),
     
@@ -85,7 +84,6 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
     })),
   ];
   
-  // console.log("columns", columns);
   return (
     <div style={{ height, width }}>
       {enableExport && (
@@ -101,46 +99,44 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
 
       {/* Data Table */}
       <Paper sx={{ height: 400, width: '100%' }} style={{ overflowX: 'auto' }}>
-        
-  <DataGrid
-    sx={{ border: 0 }}
-    columns={[
-      ...updatedColumns,
-      {
-        field: "actions",
-        headerName: "Actions",
-        renderCell: (params) => (
-          <div>
-            {showEdit && (
-              <Button variant="contained" color="primary" size="small" onClick={() => onEdit(params.row)}>
-                Edit
-              </Button>
-            )}
-            {showDelete && (
-              <Button variant="contained" color="secondary" size="small" onClick={() => onDelete(params.row.id)}>
-                Delete
-              </Button>
-            )}
-          </div>
-        ),
-        width: 150,
-      },
-    ]}
-    rows={rows}
-    pageSize={10}
-    initialState={{
-      columns:{
-        columnVisibilityModel:{
-          columns: columns.map((column) => ({
-            columnField: column.field,
-            isVisible: column.hide
-          }))
-        }
-      }
-    }}
-  />
-</Paper>
-
+        <DataGrid
+          sx={{ border: 0 }}
+          columns={[
+            ...updatedColumns,
+            {
+              field: "actions",
+              headerName: "Actions",
+              renderCell: (params) => (
+                <div>
+                  {showEdit && (
+                    <Button variant="contained" color="primary" size="small" onClick={() => onEdit(params.row)}>
+                      Edit
+                    </Button>
+                  )}
+                  {showDelete && (
+                    <Button variant="contained" color="secondary" size="small" onClick={() => onDelete(params.row.id)}>
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              ),
+              width: 150,
+            },
+          ]}
+          rows={rows}
+          pageSize={10}
+          initialState={{
+            columns: {
+              columnVisibilityModel: Object.fromEntries(
+                columns.map((column) => [
+                  column.field, 
+                  !column.hide // Ensure columns with `hide` false are visible
+                ])
+              ),
+            },
+          }}
+        />
+      </Paper>
     </div>
   );
 };

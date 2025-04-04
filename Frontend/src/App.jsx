@@ -36,7 +36,7 @@ function App() {
             <Route path='/' element={<ProtectedRoute />}>
               <Route path='/' element={<Sidenav />}>
                 <Route path='/sadmin' element={<SuperAdmin />}>
-                  <Route index element={<OfficeBranchPage />} />
+                  <Route path='branch' element={<OfficeBranchPage />} />
                   <Route path='users' element={<Users />} />
                   <Route path='office' element={<Office />} />
                 </Route>
