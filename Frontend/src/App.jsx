@@ -5,7 +5,8 @@ import ProtectedRoute from './Context/ProtectedRoute';
 
 // Lazy-loaded components
 const Login = lazy(() => import('./Components/Auth/Login'));
-const Sidenav = lazy(() => import('./Components/Nav/Sidenav'));
+// const Sidenav = lazy(() => import('./Components/Nav/Sidenav'));
+const CombinedNavBar=lazy(() => import ('./Components/Nav/CombinedNavBar'));
 const Home = lazy(() => import('./Components/Pages/Home'));
 const Users = lazy(() => import('./Components/AdminPanel/User/CreateUser'));
 const OfficeBranchPage = lazy(() => import('./Components/AdminPanel/Office/OfficeBranchPage'));
@@ -17,6 +18,8 @@ const DailyKasurForm = lazy(() => import('./Components/Tango/ArrestedVehicle/Cli
 const ArrestedVehicleForm = lazy(() => import('./Components/Tango/ArrestedVehicle/Client/ArrestedVehicleForm'));
 const TangoAdminDashboard = lazy(() => import('./Components/Tango/ArrestedVehicle/Admin/TangoAdminDashboard'));
 const TangoHome = lazy(() => import('./Components/Tango/ArrestedVehicle/Admin/TangoHome'));
+
+const AccidentForm = lazy(() => import('./Components/VehicleAccident/AccidentForm'));
 
 // Middleware Components
 import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
@@ -34,7 +37,7 @@ function App() {
 
             {/* Protected Routes */}
             <Route path='/' element={<ProtectedRoute />}>
-              <Route path='/' element={<Sidenav />}>
+              <Route path='/' element={<CombinedNavBar />}>
                 <Route path='/sadmin' element={<SuperAdmin />}>
                   <Route path='branch' element={<OfficeBranchPage />} />
                   <Route path='users' element={<Users />} />
@@ -59,6 +62,11 @@ function App() {
                     <Route path='tango-user' element={<Users />} />
                     <Route path='arrest_vehicle-report' element={<ArrestVehicleReport />} />
                   </Route>
+                </Route>
+
+                <Route path='/va'>
+                  <Route index element={<AccidentForm />} />
+                  <Route path='accident-form' element={<AccidentForm/>} />
                 </Route>
 
               </Route>

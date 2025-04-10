@@ -28,10 +28,11 @@ router.post("/create_user", async (req, res) => {
             return res.status(400).json({ message: "पासवर्डहरू मिलेन।" });
         }
         // Check if the username already exists
-        const existingUser = await query("SELECT id FROM users WHERE username = ?", [userid]);
-        if (existingUser.length === 0) {
+        const existingUser = await query("SELECT id FROM users WHERE username = ?", [username]);
+        if (existingUser.length > 0) {
             return res.status(400).json({ message: "यो प्रयोगकर्ता नाम पहिल्यै अवस्थित छ।" });
         }
+        
         // Hash the password
         const hashedPassword = await hashPassword(password);
         // Insert user into the database
@@ -95,10 +96,11 @@ router.put('/update_user/:userid', async (req, res) => {
         return res.status(400).json({ message: "पासवर्डहरू मिलेन।" });
     }
     // Check if the username already exists
-    const existingUser = await query("SELECT id FROM users WHERE username = ?", [userid]);
-    if (!existingUser.length > 0) {
+    const existingUser = await query("SELECT id FROM users WHERE id = ?", [userid]);
+    if (existingUser.length === 0) {
         return res.status(400).json({ message: "यो प्रयोगकर्ता अवस्थित छैन।" });
     }
+    
     console.log('username:', userid)    
     // Hash the password
     const hashedPassword = await hashPassword(password);
@@ -162,10 +164,14 @@ const fetchUserQuery = `
     WHERE u.username = ?;
 `;
 
-// Route to login
-// const password = hashedPasswordpassword;
-// console.log('username:',username,'password:',password)
+const fetchUserAppsQuery = `
+    SELECT a.id AS app_id, a.name_np AS app_name_np, a.name_en AS app_name_en, a.short_name AS app_short_name
+    FROM apps a
+            LEFT JOIN user_apps ua ON a.id = ua.app_id
+    WHERE ua.user_id = ?;
+`;
 
+// Route to login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -195,38 +201,63 @@ router.post('/login', async (req, res) => {
                 return res.status(401).json({ loginStatus: false, Error: "Invalid username or password" });
             }
 
-            // Generate JWT token
-            const token = jwt.sign({
-                uid: user.uid,
-                role: user.role_en,
-                username: user.username,
-                office: user.office_id
-            },
-                process.env.JWT_SECRET,
-                { expiresIn: '3d' }
-            );
+            // Fetch the user's allowed apps
+            con.query(fetchUserAppsQuery, [user.id], (err, appsResult) => {
+                if (err) {
+                    console.error("Error fetching apps:", err);
+                    return res.status(500).json({ loginStatus: false, Error: "Error fetching apps" });
+                }
 
-            // Set token in HTTP-only cookie
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                path: '/',
-                maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+                // Extract allowed apps
+                const allowedApps = appsResult.map(app => ({
+                    app_id: app.app_id,
+                    app_name_np: app.app_name_np,
+                    app_name_en: app.app_name_en,
+                    app_short_name: app.app_short_name
+                }));
+                console.log("Allowed Apps:", allowedApps);
+
+                // Prepare user details
+                const userdetails = {
+                    id: user.id,
+                    username: user.username,
+                    usertype: user.usertype,
+                    office_id: user.office_id,
+                    branch_id: user.branch_id,
+                    is_active: user.is_active,
+                    role_np: user.role_np,
+                    role_en: user.role_en,
+                    office_np: user.office_np,
+                    office_en: user.office_en,
+                    branch_name: user.branch_name,
+                    allowed_apps: allowedApps, // Include allowed apps in the response
+                };
+
+                // Generate JWT token
+                const token = jwt.sign(userdetails, process.env.JWT_SECRET, {expiresIn: '1d'});
+
+                // Set token in HTTP-only cookie
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'Lax',
+                    path: '/',
+                    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+                });
+
+                // Send user details along with allowed apps (without token)
+                return res.json({
+                    loginStatus: true,
+                    userdetails: {
+                        username: user.username,
+                        role: user.role_en,
+                        office: user.office_np,
+                        allowed_apps: allowedApps,
+                    },
+                    token: token,
+                });
             });
 
-            // Send user details (without token)
-            return res.json({
-                loginStatus: true,
-                username: user.username,
-                branch: user.branch_name,
-                usertype: user.role_en,
-                // office_np: user.office_name,
-                office_np: user.office_np,
-                office_id: user.office_id,
-                main_office_id: user.main_office_id,
-                token: token,
-            });
         });
 
     } catch (err) {
@@ -239,7 +270,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
     console.log('Logging out');
     try {
-        res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'Strict' });
+        res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'Lax' });
         return res.status(200).json({ success: true, message: 'Logout successful' });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Logout failed' });
@@ -248,15 +279,25 @@ router.post('/logout', (req, res) => {
 
 router.get('/session', (req, res) => {
     const token = req.cookies.token;
-    console.log("Session:", token)
+    // console.log("Session:", token)
     if (!token) {
         return res.status(401).json({ success: false, message: 'No active session' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        res.status(200).json({ success: true, role: decoded.role, 
-                                token, user: decoded.username, office_id:decoded.office });
+        res.status(200).json({
+            success: true,
+            token,
+            user: decoded.username,
+            role: decoded.role_en,
+            office_id: decoded.office_id,
+            office_np: decoded.office_np,
+            branch_np: decoded.branch_name,
+            main_office_id: decoded.main_office_id,
+            allowed_apps: decoded.allowed_apps,
+        });  // Send the decoded token data as response to AuthProvider(AuthContext.jsx)
+        
     } catch (error) {
         res.status(401).json({ success: false, message: 'Invalid session' });
     }

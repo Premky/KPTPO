@@ -1,5 +1,4 @@
 import React from 'react'
-import Sidenav from '../Nav/Sidenav'
 import { Box } from '@mui/material'
 import AccidentForm from '../Tango/Accident/AccidentForm'
 import DriverForm from '../Tango/Driver/DriverForm'
@@ -12,7 +11,7 @@ const Home = () => {
 
       <Box sx={{ display: 'flex' }}>
         {/* <AccidentForm/> */}        
-        <DriverForm />
+        Home Page
         
       </Box>
     </>

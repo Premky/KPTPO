@@ -28,7 +28,7 @@ const ReuseInput = ({ name, label, required, control, error, placeholder,type, r
                         placeholder={placeholder}
                         type={type||'text'}
                         readOnly={readonly}
-                        inputProps={{ maxLength: length || 255 }} // Set max length
+                        inputProps={{ maxLength: length || 255 }} // Set max length                        }}
                     />
                 )}
             />

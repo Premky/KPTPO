@@ -29,6 +29,7 @@ const useApiBaseUrl = () => {
         const fetchBaseUrl = async () => {
             const url = await getAvailableBaseUrl();
             setBaseUrl(url);
+            console.log("Base URL:", url);
         };
         fetchBaseUrl();
     }, []);
@@ -52,8 +53,7 @@ const Login = () => {
         password: '',
     });
     const [error, setError] = useState();
-
-    const branch = localStorage.getItem("branch")
+    
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
@@ -84,12 +84,7 @@ const Login = () => {
             if (response.data.loginStatus) {
                 // Save necessary data in localStorage
                 // setToken(response.data.token);
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem("office_np", response.data.office_np);
-                localStorage.setItem("branch", response.data.branch);
-                localStorage.setItem("BASE_URL", BASE_URL);
-                sessionStorage.setItem("token", response.data.token);
-                console.log(response.data);
+
                 dispatch({
                     type: "LOGIN",
                     payload: {
@@ -101,6 +96,8 @@ const Login = () => {
                         office_id: response.data.office_id,
                         main_office_id: response.data.main_office_id,
                         valid: response.data.loginStatus,
+                        app_np: response.data.app_np,
+                        app_en: response.data.app_en
                     },
                 });
                 // Redirect to home page
