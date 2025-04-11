@@ -15,9 +15,10 @@ const ReuseAccidentReason = ({ name, label, required, control, error, reason_typ
 
     const fetchAccidentReasons = async () => {
         try {
-            const url = `${BASE_URL}/public/get_states`;
+            const url = `${BASE_URL}/public/get_accident_reasons/${reason_type}`; // Adjusted URL to include reason_type
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
             });
 
             const { Status, Result, Error } = response.data;

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios'; // Import axios
-import { InputLabel, TextField, Autocomplete } from '@mui/material';
+import { InputLabel, TextField, Autocomplete, Grid2 } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
 
 const ReuseVehicles = ({ name, label, required, control, error }) => {
-        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = localStorage.getItem('BASE_URL');
     const token = localStorage.getItem('token');
 
     // State to store district options
@@ -47,8 +47,14 @@ const ReuseVehicles = ({ name, label, required, control, error }) => {
     return (
         <>
             <InputLabel id={name}>
-                {label}
-                {required && <span style={{ color: 'red' }}>*</span>}
+                <Grid2 container alignItems="center">
+                    <Grid2 xs={12} sm={6} md={6} >
+                        {label}
+                    </Grid2>
+                    <Grid2 xs={12} sm={6} md={6} >
+                        {required && <span style={{ color: 'red' }}>*</span>}
+                    </Grid2>
+                </Grid2>
             </InputLabel>
 
             <Controller
@@ -63,11 +69,7 @@ const ReuseVehicles = ({ name, label, required, control, error }) => {
                         value={formattedOptions.find((option) => option.value === value) || null} // Ensure selected value matches
                         onChange={(_, newValue) => onChange(newValue ? newValue.value : '')} // Store only value
                         sx={{ width: '100%' }}
-                        // renderOption={(props, option) => (
-                        //     <Box key={option.value} component="li" {...props}>
-                        //         {option.label}
-                        //     </Box>
-                        // )}
+
                         renderInput={(params) => (
                             <TextField
                                 {...params}

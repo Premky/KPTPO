@@ -215,7 +215,7 @@ router.post('/login', async (req, res) => {
                     app_name_en: app.app_name_en,
                     app_short_name: app.app_short_name
                 }));
-                console.log("Allowed Apps:", allowedApps);
+                // console.log("Allowed Apps:", allowedApps);
 
                 // Prepare user details
                 const userdetails = {
