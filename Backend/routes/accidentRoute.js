@@ -24,7 +24,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
         accident_location, accident_time, death_male, death_female, death_other,
         gambhir_male, gambhir_female, gambhir_other,
         general_male, general_female, general_other,
-        animal_death, animal_injured
+        animal_death, remarks, animal_injured
     } = req.body;
 
     const accidentRecord = [
@@ -32,7 +32,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
         accident_location, accident_time, death_male, death_female, death_other,
         gambhir_male, gambhir_female, gambhir_other,
         general_male, general_female, general_other,
-        animal_death, animal_injured, office_id, username
+        animal_death, animal_injured, remarks, office_id, username
     ];
 
     try {
@@ -45,7 +45,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
                 accident_location, accident_time, death_male, death_female, death_other,
                 gambhir_male, gambhir_female, gambhir_other,
                 general_male, general_female, general_other,
-                animal_death, animal_injured, office_id, created_by
+                animal_death, animal_injured, remarks, office_id, created_by
             ) VALUES (?)`;
 
         const accidentResult = await queryAsync(insertAccidentSQL, [accidentRecord]);

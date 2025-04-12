@@ -48,7 +48,6 @@ const AccidentShortTable = () => {
         });
     };
 
-    const [vehiclesMap, setVehiclesMap] = useState({});
 
 
 
@@ -67,7 +66,7 @@ const AccidentShortTable = () => {
         { field: "casualties", headerName: "घाइतेको संख्या" },
         { field: "fatalities", headerName: "मृतकको संख्या" },
         { field: "vehicle_names", headerName: "सवारी साधन संलग्न" },
-        { field: "remark", headerName: "कैफियत" },
+        { field: "remarks", headerName: "कैफियत" },
     ]
     return (
         <>

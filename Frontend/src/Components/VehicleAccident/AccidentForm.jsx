@@ -15,6 +15,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import RemoveIcon from '@mui/icons-material/Remove';
 import AccidentShortTable from './AccidentShortTable'
+import AccidentLongTable from './AccidentLongTable'
 
 const AccidentForm = () => {
     const BASE_URL = localStorage.getItem('BASE_URL');
@@ -294,6 +295,7 @@ const AccidentForm = () => {
             </Box >
             <Box sx={{ flexGrow: 1, margin: 2 }}>
                 <AccidentShortTable/>
+                <AccidentLongTable/>
             </Box>
         </>
     )
