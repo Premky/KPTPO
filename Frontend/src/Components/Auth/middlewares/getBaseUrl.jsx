@@ -1,7 +1,8 @@
 const API_OPTIONS = [
     "http://192.168.165.250:3003",
     "http://192.168.192.250:3003",
-    "http://localhost:3003"
+    "http://localhost:3003",
+    "https://kptpo-backend.onrender.com"
 ];
 
 const HEALTH_CHECK_PATH = "/auth/health";

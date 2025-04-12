@@ -14,6 +14,7 @@ import ReuseAccidentReason from '../ReuseableComponents/ReuseAccidentReason'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import RemoveIcon from '@mui/icons-material/Remove';
+import AccidentShortTable from './AccidentShortTable'
 
 const AccidentForm = () => {
     const BASE_URL = localStorage.getItem('BASE_URL');
@@ -89,7 +90,7 @@ const AccidentForm = () => {
             const { Status, Result, Error } = response.data;
             if (Status) {
                 alert('Data submitted successfully!');
-                
+
                 reset(); // Reset the form after successful submission
                 setEditing(false); // Reset editing state
                 fetchAccidentRecords(); // Fetch updated records
@@ -199,9 +200,9 @@ const AccidentForm = () => {
                                     <Button variant="contained" color="secondary" size='small'
                                         type="button" onClick={() => setVehicleCount(vehicleCount + 1)}>+</Button>
                                 </Grid2>
-                                <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>                                                                        
+                                <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>
                                     {vehicleCount > 1 ?
-                                        <Button variant="contained" color="warning" size='small' spacing={1} 
+                                        <Button variant="contained" color="warning" size='small' spacing={1}
                                             type="button" onClick={() => setVehicleCount(vehicleCount - 1)}><RemoveIcon /></Button>
                                         : null}
                                 </Grid2>
@@ -291,6 +292,9 @@ const AccidentForm = () => {
                     </Grid2>
                 </form>
             </Box >
+            <Box sx={{ flexGrow: 1, margin: 2 }}>
+                <AccidentShortTable/>
+            </Box>
         </>
     )
 }
