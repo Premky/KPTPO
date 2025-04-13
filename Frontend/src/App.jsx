@@ -25,6 +25,7 @@ const AccidentForm = lazy(() => import('./Components/VehicleAccident/AccidentFor
 import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
 import AdminCheck from './Components/Auth/middlewares/AdminCheck';
 import UserCheck from './Components/Auth/middlewares/UserCheck';
+import AccidentLongTable from './Components/VehicleAccident/AccidentLongTable';
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
                 <Route path='/va'>
                   <Route index element={<AccidentForm />} />
                   <Route path='accident-form' element={<AccidentForm/>} />
+                  <Route path='accident-report' element={<AccidentLongTable/>} />
                 </Route>
 
               </Route>

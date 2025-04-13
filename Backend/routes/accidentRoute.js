@@ -78,14 +78,18 @@ router.post("/create_accident", verifyToken, async (req, res) => {
 
         for (const [key, vehicle_id] of vehicleEntries) {
             const vehicleIndex = key.split('_')[2];
+            const categoryKey = `vehicle_category_${vehicleIndex}`;
+            const vehicle_category = req.body[categoryKey] || "";
+            const countryKey = `vehicle_country_${vehicleIndex}`;
+            const vehicle_country = req.body[countryKey] || "";
             const remarkKey = `vehicle_remark_${vehicleIndex}`;
             const vehicle_remark = req.body[remarkKey] || "";
 
             const insertVehicleSQL = `
                 INSERT INTO accident_vehicles (
-                    accident_id, vehicle_id, vehicle_role
-                ) VALUES (?, ?, ?)`;
-            await queryAsync(insertVehicleSQL, [accident_id, vehicle_id, vehicle_remark]);
+                    accident_id, vehicle_id, category_id, country_id, vehicle_role
+                ) VALUES (?, ?, ?,?, ?)`;
+            await queryAsync(insertVehicleSQL, [accident_id, vehicle_id, vehicle_category, vehicle_country, vehicle_remark]);
         }
 
         await commitAsync(); // Commit the transaction
@@ -134,6 +138,19 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
                 WHERE av.accident_id = ar.id
             ) AS vehicles,
 
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', ars.id,
+                        'name_np', ars.name_np,
+                        'name_en', ars.name_en
+                    )
+                )
+                FROM accident_record_reasons arr
+                JOIN accident_reasons ars ON arr.accident_id = ars.id                
+                WHERE arr.accident_id = ar.id
+            ) AS reasons,
+
             (ar.death_male + ar.death_female + ar.death_other) AS fatalities,
             (ar.gambhir_male + ar.gambhir_female + ar.gambhir_other) AS gambhir,
             (ar.general_male + ar.general_female + ar.general_other) AS general,
@@ -149,11 +166,7 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
         LEFT JOIN np_states s ON ar.state_id = s.id
         LEFT JOIN np_municipalities m ON ar.municipality_id = m.id
 
-        GROUP BY ar.id;
-
-
-
-                `;
+        GROUP BY ar.id`;
     try {
         const result = await query(sql);
         return res.json({ Status: true, Result: result, message: 'Records fetched successfully.' })

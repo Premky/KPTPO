@@ -18,6 +18,10 @@ const VehicleAccidentMenu = () => {
         <ListItemIcon> <DynamicFormIcon />    </ListItemIcon>
         <ListItemText primary="AV Dashboard" />
       </ListItemButton>
+      <ListItemButton onClick={() => navigate('/va/accident-report')}>
+        <ListItemIcon> <DynamicFormIcon />    </ListItemIcon>
+        <ListItemText primary="Details" />
+      </ListItemButton>
     </List>
   );
 };

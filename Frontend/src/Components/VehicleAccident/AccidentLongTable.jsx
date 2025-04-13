@@ -53,7 +53,7 @@ export default function AccidentLongTable() {
                 withCredentials: true,
             });
             const { Status, Result, Error } = response.data;
-    
+
             if (Status) {
                 return Result || [];
             } else {
@@ -66,7 +66,7 @@ export default function AccidentLongTable() {
             return [];
         }
     };
-    
+
 
     const fetchVehicles = async () => {
         const url = `${BASE_URL}/public/get_vehicles`;
@@ -98,10 +98,10 @@ export default function AccidentLongTable() {
     const fetchAccidentReasons = () => {
         fetchData(`${BASE_URL}/public/get_accident_reasons`, {}, setAccidentReasons);
         // console.log('Accident Reasons:', accidentReasons);
-        accidentReasons.forEach((reason, index ) => {
+        accidentReasons.forEach((reason, index) => {
             // console.log('Accident Reason:',reason.reason_type, reason.name_np);
             setAccidentReasonCount((prev) => [...prev, reason.name_np]);
-            
+
         });
     };
 
@@ -116,7 +116,7 @@ export default function AccidentLongTable() {
             const types = await fetchData(`${BASE_URL}/public/get_accident_types`);
             const vehicles = await fetchData(`${BASE_URL}/public/get_vehicles`);
             const records = await fetchData(`${BASE_URL}/accident/get_accident_records`);
-    
+
             setAccidentReasons(reasons);
             setAccidentTypes(types);
             setVehicles(vehicles.map(opt => ({
@@ -124,7 +124,7 @@ export default function AccidentLongTable() {
                 value: opt.id
             })));
             setVehicleCount(vehicles.length);
-    
+
             const formatted = records.map((item, index) => ({
                 ...item,
                 id: item.id || index,
@@ -133,7 +133,7 @@ export default function AccidentLongTable() {
             }));
             setFormattedOptions(formatted);
             setAccidentRecords(records);
-    
+
             const reasonTypeCount = types.map((type) => {
                 const count = reasons.filter(reason => reason.reason_type === type.id).length;
                 return {
@@ -145,10 +145,10 @@ export default function AccidentLongTable() {
             setAccidentReasonCount(reasonTypeCount);
             // console.log('Accident Reason Count:', reasonTypeCount);
         };
-    
+
         fetchDataAsync();
     }, []);
-    
+
     const totalAccidentCount = accidentTypes.reduce((sum, type) => sum + type.count, 0);
 
     useEffect(() => {
@@ -156,7 +156,7 @@ export default function AccidentLongTable() {
         fetchAccidentRecords();
         fetchAccidentTypes();
         fetchAccidentReasons();
-    }, []);    
+    }, []);
 
     const sortedRows = [...formattedOptions].sort(getComparator(order, orderBy));
 
@@ -176,8 +176,8 @@ export default function AccidentLongTable() {
 
                         <TableCell align="center" rowSpan={2} colSpan={2}>चौपाया</TableCell>
                         <TableCell align="center" colSpan={6}>दुर्घटनाको समय</TableCell>
-                        
-                        <TableCell align="center" colSpan={totalAccidentCount+1}> सवारी दुर्घटनाको कारण </TableCell>
+
+                        <TableCell align="center" colSpan={totalAccidentCount + 1}> सवारी दुर्घटनाको कारण </TableCell>
                         <TableCell align="center" rowSpan={3}> सवारी साधन क्षेती </TableCell>
                         <TableCell align="center" rowSpan={3}> अनुमानित रकम </TableCell>
                         <TableCell align="center" rowSpan={3}> कसरी सदु भएको </TableCell>
@@ -245,7 +245,56 @@ export default function AccidentLongTable() {
                                     {row.vehicle_names.includes(vehicle.label) ? vehicle.label : ''}
                                 </TableCell>
                             ))}
-                            <TableCell>{/* Total count here */}</TableCell>
+                            <TableCell>Total </TableCell>
+                            <TableCell>{row.death_male} </TableCell>
+                            <TableCell>{row.death_female} </TableCell>
+                            <TableCell>{row.death_boy} </TableCell>
+                            <TableCell>{row.death_girl} </TableCell>
+                            <TableCell>{row.death_other} </TableCell>
+                            <TableCell>{row.fatalities} </TableCell>
+
+                            <TableCell>{row.gambhir_male} </TableCell>
+                            <TableCell>{row.gambhir_female} </TableCell>
+                            <TableCell>{row.gambhir_boy} </TableCell>
+                            <TableCell>{row.gambhir_girl} </TableCell>
+                            <TableCell>{row.gambhir_other} </TableCell>
+                            <TableCell>{row.gambhir} </TableCell>
+
+                            <TableCell>{row.general_male} </TableCell>
+                            <TableCell>{row.general_female} </TableCell>
+                            <TableCell>{row.general_boy} </TableCell>
+                            <TableCell>{row.general_girl} </TableCell>
+                            <TableCell>{row.general_other} </TableCell>
+                            <TableCell>{row.general} </TableCell>
+
+                            <TableCell>{row.animal_death}</TableCell>
+                            <TableCell>{row.animal_injured}</TableCell>
+
+                            <TableCell>{row.accident_time > "00:06" && row.accident_time < "12:00" ? 1 : ""}</TableCell>
+                            <TableCell>{row.accident_time > "12:00" && row.accident_time < "18:00" ? 1 : ""}</TableCell>
+                            <TableCell>{row.accident_time > "18:00" && row.accident_time < "24:00" ? 1 : ""}</TableCell>
+                            <TableCell>{row.accident_time > "24:00" && row.accident_time < "00:06" ? 1 : ""}</TableCell>
+                            <TableCell>{!row.accident_time ? 1 : ""}</TableCell>
+                            {/* <TableCell>{row.reasons}</TableCell> */}
+
+                            {/* {row.reasons.map((reason) => (
+                                <TableCell key={reason.value}>
+                                    {row.reason_names.includes(reason.label) ? reason.label : ''}
+                                </TableCell>
+                            ))} */}
+
+                            {/* {row.reasons.map((reason) => (
+                                <TableCell key={reason.id}>
+                                    {reason.name_np}
+                                </TableCell>
+                            ))} */}
+
+
+                            {/* {accidentReasons.map((reason, index) => (
+                                <TableCell key={index} align="center">{reason.name_np === row. ? 1 : 0}</TableCell>
+                            ))} */}
+
+
                             {/* Add more cells for human injuries, deaths, animals, etc. */}
                         </TableRow>
                     ))}

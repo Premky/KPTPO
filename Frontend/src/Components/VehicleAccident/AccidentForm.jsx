@@ -17,6 +17,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import AccidentShortTable from './AccidentShortTable'
 import AccidentLongTable from './AccidentLongTable'
 import { useBaseURL } from '../../Context/BaseURLProvider'
+import ReuseCountry from '../ReuseableComponents/ReuseCountry'
 
 const AccidentForm = () => {
     // const BASE_URL = localStorage.getItem('BASE_URL');
@@ -172,10 +173,10 @@ const AccidentForm = () => {
                     </Grid2>
 
 
-                    <Grid2 container spacing={1} marginTop={2}>
-                        {[...Array(vehicleCount)].map((_, index) => (
-                            <React.Fragment key={index}>
-                                <Grid2 size={{ xs: 5, sm: 5, md: 5 }}>
+                    {[...Array(vehicleCount)].map((_, index) => (
+                        <Grid2 container spacing={1} marginTop={2} key={index}>
+                            
+                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
                                     <ReuseVehicles
                                         name={`vehicle_name_${index + 1}`}
                                         label={
@@ -189,8 +190,31 @@ const AccidentForm = () => {
                                         options={''}
                                     />
                                 </Grid2>
+                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
+                                    <ReuseVehicles
+                                        name={`vehicle_category_${index + 1}`}
+                                        label={
+                                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                                <>सवारीको प्रकार {index + 1}</>
+                                            </Box>
+                                        }
+                                        required
+                                        control={control}
+                                        error={errors[`vehicle_category_${index + 1}`]}
+                                        options={''}
+                                    />
+                                </Grid2>
 
-                                <Grid2 size={{ xs: 4, sm: 4, md: 4 }}>
+                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
+                                    <ReuseCountry
+                                        name={`vehicle_country_${index + 1}`}
+                                        label={<>सवारीको देश {index + 1}</>}
+                                        required
+                                        control={control}
+                                        error={errors[`vehicle_country_${index + 1}`]}
+                                    />
+                                </Grid2>
+                                <Grid2 size={{ xs: 3, sm: 3, md: 3 }}>
                                     <ReuseInput
                                         type="text"
                                         label="कैफियत"
@@ -209,9 +233,9 @@ const AccidentForm = () => {
                                             type="button" onClick={() => setVehicleCount(vehicleCount - 1)}><RemoveIcon /></Button>
                                         : null}
                                 </Grid2>
-                            </React.Fragment>
-                        ))}
-                    </Grid2>
+                            
+                        </Grid2>
+                    ))}
 
 
                     <Grid2 container spacing={1} marginTop={2}>
@@ -326,7 +350,7 @@ const AccidentForm = () => {
             </Box >
             <Box sx={{ flexGrow: 1, margin: 2 }}>
                 <AccidentShortTable />
-                {/* <AccidentLongTable/> */}
+                <AccidentLongTable/>
             </Box>
         </>
     )
