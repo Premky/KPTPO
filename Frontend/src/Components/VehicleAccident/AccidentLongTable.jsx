@@ -106,17 +106,7 @@ export default function AccidentLongTable() {
 
     const fetchAccidentTypes = () => {
         fetchData(`${BASE_URL}/public/get_accident_types`, {}, setAccidentTypes);
-        accidentTypes.forEach((type, index) => {
-            accidentReasons.forEach((reason, index) => {
-                let count=0;
-                if(type.id === reason.reason_type){
-                    count++;
-                }
-                // setAccidentReasonCount((prev)=>[...prev, reason_type:count])
-
-                count=0;
-            });
-        });
+        console.log('Accident Types:', accidentTypes);
     };
 
     useEffect(() => {
@@ -152,13 +142,13 @@ export default function AccidentLongTable() {
                 };
             });
             setAccidentReasonCount(reasonTypeCount);
-            console.log('Accident Reason Count:', reasonTypeCount);
+            // console.log('Accident Reason Count:', reasonTypeCount);
         };
     
         fetchDataAsync();
     }, []);
     
-
+    const totalAccidentCount = accidentTypes.reduce((sum, type) => sum + type.count, 0);
 
     useEffect(() => {
         fetchVehicles();
@@ -185,10 +175,12 @@ export default function AccidentLongTable() {
 
                         <TableCell align="center" rowSpan={2} colSpan={2}>चौपाया</TableCell>
                         <TableCell align="center" colSpan={6}>दुर्घटनाको समय</TableCell>
-
-                        {accidentTypes.map((type, index) => (
-                            <TableCell key={index} align="center" rowSpan={2} >{type.name_np}</TableCell>
-                        ))}
+                        
+                        <TableCell align="center" colSpan={totalAccidentCount+1}> सवारी दुर्घटनाको कारण </TableCell>
+                        <TableCell align="center" rowSpan={3}> सवारी साधन क्षेती </TableCell>
+                        <TableCell align="center" rowSpan={3}> अनुमानित रकम </TableCell>
+                        <TableCell align="center" rowSpan={3}> कसरी सदु भएको </TableCell>
+                        <TableCell align="center" rowSpan={3}> कैफियत </TableCell>
                     </TableRow>
 
                     <TableRow>
@@ -204,6 +196,10 @@ export default function AccidentLongTable() {
                         <TableCell align="center" rowSpan={2}>००ः१८/००ः००</TableCell>
                         <TableCell align="center" rowSpan={2}>००ः००/०६ः००</TableCell>
                         <TableCell align="center" rowSpan={2}>समय नखुलेको</TableCell>
+                        <TableCell align="center" rowSpan={2}>जम्मा</TableCell>
+                        {accidentTypes.map((type, index) => (
+                            <TableCell key={index} align="center" colSpan={type.count} >{type.name_np}</TableCell>
+                        ))}
                         <TableCell align="center" rowSpan={2}>जम्मा</TableCell>
                     </TableRow>
 

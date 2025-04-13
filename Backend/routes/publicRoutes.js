@@ -104,7 +104,15 @@ router.get('/get_usertypes', async(req, res)=>{
 
 router.get('/get_accident_types/', async(req, res)=>{
     
-    const sql = `SELECT * from accident_reason_type ORDER BY id`; 
+    const sql = `SELECT art.*,
+                    COUNT(*) AS count
+                FROM 
+                    accident_reasons ar
+                JOIN 
+                    accident_reason_type art ON ar.reason_type = art.id
+                GROUP BY 
+                    ar.reason_type
+                ORDER BY ar.reason_type`;; 
     try{
         const result = await query(sql);
         return res.json({Status:true, Result:result})
@@ -116,7 +124,8 @@ router.get('/get_accident_types/', async(req, res)=>{
 
 router.get('/get_accident_reasons/', async(req, res)=>{
     const {reason_type} = req.params;
-    const sql = `SELECT * FROM accident_reasons ar ORDER BY reason_type`; 
+    const sql = `SELECT * FROM accident_reasons ar 
+                ORDER BY reason_type`; 
     try{
         const result = await query(sql, [reason_type]);
         return res.json({Status:true, Result:result})
