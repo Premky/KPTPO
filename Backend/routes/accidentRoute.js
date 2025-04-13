@@ -21,17 +21,17 @@ router.post("/create_accident", verifyToken, async (req, res) => {
 
     const {
         date, state_id, district_id, municipality_id, ward, road_name,
-        accident_location, accident_time, death_male, death_female, death_other,
-        gambhir_male, gambhir_female, gambhir_other,
-        general_male, general_female, general_other,
-        animal_death, remarks, animal_injured
+        accident_location, accident_time, death_male, death_female, death_boy, death_girl, death_other,
+        gambhir_male, gambhir_female, gambhir_boy, gambhir_girl, gambhir_other,
+        general_male, general_female, general_boy, general_girl, general_other,
+        animal_death, animal_injured, remarks
     } = req.body;
 
     const accidentRecord = [
         date, state_id, district_id, municipality_id, ward, road_name,
-        accident_location, accident_time, death_male, death_female, death_other,
-        gambhir_male, gambhir_female, gambhir_other,
-        general_male, general_female, general_other,
+        accident_location, accident_time, death_male, death_female, death_boy, death_girl, death_other,
+        gambhir_male, gambhir_female, gambhir_boy, gambhir_girl, gambhir_other,
+        general_male, general_female, general_boy, general_girl, general_other,
         animal_death, animal_injured, remarks, office_id, username
     ];
 
@@ -42,9 +42,9 @@ router.post("/create_accident", verifyToken, async (req, res) => {
         const insertAccidentSQL = `
             INSERT INTO accident_records (
                 date, state_id, district_id, municipality_id, ward, road_name,
-                accident_location, accident_time, death_male, death_female, death_other,
-                gambhir_male, gambhir_female, gambhir_other,
-                general_male, general_female, general_other,
+                accident_location, accident_time, death_male, death_female, death_boy, death_girl, death_other,
+                gambhir_male, gambhir_female, gambhir_boy, gambhir_girl, gambhir_other,
+                general_male, general_female, general_boy, general_girl, general_other,
                 animal_death, animal_injured, remarks, office_id, created_by
             ) VALUES (?)`;
 
