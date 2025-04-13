@@ -16,7 +16,7 @@ import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 import XportKasur from '../XportKasur';
 import XportData from '../XportKasurReport';
 import XportKasurReport from '../XportKasurReport';
-import { useBaseURL } from '../../../Context/BaseURLProvider'; // Import the custom hook for base URL
+import { useBaseURL } from '../../../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const RajashwaReport = () => {
     const { pmis } = useParams();
