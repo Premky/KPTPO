@@ -16,13 +16,14 @@ import ReusableTable from '../../../ReuseableComponents/ReuseTable';
 import { useAuth } from '../../../../Context/AuthContext';
 import Swal from 'sweetalert2';
 import ReuseSelect from '../../../ReuseableComponents/ReuseSelect';
+import { useBaseURL } from '../../../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const DailyKasurForm = () => {
     const { pmis } = useParams();
     const { state } = useAuth();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const [BASE_URL, setBASE_URL] = useState(localStorage.getItem('BASE_URL'));
-
+    // const [BASE_URL, setBASE_URL] = useState(localStorage.getItem('BASE_URL'));
+    const BASE_URL = useBaseURL();
     const token = state.token;
 
     const navigate = useNavigate();

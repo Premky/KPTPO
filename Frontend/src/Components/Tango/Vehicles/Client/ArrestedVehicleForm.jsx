@@ -14,10 +14,12 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 
 import XportKasur from '../XportKasur';
+import { useBaseURL } from '../../../../Context/BaseURLProvider';
 
 const ArrestedVehicleForm = () => {
     const { pmis } = useParams();
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
     const npToday = new NepaliDate();

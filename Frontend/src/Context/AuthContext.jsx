@@ -1,9 +1,9 @@
 import { createContext, useContext, useReducer, useEffect, useState } from "react";
 import axios, { all } from "axios";
-
+import { useBaseURL } from "./BaseURLProvider";
 // const BASE_URL = localStorage.getItem('BASE_URL') || 'http://192.168.165.250:3003';
-const BASE_URL = localStorage.getItem('BASE_URL');
-
+// const BASE_URL = localStorage.getItem('BASE_URL');
+const BASE_URL = useBaseURL();
 const AuthContext = createContext();
 
 const initialState = {

@@ -2,10 +2,12 @@ import { Autocomplete, TextField, InputLabel } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Controller } from 'react-hook-form';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const ReuseBranch = ({ name, label, required, control, error, selectedValue }) => {
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
 
     const [formattedOptions, setFormattedOptions] = useState([]);

@@ -5,9 +5,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import NepaliDate from 'nepali-datetime'
 import { Box, Grid2 as Grid, Grid2, InputLabel, TextField } from '@mui/material'
-
+import { useBaseURL } from '../../../Context/BaseURLProvider' // Import the custom hook for base URL
 const AccidentForm = () => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

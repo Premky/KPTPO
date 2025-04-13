@@ -26,12 +26,13 @@ import CarCrashIcon from '@mui/icons-material/CarCrash';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useAuth } from '../../Context/AuthContext';
-
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 const DriverMenu = () => {
-        const { state } = useAuth();
-        const currentRole = state.role;
-        const navigate = useNavigate();
-        
+    const BASE_URL = useBaseURL();
+    const { state } = useAuth();
+    const currentRole = state.role;
+    const navigate = useNavigate();
+
     return (
         <div>
             {currentRole === "Superuser" && (

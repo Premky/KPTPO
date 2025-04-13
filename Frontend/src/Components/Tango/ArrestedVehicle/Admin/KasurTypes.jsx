@@ -13,11 +13,12 @@ import { NepaliDatePicker } from 'nepali-datepicker-reactjs';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 import XportRajaswa from '../XportRajaswa';
-
+import { useBaseURL } from '../../../Context/BaseURLProvider'; // Import the custom hook for base URL
 const KasurForm = () => {
     const { pmis } = useParams();
-        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL') 
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = localStorage.getItem('BASE_URL') 
+    const BASE_URL = useBaseURL();
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');
@@ -27,7 +28,7 @@ const KasurForm = () => {
 
     const [fetchedOffice, setFetchedOffice] = useState([]);
 
-        
+
     const [fetchedDatas, setFetchedDatas] = useState([]);
     const [currentData, setCurrentData] = useState([]);
 
@@ -35,9 +36,10 @@ const KasurForm = () => {
 
     const fetchvehicles = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/tango/kashurs`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+            const result = await axios.get(`${BASE_URL}/tango/kashurs`,
+                {
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                });
             if (result.data.Status) {
                 // const options = result.data.Result.map(opt => ({
                 //     value: opt.id,
@@ -199,7 +201,7 @@ const KasurForm = () => {
                                         <TableBody>
                                             {fetchedDatas.map((row, index) => (
                                                 <TableRow key={row.id}>
-                                                    <TableCell>{index + 1}</TableCell>                                                    
+                                                    <TableCell>{index + 1}</TableCell>
                                                     <TableCell>{row.name_np}</TableCell>
                                                     <TableCell>{row.name_en}</TableCell>
                                                     <TableCell>
@@ -216,7 +218,7 @@ const KasurForm = () => {
                                                                     title={'Are you sure you want to delete this record?'}
                                                                     buttonText={<span><Icon iconName="Trash" style={{ color: 'red', fontSize: '1em' }} /></span>}
                                                                     onConfirm={() => handleDelete(row.id)}>
-                                                                    <b>{row.name_np} = {row.name_en} 
+                                                                    <b>{row.name_np} = {row.name_en}
                                                                         {/* {convertToNepaliDate(row.date)} */}
                                                                     </b>
                                                                     <p>This action cannot be undone.</p>

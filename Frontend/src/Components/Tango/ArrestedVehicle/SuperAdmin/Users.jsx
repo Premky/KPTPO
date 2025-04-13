@@ -3,20 +3,22 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Select from 'react-select'
 import { getBaseUrl } from '../../../Utilities/getBaseUrl'
-
+import { useBaseURL } from '../../../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const Users = () => {
     const navigate = useNavigate()
-    // const BASE_URL = import.meta.env.VITE_API_BASE_URL
-    const [BASE_URL, setBase_Url] = useState();
-    const getBaseURLFunc = async () => {
-        const url = await getBaseUrl();
-        setBase_Url(url)
-    }
+    const BASE_URL = useBaseURL();
 
-    useEffect(() => {
-        getBaseURLFunc();
-    }, []);
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL
+    // const [BASE_URL, setBase_Url] = useState();
+    // const getBaseURLFunc = async () => {
+    //     const url = await getBaseUrl();
+    //     setBase_Url(url)
+    // }
+
+    // useEffect(() => {
+    //     getBaseURLFunc();
+    // }, []);
 
     const [user, setUser] = useState({
         name: '',

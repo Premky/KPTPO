@@ -16,10 +16,12 @@ import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 import XportKasur from '../XportKasur';
 import XportData from '../XportKasurReport';
 import XportKasurReport from '../XportKasurReport';
+import { useBaseURL } from '../../../../Context/BaseURLProvider';
 
 const RajashwaReport = () => {
     const { pmis } = useParams();
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = useBaseURL();
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

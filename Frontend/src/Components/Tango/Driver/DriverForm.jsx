@@ -16,10 +16,11 @@ import ReuseVehicles from '../../ReuseableComponents/ReuseVehciles'
 import ReuseLisenceCategory from '../../ReuseableComponents/ReuseLisenceCategory'
 import ReusableTable from '../../ReuseableComponents/ReuseTable'
 import ReuseMedical from '../../ReuseableComponents/ReuseMedical';
-
+import { useBaseURL } from '../../../Context/BaseURLProvider';
 const DriverForm = () => {
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL') 
+    // const BASE_URL = localStorage.getItem('BASE_URL') 
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

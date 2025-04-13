@@ -14,6 +14,7 @@ import { useAuth } from '../../Context/AuthContext';
 import DriverMenu from './DriverMenu';
 import axios from 'axios';
 import VehicleAccidentMenu from './Menues/VehicleAccidentMenu';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const drawerWidth = 240;
 
@@ -89,7 +90,8 @@ export default function CombinedNavBar() {
   const [open, setOpen] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const BASE_URL = localStorage.getItem('BASE_URL') || '';
+  // const BASE_URL = localStorage.getItem('BASE_URL') || '';
+  const BASE_URL = useBaseURL();
 
   const handleLogout = async () => {
     try {

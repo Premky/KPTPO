@@ -16,6 +16,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logout from '../Auth/Logout';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 // const pages = ['Products', 'Pricing', 'Blog'];
 
 function Navbar() {
@@ -39,7 +40,8 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
-  const BASE_URL = localStorage.getItem('BASE_URL');
+  // const BASE_URL = localStorage.getItem('BASE_URL');
+  const BASE_URL = useBaseURL();
 
   const handleLogout = async () => {
     console.log("Logged out");

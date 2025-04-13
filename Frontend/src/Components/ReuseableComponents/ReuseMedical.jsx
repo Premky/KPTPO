@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { InputLabel, TextField, Autocomplete, Box } from '@mui/material';
 import { Controller } from 'react-hook-form';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const ReuseMedical = ({ name, label, required, control, error, medicaltype }) => {
-        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
 
     // State to store medical options

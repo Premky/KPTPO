@@ -13,10 +13,12 @@ import { NepaliDatePicker } from 'nepali-datepicker-reactjs';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 import XportRajaswa from '../XportRajaswa';
+import { useBaseURL } from '../../../../Context/BaseURLProvider';
 
 const VehicleForm = () => {
     const { pmis } = useParams();
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = useBaseURL();
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

@@ -29,12 +29,13 @@ const style = {
 //Modal End
 
 import XportArrestVehicles from '../XportArrestVehicles';
-
+import { useBaseURL } from '../../../../Context/BaseURLProvider';
 
 
 const ArrestVehicleReport = () => {
     const { pmis } = useParams();
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = useBaseURL();  
     const navigate = useNavigate();
     const npToday = new NepaliDate();
     const formattedDateNp = npToday.format('YYYY-MM-DD');

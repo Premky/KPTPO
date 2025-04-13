@@ -3,17 +3,20 @@ import { Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import Logout from '../Login/Logout';
 const token = localStorage.getItem("toekn");
+import { useBaseURL } from '../../Context/BaseURLProvider';
 const TangoDashboard = () => {
-        // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL') 
+    // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    // const BASE_URL = localStorage.getItem('BASE_URL')
+    const BASE_URL = useBaseURL();
     const [currentOffice, setCurrentOffice] = useState({});
 
     useEffect(() => {
         const fetchCurrentOffice = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/display/currentoffice/${localStorage.getItem('oid')}`, 
-                {headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-            });
+                const response = await axios.get(`${BASE_URL}/display/currentoffice/${localStorage.getItem('oid')}`,
+                    {
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+                    });
                 if (response.data.Status) {
                     setCurrentOffice(response.data.Result[0]);
                 } else {
@@ -41,10 +44,10 @@ const TangoDashboard = () => {
                             </span>
                         </Link>
                         <ul className='nav flex-column mb-0'>
-                            {usertype==='superuser' &&
+                            {usertype === 'superuser' &&
                                 <li><Link to="/tango/report/tango-user" className='nav-link text-white'><i className="bi bi-person-badge fs-4"></i><span className='text-white'>Users</span></Link></li>
                             }
-                            
+
                             {(usertype === 'Admin' || usertype === 'superuser') && (
                                 <>
                                     <li><Link to="/tango/report/rajashwa-report" className='nav-link text-white'><i className="bi bi-person-badge fs-4"></i><span className='text-white'>राजश्व Report</span></Link></li>
@@ -76,7 +79,7 @@ const TangoDashboard = () => {
             </div>
         </div>
     );
-    
+
 };
 
 export default TangoDashboard;

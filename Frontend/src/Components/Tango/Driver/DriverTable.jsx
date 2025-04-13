@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReusableTable from "../../ReuseableComponents/ReuseTable";
 import { useForm, Controller } from 'react-hook-form';
-
+import { useBaseURL } from '../../../Context/BaseURLProvider';
 const DriverTable = () => {
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL') 
+    // const BASE_URL = localStorage.getItem('BASE_URL') 
+    const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
     const [formattedOptions, setFormattedOptions] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
-
     const columns = [
         { field: "sn", headerName: "सि.नं." },
         { field: "vehicledistrict", headerName: "जिल्ला" },

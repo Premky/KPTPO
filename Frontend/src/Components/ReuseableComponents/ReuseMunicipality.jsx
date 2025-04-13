@@ -3,10 +3,12 @@ import axios from 'axios';
 import { InputLabel, TextField, Autocomplete } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import { Box } from '@mui/material';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const ReuseMunicipality = ({ name, label, required, control, error, selectedDistrict }) => {
         // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const BASE_URL = localStorage.getItem('BASE_URL');
+        // const BASE_URL = localStorage.getItem('BASE_URL');
+        const BASE_URL = useBaseURL();
     const token = localStorage.getItem('token');
 
     // State to store Municipality options

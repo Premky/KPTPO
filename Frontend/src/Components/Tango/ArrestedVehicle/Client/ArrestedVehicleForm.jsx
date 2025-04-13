@@ -13,12 +13,14 @@ import { NepaliDatePicker } from 'nepali-datepicker-reactjs';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import DeleteConfirmationModal from '../../Utils/ConfirmDeleteModal';
 
-import XportKasur from '../XportKasur';
+import { useBaseURL } from '../../../../Context/BaseURLProvider'; // Import the custom hook for base URL
+
 
 const ArrestedVehicleForm = () => {
     const { pmis } = useParams();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL')
+    // const BASE_URL = localStorage.getItem
+    const BASE_URL = useBaseURL();
     const token = sessionStorage.getItem("token");
 
     const navigate = useNavigate();
