@@ -17,25 +17,25 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Button } from '@mui/material';
-
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 //Close Item from MaterialUI
 
 
-const useApiBaseUrl = () => {
-    const [baseUrl, setBaseUrl] = useState(null);
+// const useApiBaseUrl = () => {
+//     const [baseUrl, setBaseUrl] = useState(null);
 
-    useEffect(() => {
-        const fetchBaseUrl = async () => {
-            const url = await getAvailableBaseUrl();
-            setBaseUrl(url);
-            console.log("Base URL:", url);
-        };
-        fetchBaseUrl();
-    }, []);
+//     useEffect(() => {
+//         const fetchBaseUrl = async () => {
+//             const url = await getAvailableBaseUrl();
+//             setBaseUrl(url);
+//             console.log("Base URL:", url);
+//         };
+//         fetchBaseUrl();
+//     }, []);
 
-    return baseUrl;
-};
+//     return baseUrl;
+// };
 
 // import './LoginStyle.css'
 // if (!BASE_URL) return;
@@ -43,7 +43,8 @@ const useApiBaseUrl = () => {
 const Login = () => {
     // const {token, setToken} = useAuth();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL
-    const BASE_URL = useApiBaseUrl();
+    // const BASE_URL = useApiBaseUrl();
+    const BASE_URL = useBaseURL();
     const navigate = useNavigate();
     const { state, dispatch } = useAuth();
 
@@ -53,7 +54,7 @@ const Login = () => {
         password: '',
     });
     const [error, setError] = useState();
-    
+
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
@@ -63,7 +64,7 @@ const Login = () => {
         event.preventDefault();
     };
 
-   const handleLogin = async (event) => {
+    const handleLogin = async (event) => {
         event.preventDefault();
         if (!BASE_URL) {
             console.error("🚨 No backend available!");
@@ -80,7 +81,7 @@ const Login = () => {
                     Swal.showLoading();
                 },
             });
-            
+
             if (response.data.loginStatus) {
                 // Save necessary data in localStorage
                 // setToken(response.data.token);

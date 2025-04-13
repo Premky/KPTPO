@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react'
 
 import { useForm, Controller } from 'react-hook-form';
 import ReusableTable from '../ReuseableComponents/ReuseTable';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const AccidentShortTable = () => {
-    const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL = useBaseURL();
+    // const BASE_URL = localStorage.getItem('BASE_URL');
     // API fetch function
     const fetchData = async (url, params, setStateFunction) => {
         try {

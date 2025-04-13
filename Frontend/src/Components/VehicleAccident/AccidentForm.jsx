@@ -16,9 +16,11 @@ import Swal from 'sweetalert2'
 import RemoveIcon from '@mui/icons-material/Remove';
 import AccidentShortTable from './AccidentShortTable'
 import AccidentLongTable from './AccidentLongTable'
+import { useBaseURL } from '../../Context/BaseURLProvider'
 
 const AccidentForm = () => {
-    const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL=useBaseURL();
     const { register, handleSubmit, reset, setValue, watch, formState: { errors }, control } = useForm();
     const [editing, setEditing] = useState(false);
 

@@ -2,12 +2,14 @@ import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 const Logout = () => {
     const { dispatch } = useAuth();
     const navigate = useNavigate();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL = useBaseURL();
 
     const handleLogout = async () => {
         try {

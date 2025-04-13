@@ -26,9 +26,10 @@ const CustomSortLabel = ({ columnKey, label, order, orderBy, onSort }) => (
         {label}
     </TableSortLabel>
 );
-
+import { useBaseURL } from "../../Context/BaseURLProvider"; // Import the custom hook for base URL
 export default function AccidentLongTable() {
-    const BASE_URL = localStorage.getItem('BASE_URL');
+    // const BASE_URL = localStorage.getItem('BASE_URL');
+    const BASE_URL = useBaseURL();
 
     const [accidentRecords, setAccidentRecords] = useState([]);
     const [formattedOptions, setFormattedOptions] = useState([]);
