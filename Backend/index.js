@@ -2,6 +2,9 @@ import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import connectMySQL  from 'express-mysql-session';
+const MySQLStore = connectMySQL(session);
+
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import compression from 'compression';
@@ -31,16 +34,32 @@ const __dirname = path.dirname(__filename);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ...(process.env.SSL && {
+        ssl: {
+            rejectUnauthorized: false,
+        }
+    })
+});
+
 app.use(session({
-    secret: process.env.jwt_prem_ko_secret_key || 'jwt_prem_ko_secret_key', // use .env for production
+    key: 'user_sid',
+    secret: process.env.jwt_prem_ko_secret_key || 'jwt_prem_ko_secret_key',
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false, // true only in HTTPS (e.g., production)
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
+        secure: false, // Set to true if you're using HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
     }
 }));
+
 // app.use(morgan('tiny')); // Logs HTTP requests 
 app.use(compression());
 // app.use(express.urlencoded());
