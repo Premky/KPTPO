@@ -245,16 +245,12 @@ router.post('/login', async (req, res) => {
                     maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
                 });
 
+                req.session.user={userdetails};
+
                 // Send user details along with allowed apps (without token)
                 return res.json({
                     loginStatus: true,
-                    userdetails: {
-                        username: user.username,
-                        role: user.role_en,
-                        office: user.office_np,
-                        allowed_apps: allowedApps,
-                    },
-                    token: token,
+                    userdetails: userdetails,
                 });
             });
 

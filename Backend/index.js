@@ -1,6 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import compression from 'compression';
@@ -11,11 +12,6 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import errorHandler from './middlewares/errorHandler.js';
 
-// import userRoutes from './routes/userRoutes.js';
-// import { adminRouter } from './routes/authRoutes.js';
-// import { policeRouter } from './routes/policeRoutes.js';
-// import { prisionerRouter } from './routes/prisionerRoutes.js';
-// import { commonRouter } from './routes/commonRoutes.js';
 
 import {publicRouter} from './routes/publicRoutes.js';
 import { driverRouter } from './routes/driverRoute.js';
@@ -35,6 +31,16 @@ const __dirname = path.dirname(__filename);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({
+    secret: process.env.jwt_prem_ko_secret_key || 'jwt_prem_ko_secret_key', // use .env for production
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false, // true only in HTTPS (e.g., production)
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
+    }
+}));
 // app.use(morgan('tiny')); // Logs HTTP requests 
 app.use(compression());
 // app.use(express.urlencoded());
@@ -82,6 +88,8 @@ app.use('/accident', accidentRoute);
 
 // Global error handler
 app.use(errorHandler);
+
+
 
 // Start the server
 app.listen(port, () => {
