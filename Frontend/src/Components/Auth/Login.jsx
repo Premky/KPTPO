@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../Context/AuthContext';
 import Swal from 'sweetalert2';
 import toast, { Toaster } from 'react-hot-toast';
-import { getAvailableBaseUrl } from './middlewares/getBaseUrl';
 
 //Items from Material UI
 import Box from '@mui/material/Box';
@@ -20,7 +19,6 @@ import { Button } from '@mui/material';
 import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
 
 //Close Item from MaterialUI
-
 
 // const useApiBaseUrl = () => {
 //     const [baseUrl, setBaseUrl] = useState(null);
@@ -41,18 +39,18 @@ import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom
 // if (!BASE_URL) return;
 // const Login = ({onLogin}) => {
 const Login = () => {
-    // const {token, setToken} = useAuth();
     // const BASE_URL = import.meta.env.VITE_API_BASE_URL
     // const BASE_URL = useApiBaseUrl();
     const BASE_URL = useBaseURL();
     const navigate = useNavigate();
-    const { state, dispatch } = useAuth();
+    const { dispatch, fetchSession } = useAuth();
 
     const [showPassword, setShowPassword] = useState(false);
     const [values, setValues] = useState({
         username: '',
         password: '',
     });
+    const [user, setUser] = useState(null);
     const [error, setError] = useState();
 
 
@@ -70,10 +68,10 @@ const Login = () => {
             console.error("🚨 No backend available!");
             return;
         }
-
+    
         try {
             const response = await axios.post(`${BASE_URL}/auth/login`, values, { withCredentials: true });
-            // Swal.showLoading(Swal.getDenyButton());
+            
             Swal.fire({
                 title: "Logging in...",
                 allowOutsideClick: false,
@@ -81,11 +79,12 @@ const Login = () => {
                     Swal.showLoading();
                 },
             });
-
+    
             if (response.data.loginStatus) {
-                // Save necessary data in localStorage
-                // setToken(response.data.token);
-
+                // First, fetch session data to ensure we have the latest details
+                await fetchSession(); // This will update your auth context
+                
+                // Then, dispatch the state only after session data is fetched
                 dispatch({
                     type: "LOGIN",
                     payload: {
@@ -101,7 +100,7 @@ const Login = () => {
                         app_en: response.data.app_en
                     },
                 });
-                // Redirect to home page
+    
                 Swal.fire({
                     title: "Login Success",
                     text: "Redirecting to Home Page",
@@ -109,13 +108,12 @@ const Login = () => {
                     timer: 1000,
                     showConfirmButton: false
                 });
-                navigate('/');
+                navigate('/'); // Redirect to the home page
             } else {
                 Swal.fire({ title: "Login Failed", text: response.data.error, icon: "error" });
             }
         } catch (err) {
             console.error("Login Error:", err);
-
             const errorMessage =
                 err.response?.data?.Error || "An unexpected error occurred.";
             setError(errorMessage);
@@ -126,9 +124,16 @@ const Login = () => {
             });
         }
     };
+    
 
     const [notification, setNotification] = useState('');
     const notify = (message) => toast(message);
+    useEffect(() => {
+        axios.get('/session')
+            .then(res => setUser(res.data))
+            .catch(() => setUser(null));
+    }, []);
+
     return (
         <>
             <Box

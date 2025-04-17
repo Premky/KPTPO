@@ -112,7 +112,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
 });
 
 // Route to get accident records
-router.get('/get_accident_records', verifyToken, async (req, res) => {
+router.get('/get_accident_records१', verifyToken, async (req, res) => {
     const { username } = req.user;  // Extracting username from JWT token
     // console.log("Username:", req.user);
 
@@ -175,5 +175,80 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
         res.status(500).json({ Status: false, Error: "Internal Server Error" })
     }
 });
+
+router.get('/get_accident_records', verifyToken, async (req, res) => {
+    try {
+        //setp 1: fetch all reason type
+        const reasonTypes = await query('SELECT id, name_en, name_np FROM accident_reason_type');
+
+
+        //step 2: Fetch all accidents
+        const accidents = await query(`SELECT 
+                                        ar.*, 
+                                        ns.name_np AS state_np, 
+                                        nd.name_np AS district_np, 
+                                        nm.name_np AS municipality_np
+                                    FROM accident_records ar
+                                    LEFT JOIN np_states ns ON ns.id = ar.state_id
+                                    LEFT JOIN np_districts nd ON nd.id = ar.district_id
+                                    LEFT JOIN np_municipalities nm ON nm.id = ar.municipality_id
+                        `);
+
+        // console.log(accidents)
+
+        const accidentData = [];
+        for (const acc of accidents) {
+            const accidentId = acc.id;
+            //step 3: Fetch vehicles for this accident
+            const vehicles = await query(`SELECT v.name_np FROM accident_vehicles av
+                                            JOIN vehicles v ON v.id = av.vehicle_id
+                                            WHERE av.accident_id = ?`, [accidentId]);
+
+            //Step 4: Fetch reasons with reason type
+            const reasons = await query(`SELECT r.name_np AS reason, rt.name_np AS reason_type 
+                                        FROM accident_record_reasons arr
+                                        JOIN accident_reasons r ON r.id = arr.accident_reason_id
+                                        JOIN accident_reason_type rt ON rt.id=r.reason_type                                        
+                                        WHERE arr.accident_id=?`, [accidentId]);
+
+            //Step 5: Group reasons by reason_type
+            const reasonMap = {};
+            reasonTypes.forEach(rt => {
+                reasonMap[rt.name_np] = []; //empty by default
+            });
+
+            reasons.forEach(r => {
+                reasonMap[r.reason_type]?.push(r.reason);
+            });
+
+            //Step 6: Prepare row
+            const row = {
+                accident_id: accidentId,
+                accident_date: acc.date,                
+                state_np: acc.state_np, 
+                district_np: acc.district_np,
+                municipality_np: acc.municipality_np,
+                vehicles: vehicles.map(v => v.name_np).join(','),
+            };
+
+            //Add reasons
+            reasonTypes.forEach(rt => {
+                row[rt.name_np] = reasonMap[rt.name_np].join(',');
+            });
+
+            accidentData.push(row);
+        }
+        console.log(accidentData)
+
+        res.json({
+            Status: true, data: accidentData,
+            reasonTypes: reasonTypes.map(rt => rt.name_np),
+            message: 'Records fetched successfully.'
+        });
+    } catch (error) {
+        console.log('Error fetching accident table data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
 
 export { router as accidentRoute };

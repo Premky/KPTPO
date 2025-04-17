@@ -79,7 +79,7 @@ const AccidentForm = () => {
     }, []); // Fetch accident types on component mount
 
     const onFormSubmit = async (data) => {
-        console.log('Form Data:', data);
+        // console.log('Form Data:', data);
         try {
             const url = editing ? `${BASE_URL}/accident/update_accident/${currentData.id}` :
                 `${BASE_URL}/accident/create_accident`;
@@ -350,7 +350,7 @@ const AccidentForm = () => {
             </Box >
             <Box sx={{ flexGrow: 1, margin: 2 }}>
                 <AccidentShortTable />
-                <AccidentLongTable/>
+                <AccidentLongTable />
             </Box>
         </>
     )

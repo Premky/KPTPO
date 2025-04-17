@@ -1,51 +1,34 @@
 import React, { useEffect, useState } from "react";
 import {
-    Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, TableSortLabel
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
 } from "@mui/material";
 import axios from "axios";
+import { useBaseURL } from "../../Context/BaseURLProvider";
 
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) return -1;
-    if (b[orderBy] > a[orderBy]) return 1;
-    return 0;
-}
+// Fallback for missing CustomSortLabel
+const CustomSortLabel = ({ columnKey, label }) => label;
 
-function getComparator(order, orderBy) {
-    return order === "desc"
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-const CustomSortLabel = ({ columnKey, label, order, orderBy, onSort }) => (
-    <TableSortLabel
-        active={orderBy === columnKey}
-        direction={orderBy === columnKey ? order : "asc"}
-        onClick={() => onSort(columnKey)}
-    >
-        {label}
-    </TableSortLabel>
-);
-import { useBaseURL } from "../../Context/BaseURLProvider"; // Import the custom hook for base URL
-export default function AccidentLongTable() {
-    // const BASE_URL = localStorage.getItem('BASE_URL');
+const AccidentTable = ({
+    // sortedRows = [],
+    order,
+    orderBy,
+    handleSort,
+    vehicles = [],
+    accidentTypes,
+    accidentReasons = [],
+    accReasons = [],
+    totalAccidentCount = 0,
+}) => {
     const BASE_URL = useBaseURL();
-
-    const [accidentRecords, setAccidentRecords] = useState([]);
     const [formattedOptions, setFormattedOptions] = useState([]);
-    const [vehicles, setVehicles] = useState([]);
-    const [vehicleCount, setVehicleCount] = useState([]);
-    const [accidentTypes, setAccidentTypes] = useState([]);
 
-    const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState("name");
-
-    const handleSort = (property) => {
-        const isAsc = orderBy === property && order === "asc";
-        setOrder(isAsc ? "desc" : "asc");
-        setOrderBy(property);
-    };
-
+    // Fetch data with error handling
     const fetchData = async (url, params = {}) => {
         try {
             const response = await axios.get(url, {
@@ -67,239 +50,209 @@ export default function AccidentLongTable() {
         }
     };
 
-
+    const [vehicleCount, setVehicleCount] = useState(0);
+    const [vehicleList, setVehicleList] = useState([]);
     const fetchVehicles = async () => {
         const url = `${BASE_URL}/public/get_vehicles`;
-        fetchData(url, {}, (Result) => {
-            const formatted = Result.map(opt => ({
-                label: opt.name_np,
-                value: opt.id
-            }));
-            setVehicles(formatted);
-            setVehicleCount(formatted.length);
-        });
+        const result = await fetchData(url);
+
+        const formatted = result.map(opt => ({
+            label: opt.name_np,
+            value: opt.id
+        }));
+
+        setVehicleList(formatted);
+        setVehicleCount(formatted.length);
+        console.log("Formatted:", formatted);
     };
 
-    const fetchAccidentRecords = () => {
-        fetchData(`${BASE_URL}/accident/get_accident_records`, {}, (result) => {
-            const formatted = result.map((item, index) => ({
-                ...item,
-                id: item.id || index,
-                sn: index + 1,
-                vehicle_names: item.vehicles?.map(v => v.name_np).join(', ') || ''
-            }));
-            setFormattedOptions(formatted);
-            setAccidentRecords(result);
-        });
-    };
+    const [accidentRecords, setAccidentRecords] = useState([]);
+    const [reasonTypes, setReasonTypes] = useState([]); // <-- new state
 
-    const [accidentReasons, setAccidentReasons] = useState([]);
-    const [accidentReasonCount, setAccidentReasonCount] = useState([]);
-    const fetchAccidentReasons = () => {
-        fetchData(`${BASE_URL}/public/get_accident_reasons`, {}, setAccidentReasons);
-        // console.log('Accident Reasons:', accidentReasons);
-        accidentReasons.forEach((reason, index) => {
-            // console.log('Accident Reason:',reason.reason_type, reason.name_np);
-            setAccidentReasonCount((prev) => [...prev, reason.name_np]);
-
-        });
-    };
-
-    const fetchAccidentTypes = () => {
-        fetchData(`${BASE_URL}/public/get_accident_types`, {}, setAccidentTypes);
-        console.log('Accident Types:', accidentTypes);
-    };
-
-    useEffect(() => {
-        const fetchDataAsync = async () => {
-            const reasons = await fetchData(`${BASE_URL}/public/get_accident_reasons`);
-            const types = await fetchData(`${BASE_URL}/public/get_accident_types`);
-            const vehicles = await fetchData(`${BASE_URL}/public/get_vehicles`);
-            const records = await fetchData(`${BASE_URL}/accident/get_accident_records`);
-
-            setAccidentReasons(reasons);
-            setAccidentTypes(types);
-            setVehicles(vehicles.map(opt => ({
-                label: opt.name_np,
-                value: opt.id
-            })));
-            setVehicleCount(vehicles.length);
-
-            const formatted = records.map((item, index) => ({
-                ...item,
-                id: item.id || index,
-                sn: index + 1,
-                vehicle_names: item.vehicles?.map(v => v.name_np).join(', ') || ''
-            }));
-            setFormattedOptions(formatted);
-            setAccidentRecords(records);
-
-            const reasonTypeCount = types.map((type) => {
-                const count = reasons.filter(reason => reason.reason_type === type.id).length;
-                return {
-                    type_id: type.id,
-                    type_name: type.name_np,
-                    count: count
-                };
+    const fetchAccidentRecords = async () => {
+        const url = `${BASE_URL}/accident/get_accident_records`;
+        try {
+            const response = await axios.get(url, {
+                withCredentials: true,
             });
-            setAccidentReasonCount(reasonTypeCount);
-            // console.log('Accident Reason Count:', reasonTypeCount);
-        };
 
-        fetchDataAsync();
-    }, []);
+            console.log(response); // optional: inspect full response
 
-    const totalAccidentCount = accidentTypes.reduce((sum, type) => sum + type.count, 0);
+            const { Status, data, reasonTypes, Error } = response.data;
+
+            if (Status) {
+                setAccidentRecords(data);        // set accident records
+                setFormattedOptions(data);
+                setReasonTypes(reasonTypes);     // set reason types
+                console.log('Records:', data);
+                console.log('Reason Types:', reasonTypes);
+            } else {
+                console.error(Error || 'Failed to fetch records');
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            alert('An error occurred while fetching data.');
+        }
+    };
+
 
     useEffect(() => {
-        fetchVehicles();
         fetchAccidentRecords();
-        fetchAccidentTypes();
-        fetchAccidentReasons();
-    }, []);
+        fetchVehicles();
+    }, []);  // Fetch accident records on component mount
 
+    function descendingComparator(a, b, orderBy) {
+        if (b[orderBy] < a[orderBy]) return -1;
+        if (b[orderBy] > a[orderBy]) return 1;
+        return 0;
+    }
+
+    function getComparator(order, orderBy) {
+        return order === "desc"
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
     const sortedRows = [...formattedOptions].sort(getComparator(order, orderBy));
-
     return (
         <TableContainer component={Paper}>
-            <Table size="small" border="1px solid #ccc" stickyHeader>
+            <Table size="small" stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell rowSpan={3}><CustomSortLabel columnKey="sn" label="सि.नं." order={order} orderBy={orderBy} onSort={handleSort} /></TableCell>
-                        <TableCell rowSpan={3}><CustomSortLabel columnKey="date" label="मिति" order={order} orderBy={orderBy} onSort={handleSort} /></TableCell>
-                        <TableCell rowSpan={3}><CustomSortLabel columnKey="accident_time" label="समय" order={order} orderBy={orderBy} onSort={handleSort} /></TableCell>
-                        <TableCell rowSpan={3}><CustomSortLabel columnKey="road_name" label="सडकको नाम" order={order} orderBy={orderBy} onSort={handleSort} /></TableCell>
-                        <TableCell rowSpan={3}><CustomSortLabel columnKey="location" label="स्थान" order={order} orderBy={orderBy} onSort={handleSort} /></TableCell>
-                        <TableCell align="center" colSpan={vehicleCount + 1}>सवारी दुर्घटनामा संलग्न सवारी साधनहरु</TableCell>
-
-                        <TableCell colSpan={18} align="center">मानव घाइते</TableCell>
-
-                        <TableCell align="center" rowSpan={2} colSpan={2}>चौपाया</TableCell>
-                        <TableCell align="center" colSpan={6}>दुर्घटनाको समय</TableCell>
-
-                        <TableCell align="center" colSpan={totalAccidentCount + 1}> सवारी दुर्घटनाको कारण </TableCell>
-                        <TableCell align="center" rowSpan={3}> सवारी साधन क्षेती </TableCell>
-                        <TableCell align="center" rowSpan={3}> अनुमानित रकम </TableCell>
-                        <TableCell align="center" rowSpan={3}> कसरी सदु भएको </TableCell>
-                        <TableCell align="center" rowSpan={3}> कैफियत </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            <CustomSortLabel columnKey="sn" label="सि.नं." order={order} orderBy={orderBy} onSort={handleSort} />
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            <CustomSortLabel columnKey="date" label="मिति" order={order} orderBy={orderBy} onSort={handleSort} />
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            <CustomSortLabel columnKey="accident_time" label="समय" order={order} orderBy={orderBy} onSort={handleSort} />
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            <CustomSortLabel columnKey="road_name" label="सडकको नाम" order={order} orderBy={orderBy} onSort={handleSort} />
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            <CustomSortLabel columnKey="location" label="स्थान" order={order} orderBy={orderBy} onSort={handleSort} />
+                        </TableCell>
+                        <TableCell align="center" colSpan={vehicleCount + 1}>
+                            सवारी दुर्घटनामा संलग्न सवारी साधनहरु
+                        </TableCell>
+                        <TableCell colSpan={18} align="center">
+                            मानव घाइते
+                        </TableCell>
+                        <TableCell align="center" rowSpan={2} colSpan={2}>
+                            चौपाया
+                        </TableCell>
+                        <TableCell align="center" colSpan={6}>
+                            दुर्घटनाको समय
+                        </TableCell>
+                        <TableCell align="center" colSpan={totalAccidentCount + 1}>
+                            सवारी दुर्घटनाको कारण
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            सवारी साधन क्षेती
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            अनुमानित रकम
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            कसरी सदु भएको
+                        </TableCell>
+                        <TableCell rowSpan={3} align="center">
+                            कैफियत
+                        </TableCell>
                     </TableRow>
-
                     <TableRow>
                         {vehicles.map((vehicle, index) => (
-                            <TableCell key={index} align="center" rowSpan={2}>{vehicle.label}</TableCell>
+                            <TableCell key={index} align="center" rowSpan={2}>
+                                {vehicle.label}
+                            </TableCell>
                         ))}
-                        <TableCell align="center" rowSpan={2}>कुल</TableCell>
-                        <TableCell align="center" colSpan={6}>मृत्यु</TableCell>
-                        <TableCell align="center" colSpan={6}>गम्भिर घाइते</TableCell>
-                        <TableCell align="center" colSpan={6}>सामान्य घाइते</TableCell>
-                        <TableCell align="center" rowSpan={2}>००ः०६/१२ः००</TableCell>
-                        <TableCell align="center" rowSpan={2}>००ः१२/१८ः००</TableCell>
-                        <TableCell align="center" rowSpan={2}>००ः१८/००ः००</TableCell>
-                        <TableCell align="center" rowSpan={2}>००ः००/०६ः००</TableCell>
-                        <TableCell align="center" rowSpan={2}>समय नखुलेको</TableCell>
-                        <TableCell align="center" rowSpan={2}>जम्मा</TableCell>
-                        {accidentTypes.map((type, index) => (
-                            <TableCell key={index} align="center" colSpan={type.count} >{type.name_np}</TableCell>
+                        {vehicleList.map((v, i) => (
+                            <TableCell key={`vehicle-${i}`} align="center">
+                                {v.label}
+                            </TableCell>
                         ))}
-                        <TableCell align="center" rowSpan={2}>जम्मा</TableCell>
-                    </TableRow>
+                        <TableCell align="center" rowSpan={2}>
+                            कुल
+                        </TableCell>
 
-                    <TableRow>
-                        <TableCell align="center">पुरुष</TableCell>
-                        <TableCell align="center">महिला</TableCell>
-                        <TableCell align="center">बालक</TableCell>
-                        <TableCell align="center">बालिका</TableCell>
-                        <TableCell align="center">अन्य</TableCell>
-                        <TableCell align="center">जम्मा</TableCell>
-                        <TableCell align="center">पुरुष</TableCell>
-                        <TableCell align="center">महिला</TableCell>
-                        <TableCell align="center">बालक</TableCell>
-                        <TableCell align="center">बालिका</TableCell>
-                        <TableCell align="center">अन्य</TableCell>
-                        <TableCell align="center">जम्मा</TableCell>
-                        <TableCell align="center">पुरुष</TableCell>
-                        <TableCell align="center">महिला</TableCell>
-                        <TableCell align="center">बालक</TableCell>
-                        <TableCell align="center">बालिका</TableCell>
-                        <TableCell align="center">अन्य</TableCell>
-                        <TableCell align="center">जम्मा</TableCell>
-                        <TableCell align="center">घाइते</TableCell>
-                        <TableCell align="center">मृत्यु</TableCell>
+                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
+                            <TableCell key={`death-${i}`} align="center">
+                                {label}
+                            </TableCell>
+                        ))}
+                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
+                            <TableCell key={`gambhir-${i}`} align="center">
+                                {label}
+                            </TableCell>
+                        ))}
+                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
+                            <TableCell key={`general-${i}`} align="center">
+                                {label}
+                            </TableCell>
+                        ))}
+                        {["००ः०६/१२ः००", "१२ः००/१८ः००", "१८ः००/२४ः००", "२४ः००/०६ः००", "समय नखुलेको", "जम्मा"].map((label, i) => (
+                            <TableCell key={`time-${i}`} align="center">
+                                {label}
+                            </TableCell>
+                        ))}
                         {accidentReasons.map((reason, index) => (
-                            <TableCell key={index} align="center">{reason.name_np}</TableCell>
+                            <TableCell key={index} align="center">
+                                {reason.name_np}
+                            </TableCell>
                         ))}
+                        <TableCell align="center">
+                            जम्मा
+                        </TableCell>
                     </TableRow>
-
                 </TableHead>
-
                 <TableBody>
                     {sortedRows.map((row, idx) => (
                         <TableRow key={idx}>
-                            <TableCell>{row.sn}</TableCell>
-                            <TableCell>{row.date}</TableCell>
+                            <TableCell>{row.id}</TableCell>
+                            <TableCell>{row.accident_date}</TableCell>
                             <TableCell>{row.accident_time}</TableCell>
-                            <TableCell>{row.municipality_np}, {row.district_np}</TableCell>
+                            <TableCell>
+                                {row.municipality_np}, {row.district_np}
+                            </TableCell>
                             <TableCell>{row.accident_location}</TableCell>
                             {vehicles.map((vehicle) => (
-                                <TableCell key={vehicle.value}>
-                                    {row.vehicle_names.includes(vehicle.label) ? vehicle.label : ''}
+                                <TableCell key={vehicle.value} align="center">                                    
+                                    {/* {row.vehicle_names?.includes(vehicle.label) ? "✓" : ""} */}
                                 </TableCell>
                             ))}
-                            <TableCell>Total </TableCell>
-                            <TableCell>{row.death_male} </TableCell>
-                            <TableCell>{row.death_female} </TableCell>
-                            <TableCell>{row.death_boy} </TableCell>
-                            <TableCell>{row.death_girl} </TableCell>
-                            <TableCell>{row.death_other} </TableCell>
-                            <TableCell>{row.fatalities} </TableCell>
+                            <TableCell align="center">{row.vehicle_names?.length || 0}</TableCell>
+                            {["death_male", "death_female", "death_boy", "death_girl", "death_other", "fatalities", "gambhir_male", "gambhir_female", "gambhir_boy", "gambhir_girl", "gambhir_other", "gambhir", "general_male", "general_female", "general_boy", "general_girl", "general_other", "general"].map((key) => (
+                                <TableCell key={key} align="center">{row[key]}</TableCell>
+                            ))}
+                            <TableCell align="center">{row.animal_injured}</TableCell>
+                            <TableCell align="center">{row.animal_death}</TableCell>
 
-                            <TableCell>{row.gambhir_male} </TableCell>
-                            <TableCell>{row.gambhir_female} </TableCell>
-                            <TableCell>{row.gambhir_boy} </TableCell>
-                            <TableCell>{row.gambhir_girl} </TableCell>
-                            <TableCell>{row.gambhir_other} </TableCell>
-                            <TableCell>{row.gambhir} </TableCell>
-
-                            <TableCell>{row.general_male} </TableCell>
-                            <TableCell>{row.general_female} </TableCell>
-                            <TableCell>{row.general_boy} </TableCell>
-                            <TableCell>{row.general_girl} </TableCell>
-                            <TableCell>{row.general_other} </TableCell>
-                            <TableCell>{row.general} </TableCell>
-
-                            <TableCell>{row.animal_death}</TableCell>
-                            <TableCell>{row.animal_injured}</TableCell>
-
-                            <TableCell>{row.accident_time > "00:06" && row.accident_time < "12:00" ? 1 : ""}</TableCell>
-                            <TableCell>{row.accident_time > "12:00" && row.accident_time < "18:00" ? 1 : ""}</TableCell>
-                            <TableCell>{row.accident_time > "18:00" && row.accident_time < "24:00" ? 1 : ""}</TableCell>
-                            <TableCell>{row.accident_time > "24:00" && row.accident_time < "00:06" ? 1 : ""}</TableCell>
-                            <TableCell>{!row.accident_time ? 1 : ""}</TableCell>
-                            {/* <TableCell>{row.reasons}</TableCell> */}
-
-                            {/* {row.reasons.map((reason) => (
-                                <TableCell key={reason.value}>
-                                    {row.reason_names.includes(reason.label) ? reason.label : ''}
+                            {/* Time categorization */}
+                            {["00:06", "12:00", "18:00", "24:00", "06:00"].map((time, i, arr) => (
+                                <TableCell key={i} align="center">
+                                    {row.accident_time > arr[i - 1] && row.accident_time <= time ? 1 : ""}
                                 </TableCell>
-                            ))} */}
+                            ))}
+                            <TableCell align="center">1</TableCell>
 
-                            {/* {row.reasons.map((reason) => (
-                                <TableCell key={reason.id}>
-                                    {reason.name_np}
+                            {accReasons.map((reason) => (
+                                <TableCell key={reason.value} align="center">
+                                    {row.reason_names?.includes(reason.label) ? "✓" : ""}
                                 </TableCell>
-                            ))} */}
-
-
-                            {/* {accidentReasons.map((reason, index) => (
-                                <TableCell key={index} align="center">{reason.name_np === row. ? 1 : 0}</TableCell>
-                            ))} */}
-
-
-                            {/* Add more cells for human injuries, deaths, animals, etc. */}
+                            ))}
+                            <TableCell align="center">{row.reason_names?.length || 0}</TableCell>
+                            <TableCell align="center">{row.vehicle_damage}</TableCell>
+                            <TableCell align="center">{row.damage_amount}</TableCell>
+                            <TableCell align="center">{row.settlement}</TableCell>
+                            <TableCell align="center">{row.note}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
+
             </Table>
         </TableContainer>
     );
-}
+};
+
+export default AccidentTable;

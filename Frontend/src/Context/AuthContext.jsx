@@ -30,7 +30,7 @@ const authReducer = (state, action) => {
                 office_np: action.payload.office_np,
                 role: action.payload.role,
                 user: action.payload.user,
-                valid: action.payload.valid,                
+                valid: action.payload.valid,
             }; // Save the auth data and sends to CombinedNavBar
         case "LOGOUT":
 
@@ -45,26 +45,9 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const savedAuthData = sessionStorage.getItem("authData");
-
-        if (savedAuthData) {
-            const parsedData = JSON.parse(savedAuthData);
-            if (parsedData.valid) {
-                dispatch({ type: "LOGIN", payload: parsedData });
-                setLoading(false);
-            }
-        } else {
-            fetchSession();
-        }
-    }, []);
-
     const fetchSession = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/auth/session`, {
-                withCredentials: true,
-            });
-
+            const response = await axios.get(`${BASE_URL}/auth/session`, { withCredentials: true });
             if (response.data.success) {
                 // console.log(response.data);
                 const authData = {
@@ -78,22 +61,27 @@ export const AuthProvider = ({ children }) => {
                     allowed_apps: response.data.allowed_apps,
                     // app_name_np: response.data.app_name_en,
                 };
-                // console.log(authData)
-                // sessionStorage.setItem("authData", JSON.stringify(authData));
                 dispatch({ type: "LOGIN", payload: authData });
             }
         } catch (error) {
             console.error("Session fetch failed:", error);
+            dispatch({ type: 'LOGOUT' })
         } finally {
             setLoading(false);
         }
     };
 
+    useEffect(() => {
+        fetchSession(); // always fetch from backend
+    }, []);
+
+    // Inside AuthProvider
     return (
-        <AuthContext.Provider value={{ state, dispatch, loading }}>
+        <AuthContext.Provider value={{ state, dispatch, loading, fetchSession }}>
             {children}
         </AuthContext.Provider>
     );
+
 };
 
 export const useAuth = () => useContext(AuthContext);

@@ -85,8 +85,9 @@ const Drawer = styled(MuiDrawer, {
 export default function CombinedNavBar() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { dispatch, state } = useAuth();
+  const { dispatch, state, fetchSession } = useAuth();
 
+  
   const [open, setOpen] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -104,6 +105,10 @@ export default function CombinedNavBar() {
       console.error("Logout failed:", err);
     }
   };
+
+  React.useEffect(()=>{
+    fetchSession();
+  },[])
 
   const location = useLocation();
   const appCurrType = React.useMemo(() => {
