@@ -176,7 +176,7 @@ router.get('/get_accident_records१', verifyToken, async (req, res) => {
     }
 });
 
-router.get('/get_accident_records', verifyToken, async (req, res) => {
+router.get('/get_accident_records2', verifyToken, async (req, res) => {
     try {
         //setp 1: fetch all reason type
         const reasonTypes = await query('SELECT id, name_en, name_np FROM accident_reason_type');
@@ -224,11 +224,11 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
             //Step 6: Prepare row
             const row = {
                 accident_id: accidentId,
-                accident_date: acc.date,                
-                state_np: acc.state_np, 
+                accident_date: acc.date,
+                state_np: acc.state_np,
                 district_np: acc.district_np,
                 municipality_np: acc.municipality_np,
-                vehicles: vehicles.map(v => v.name_np).join(','),
+                // vehicles: vehicles.map(v => v.name_np).join(','),                
             };
 
             //Add reasons
@@ -238,10 +238,10 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
 
             accidentData.push(row);
         }
-        console.log(accidentData)
+        // console.log(accidentData)
 
         res.json({
-            Status: true, data: accidentData,
+            Status: true, data: accidents,
             reasonTypes: reasonTypes.map(rt => rt.name_np),
             message: 'Records fetched successfully.'
         });
@@ -250,5 +250,134 @@ router.get('/get_accident_records', verifyToken, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 })
+
+router.get('/get_accident_records2', verifyToken, async (req, res) => {
+    try {
+        //setp 1: fetch all reason type
+        const reasonTypes = await query('SELECT id, name_en, name_np FROM accident_reason_type');
+
+        const records = await query(`
+            SELECT 
+              vr.date,
+              vr.time,
+              CONCAT(c.name, ', ', d.name, ', ', s.name) AS location,
+              vat.name AS accident_type,
+              va.name AS accident_name,
+              v.name AS vehicle_name,
+              COUNT(*) AS count
+            FROM vehicle_records vr
+            JOIN vehicle_accident va ON va.id = vr.accident_id
+            JOIN vehicle_accident_types vat ON vat.id = va.accident_type_id
+            JOIN accident_vehicles av ON av.accident_id = va.id
+            JOIN vehicles v ON v.id = av.vehicle_id
+            JOIN np_cities c ON c.id = vr.city_id
+            JOIN np_districts d ON d.id = vr.district_id
+            JOIN np_states s ON s.id = vr.state_id
+            GROUP BY vr.date, vr.time, location, vat.name, va.name, v.name
+            ORDER BY vr.date DESC
+          `);
+
+
+
+        // console.log(accidentData)
+
+        res.json({
+            Status: true, data: accidents,
+            reasonTypes: reasonTypes.map(rt => rt.name_np),
+            message: 'Records fetched successfully.'
+        });
+    } catch (error) {
+        console.log('Error fetching accident table data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
+router.get("/get_accident_records", async (req, res) => {
+    try {
+        // Main data
+        //   ar.date,
+        //   ar.accident_time,
+
+        const records = await query(`
+                SELECT 
+                ar.date,
+                c.name_np AS municipality,
+                d.name_np AS district,
+                s.name_np AS state,
+                ar.ward,
+                ar.road_name,
+                ar.accident_location,
+                ar.accident_time,
+                ar.death_male,  ar.death_female, ar.death_boy, ar.death_girl, ar.death_other,
+                SUM(ar.death_male + ar.death_female + ar.death_boy + ar.death_girl + ar.death_other) AS total_death,
+                
+                ar.gambhir_male,  ar.gambhir_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
+                SUM(ar.gambhir_male + ar.gambhir_female + ar.gambhir_boy + ar.gambhir_girl + ar.gambhir_other) AS total_gambhir,                
+                
+                ar.general_male,  ar.general_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
+                SUM(ar.general_male + ar.general_female + ar.general_boy + ar.general_girl + ar.general_other) AS total_general,
+
+                ar.animal_death, ar.animal_injured,
+                ar.remarks,
+                ar.office_id,  ar.created_by,  ar.updated_by,
+                CONCAT(c.name_np, ', ', d.name_np, ', ', s.name_np) AS location,
+                art.name_np AS accident_type,
+                arsn.name_np AS accident_reason,
+                v.name_np AS vehicle_name,
+                COUNT(*) AS count
+                FROM accident_records ar
+                JOIN accident_record_reasons arr ON arr.accident_id = ar.id
+                JOIN accident_reasons arsn ON arsn.id = arr.accident_reason_id
+                JOIN accident_reason_type art ON art.id = arsn.reason_type
+                JOIN accident_vehicles av ON av.accident_id = ar.id
+                JOIN vehicles v ON v.id = av.vehicle_id
+                JOIN np_municipalities c ON c.id = ar.municipality_id
+                JOIN np_districts d ON d.id = ar.district_id
+                JOIN np_states s ON s.id = ar.state_id
+                GROUP BY 
+                ar.date,
+                ar.accident_time,
+                location,
+                art.name_np,
+                arsn.name_np,
+                v.name_np,
+                municipality,
+                district,
+                state,
+                ar.ward,
+                ar.road_name,
+                ar.accident_location,
+                ar.death_male,  ar.death_female, ar.death_boy, ar.death_girl, ar.death_other,
+                ar.gambhir_male,  ar.gambhir_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
+                ar.general_male,  ar.general_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
+                ar.animal_death, ar.animal_injured,
+                ar.remarks,
+                ar.office_id,  ar.created_by,  ar.updated_by
+
+                ORDER BY ar.date DESC`);
+        // All vehicles
+        const vehicles = await query(`SELECT name_np FROM vehicles`);
+
+        // All accident types and reasons
+        const typesAndReasons = await query(`
+        SELECT art.name_np AS accident_type, arsn.name_np AS accident_reason
+        FROM accident_reason_type art
+        JOIN accident_reasons arsn ON arsn.reason_type = art.id
+      `);
+        console.log('records:', records)
+        console.log('types:', typesAndReasons)
+        res.json({
+            Status: true,
+            message: "Records fetched successfully.",
+            records,
+            vehicles: vehicles.map(v => v.name_np),
+            typesAndReasons,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server Error" });
+    }
+});
+
 
 export { router as accidentRoute };

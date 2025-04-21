@@ -1,34 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useBaseURL } from "../../Context/BaseURLProvider";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
+    Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Paper, TableSortLabel
 } from "@mui/material";
 import axios from "axios";
-import { useBaseURL } from "../../Context/BaseURLProvider";
 
-// Fallback for missing CustomSortLabel
-const CustomSortLabel = ({ columnKey, label }) => label;
-
-const AccidentTable = ({
-    // sortedRows = [],
-    order,
-    orderBy,
-    handleSort,
-    vehicles = [],
-    accidentTypes,
-    accidentReasons = [],
-    accReasons = [],
-    totalAccidentCount = 0,
-}) => {
+const AccidentLongTable = () => {
     const BASE_URL = useBaseURL();
-    const [formattedOptions, setFormattedOptions] = useState([]);
+    const [data, setData] = useState([]);
+    const [vehicles, setVehicles] = useState([]);
+    const [typesAndReasons, setTypesAndReasons] = useState([]);
 
-    // Fetch data with error handling
     const fetchData = async (url, params = {}) => {
         try {
             const response = await axios.get(url, {
@@ -36,9 +19,9 @@ const AccidentTable = ({
                 withCredentials: true,
             });
             const { Status, Result, Error } = response.data;
-
+            console.log('Response:', response.data);
             if (Status) {
-                return Result || [];
+                return response.data || [];
             } else {
                 console.error(Error || 'Failed to fetch records');
                 return [];
@@ -50,209 +33,164 @@ const AccidentTable = ({
         }
     };
 
-    const [vehicleCount, setVehicleCount] = useState(0);
-    const [vehicleList, setVehicleList] = useState([]);
     const fetchVehicles = async () => {
-        const url = `${BASE_URL}/public/get_vehicles`;
-        const result = await fetchData(url);
-
-        const formatted = result.map(opt => ({
-            label: opt.name_np,
-            value: opt.id
-        }));
-
-        setVehicleList(formatted);
-        setVehicleCount(formatted.length);
-        console.log("Formatted:", formatted);
-    };
-
-    const [accidentRecords, setAccidentRecords] = useState([]);
-    const [reasonTypes, setReasonTypes] = useState([]); // <-- new state
-
-    const fetchAccidentRecords = async () => {
         const url = `${BASE_URL}/accident/get_accident_records`;
-        try {
-            const response = await axios.get(url, {
-                withCredentials: true,
-            });
-
-            console.log(response); // optional: inspect full response
-
-            const { Status, data, reasonTypes, Error } = response.data;
-
-            if (Status) {
-                setAccidentRecords(data);        // set accident records
-                setFormattedOptions(data);
-                setReasonTypes(reasonTypes);     // set reason types
-                console.log('Records:', data);
-                console.log('Reason Types:', reasonTypes);
-            } else {
-                console.error(Error || 'Failed to fetch records');
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            alert('An error occurred while fetching data.');
-        }
+        const result = await fetchData(url);
+        // console.log(result.vehicles);
+        setData(result.records);
+        setVehicles(result.vehicles);
+        setTypesAndReasons(result.typesAndReasons);
     };
+
+    const groupedReasons = typesAndReasons.reduce((acc, item) => {
+        if (!item?.accident_type || !item?.accident_reason) return acc;
+        if (!acc[item.accident_type]) acc[item.accident_type] = [];
+        if (!acc[item.accident_type].includes(item.accident_reason)) {
+            acc[item.accident_type].push(item.accident_reason);
+        }
+        return acc;
+    }, {});
+
 
 
     useEffect(() => {
-        fetchAccidentRecords();
         fetchVehicles();
-    }, []);  // Fetch accident records on component mount
+    }, []);
 
-    function descendingComparator(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) return -1;
-        if (b[orderBy] > a[orderBy]) return 1;
-        return 0;
-    }
 
-    function getComparator(order, orderBy) {
-        return order === "desc"
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
-    }
-    const sortedRows = [...formattedOptions].sort(getComparator(order, orderBy));
-    return (
-        <TableContainer component={Paper}>
-            <Table size="small" stickyHeader>
-                <TableHead>
-                    <TableRow>
-                        <TableCell rowSpan={3} align="center">
-                            <CustomSortLabel columnKey="sn" label="सि.नं." order={order} orderBy={orderBy} onSort={handleSort} />
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            <CustomSortLabel columnKey="date" label="मिति" order={order} orderBy={orderBy} onSort={handleSort} />
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            <CustomSortLabel columnKey="accident_time" label="समय" order={order} orderBy={orderBy} onSort={handleSort} />
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            <CustomSortLabel columnKey="road_name" label="सडकको नाम" order={order} orderBy={orderBy} onSort={handleSort} />
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            <CustomSortLabel columnKey="location" label="स्थान" order={order} orderBy={orderBy} onSort={handleSort} />
-                        </TableCell>
-                        <TableCell align="center" colSpan={vehicleCount + 1}>
-                            सवारी दुर्घटनामा संलग्न सवारी साधनहरु
-                        </TableCell>
-                        <TableCell colSpan={18} align="center">
-                            मानव घाइते
-                        </TableCell>
-                        <TableCell align="center" rowSpan={2} colSpan={2}>
-                            चौपाया
-                        </TableCell>
-                        <TableCell align="center" colSpan={6}>
-                            दुर्घटनाको समय
-                        </TableCell>
-                        <TableCell align="center" colSpan={totalAccidentCount + 1}>
-                            सवारी दुर्घटनाको कारण
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            सवारी साधन क्षेती
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            अनुमानित रकम
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            कसरी सदु भएको
-                        </TableCell>
-                        <TableCell rowSpan={3} align="center">
-                            कैफियत
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        {vehicles.map((vehicle, index) => (
-                            <TableCell key={index} align="center" rowSpan={2}>
-                                {vehicle.label}
-                            </TableCell>
-                        ))}
-                        {vehicleList.map((v, i) => (
-                            <TableCell key={`vehicle-${i}`} align="center">
-                                {v.label}
-                            </TableCell>
-                        ))}
-                        <TableCell align="center" rowSpan={2}>
-                            कुल
-                        </TableCell>
+    const renderTableHeader = () => (
+        <TableHead>
+            <TableRow >
+                <TableCell rowSpan="3">सि.नं.</TableCell>
+                <TableCell rowSpan="3">मिति</TableCell>
+                <TableCell rowSpan="3">समय</TableCell>
+                <TableCell rowSpan="3">स्थान</TableCell>
+                <TableCell rowSpan="3">सडक</TableCell>
+                <TableCell rowSpan="3">ठाउको नाम</TableCell>
 
-                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
-                            <TableCell key={`death-${i}`} align="center">
-                                {label}
-                            </TableCell>
-                        ))}
-                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
-                            <TableCell key={`gambhir-${i}`} align="center">
-                                {label}
-                            </TableCell>
-                        ))}
-                        {["मृ", "महि", "बा", "बालि", "अन्य", "जम"].map((label, i) => (
-                            <TableCell key={`general-${i}`} align="center">
-                                {label}
-                            </TableCell>
-                        ))}
-                        {["००ः०६/१२ः००", "१२ः००/१८ः००", "१८ः००/२४ः००", "२४ः००/०६ः००", "समय नखुलेको", "जम्मा"].map((label, i) => (
-                            <TableCell key={`time-${i}`} align="center">
-                                {label}
-                            </TableCell>
-                        ))}
-                        {accidentReasons.map((reason, index) => (
-                            <TableCell key={index} align="center">
-                                {reason.name_np}
-                            </TableCell>
-                        ))}
-                        <TableCell align="center">
-                            जम्मा
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {sortedRows.map((row, idx) => (
-                        <TableRow key={idx}>
-                            <TableCell>{row.id}</TableCell>
-                            <TableCell>{row.accident_date}</TableCell>
-                            <TableCell>{row.accident_time}</TableCell>
-                            <TableCell>
-                                {row.municipality_np}, {row.district_np}
-                            </TableCell>
-                            <TableCell>{row.accident_location}</TableCell>
-                            {vehicles.map((vehicle) => (
-                                <TableCell key={vehicle.value} align="center">                                    
-                                    {/* {row.vehicle_names?.includes(vehicle.label) ? "✓" : ""} */}
-                                </TableCell>
-                            ))}
-                            <TableCell align="center">{row.vehicle_names?.length || 0}</TableCell>
-                            {["death_male", "death_female", "death_boy", "death_girl", "death_other", "fatalities", "gambhir_male", "gambhir_female", "gambhir_boy", "gambhir_girl", "gambhir_other", "gambhir", "general_male", "general_female", "general_boy", "general_girl", "general_other", "general"].map((key) => (
-                                <TableCell key={key} align="center">{row[key]}</TableCell>
-                            ))}
-                            <TableCell align="center">{row.animal_injured}</TableCell>
-                            <TableCell align="center">{row.animal_death}</TableCell>
+                <TableCell colSpan={vehicles.length + 1} >सवारी साधन</TableCell>
+                <TableCell colSpan={Object.keys(groupedReasons).reduce((acc, type) =>
+                    acc + groupedReasons[type].length, 0)}>दुर्घटनाको कारण
+                </TableCell>
+            </TableRow>
 
-                            {/* Time categorization */}
-                            {["00:06", "12:00", "18:00", "24:00", "06:00"].map((time, i, arr) => (
-                                <TableCell key={i} align="center">
-                                    {row.accident_time > arr[i - 1] && row.accident_time <= time ? 1 : ""}
-                                </TableCell>
-                            ))}
-                            <TableCell align="center">1</TableCell>
+            <TableRow>
+                {vehicles.map(v => <TableCell key={v} rowSpan={2}>{v}</TableCell>)}
+                <TableCell rowSpan={2}>जम्मा</TableCell>
+                {Object.keys(groupedReasons).map((type, i) => (
+                    <TableCell key={`${type}-${i}`} colSpan={groupedReasons[type].length}>{type}</TableCell>
+                ))}
+            </TableRow>
 
-                            {accReasons.map((reason) => (
-                                <TableCell key={reason.value} align="center">
-                                    {row.reason_names?.includes(reason.label) ? "✓" : ""}
-                                </TableCell>
-                            ))}
-                            <TableCell align="center">{row.reason_names?.length || 0}</TableCell>
-                            <TableCell align="center">{row.vehicle_damage}</TableCell>
-                            <TableCell align="center">{row.damage_amount}</TableCell>
-                            <TableCell align="center">{row.settlement}</TableCell>
-                            <TableCell align="center">{row.note}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
+            <TableRow>
 
-            </Table>
-        </TableContainer>
+                {/* {Object.keys(groupedReasons).flatMap(type =>
+                    groupedReasons[type].map(reason => <th key={reason}>{reason}</th>)
+                    )} */}
+                {Object.entries(groupedReasons).map(([type, reasons], i) => (
+                    <React.Fragment key={`${type}-${i}`}>
+                        {reasons.map((reason, j) => (
+                            <TableCell key={`${type}-${reason}-${j}`}>{reason}</TableCell>
+                        ))}
+                    </React.Fragment>
+                ))}
+
+
+            </TableRow>
+        </TableHead>
     );
-};
 
-export default AccidentTable;
+    const renderTableRows = () => {
+        const grouped = {};
+
+        data.forEach(item => {
+            const key = `${item.date}-${item.accident_time}-${item.location}`;
+            if (!grouped[key]) {
+                grouped[key] = {
+                    date: item.date,
+                    state: item.state,
+                    district: item.district,
+                    municipality: item.municipality,
+                    ward: item.ward,
+                    road_name: item.road_name,
+                    accident_location: item.accident_location,
+                    accident_time: item.accident_time,
+                    death_male: item.death_male,
+                    death_female: item.death_female,
+                    death_boy: item.death_boy,
+                    death_girl: item.death_girl,
+                    death_total: item.death_total,
+
+                    gambhir_male: item.gambhir_male,
+                    gambhir_female: item.gambhir_female,
+                    gambhir_boy: item.gambhir_boy,
+                    gambhir_girl: item.gambhir_girl,
+                    gambhir_total: item.gambhir_total,
+
+                    general_male: item.general_male,
+                    general_female: item.general_female,
+                    general_boy: item.general_boy,
+                    general_girl: item.general_girl,
+                    general_total: item.general_total,
+
+                    animal_death: item.animal_death,
+                    animal_injured: item.animal_injured,
+                    remarks: item.remarks,
+                    office_id: item.office_id,
+                    created_by: item.created_by,
+                    updated_by: item.updated_by,
+
+                    location: item.location,
+                    vehicles: {},
+
+                    reasons: {}
+                };
+            }
+
+            grouped[key].vehicles[item.vehicle_name] = item.count;
+            grouped[key].reasons[item.accident_reason] = item.count;
+        });
+        // const total_vehicle = Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)      
+
+        return Object.values(grouped).map((row, index) => (
+            <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{row.date}</TableCell>
+                <TableCell>{row.accident_time}</TableCell>
+                <TableCell>{row.accident_location}</TableCell>
+                <TableCell>{row.road_name}</TableCell>
+                <TableCell>{row.location}</TableCell>
+                {vehicles.map(v => (
+                    <TableCell key={v}>{row.vehicles[v] || 0}</TableCell>
+                ))}
+                <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+
+                {Object.entries(groupedReasons).map(([type, reasons], i) => (
+                    <React.Fragment key={`${type}-${i}`}>
+                        {reasons.map((reason, j) => (
+                            <TableCell key={`${type}-${reason}-${j}`}>{row.reasons[reason] || 0}</TableCell>
+                        ))}
+                    </React.Fragment>
+                ))}
+                {/* <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell> */}
+            </TableRow>
+        ));
+    };
+
+    return (
+        <>
+            <TableContainer component={Paper} >
+                <Table border={1} textAlign="center" size="small" stickyHeader>
+                    {renderTableHeader()}
+                    <TableBody>
+                        {renderTableRows()}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+
+        </>
+    )
+}
+
+export default AccidentLongTable
