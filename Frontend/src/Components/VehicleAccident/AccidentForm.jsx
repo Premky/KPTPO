@@ -175,65 +175,65 @@ const AccidentForm = () => {
 
                     {[...Array(vehicleCount)].map((_, index) => (
                         <Grid2 container spacing={1} marginTop={2} key={index}>
-                            
-                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
-                                    <ReuseVehicles
-                                        name={`vehicle_name_${index + 1}`}
-                                        label={
-                                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                                                <>सवारीको नाम {index + 1}</>
-                                            </Box>
-                                        }
-                                        required
-                                        control={control}
-                                        error={errors[`vehicle_name_${index + 1}`]}
-                                        options={''}
-                                    />
-                                </Grid2>
-                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
-                                    <ReuseVehicles
-                                        name={`vehicle_category_${index + 1}`}
-                                        label={
-                                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                                                <>सवारीको प्रकार {index + 1}</>
-                                            </Box>
-                                        }
-                                        required
-                                        control={control}
-                                        error={errors[`vehicle_category_${index + 1}`]}
-                                        options={''}
-                                    />
-                                </Grid2>
 
-                                <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
-                                    <ReuseCountry
-                                        name={`vehicle_country_${index + 1}`}
-                                        label={<>सवारीको देश {index + 1}</>}
-                                        required
-                                        control={control}
-                                        error={errors[`vehicle_country_${index + 1}`]}
-                                    />
-                                </Grid2>
-                                <Grid2 size={{ xs: 3, sm: 3, md: 3 }}>
-                                    <ReuseInput
-                                        type="text"
-                                        label="कैफियत"
-                                        name={`vehicle_remark_${index + 1}`}
-                                        control={control}
-                                        error={errors[`vehicle_remark_${index + 1}`]}
-                                    />
-                                </Grid2>
-                                <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>
-                                    <Button variant="contained" color="secondary" size='small'
-                                        type="button" onClick={() => setVehicleCount(vehicleCount + 1)}>+</Button>
-                                </Grid2>
-                                <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>
-                                    {vehicleCount > 1 ?
-                                        <Button variant="contained" color="warning" size='small' spacing={1}
-                                            type="button" onClick={() => setVehicleCount(vehicleCount - 1)}><RemoveIcon /></Button>
-                                        : null}
-                                </Grid2>
-                            
+                            <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
+                                <ReuseVehicles
+                                    name={`vehicle_name_${index + 1}`}
+                                    label={
+                                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                                            <>सवारीको नाम {index + 1}</>
+                                        </Box>
+                                    }
+                                    required
+                                    control={control}
+                                    error={errors[`vehicle_name_${index + 1}`]}
+                                    options={''}
+                                />
+                            </Grid2>
+                            <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
+                                <ReuseVehicles
+                                    name={`vehicle_category_${index + 1}`}
+                                    label={
+                                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                                            <>सवारीको प्रकार {index + 1}</>
+                                        </Box>
+                                    }
+                                    required
+                                    control={control}
+                                    error={errors[`vehicle_category_${index + 1}`]}
+                                    options={''}
+                                />
+                            </Grid2>
+
+                            <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
+                                <ReuseCountry
+                                    name={`vehicle_country_${index + 1}`}
+                                    label={<>सवारीको देश {index + 1}</>}
+                                    required
+                                    control={control}
+                                    error={errors[`vehicle_country_${index + 1}`]}
+                                />
+                            </Grid2>
+                            <Grid2 size={{ xs: 3, sm: 3, md: 3 }}>
+                                <ReuseInput
+                                    type="text"
+                                    label="कैफियत"
+                                    name={`vehicle_remark_${index + 1}`}
+                                    control={control}
+                                    error={errors[`vehicle_remark_${index + 1}`]}
+                                />
+                            </Grid2>
+                            <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>
+                                <Button variant="contained" color="secondary" size='small'
+                                    type="button" onClick={() => setVehicleCount(vehicleCount + 1)}>+</Button>
+                            </Grid2>
+                            <Grid2 size={{ xs: 1, sm: 1, md: 1 }} marginTop={5}>
+                                {vehicleCount > 1 ?
+                                    <Button variant="contained" color="warning" size='small' spacing={1}
+                                        type="button" onClick={() => setVehicleCount(vehicleCount - 1)}><RemoveIcon /></Button>
+                                    : null}
+                            </Grid2>
+
                         </Grid2>
                     ))}
 
@@ -333,8 +333,14 @@ const AccidentForm = () => {
                                 </Grid2>
                             ))
                         }
-
-
+                    </Grid2>
+                    <Grid2 container spacing={1} marginTop={2}>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+                            <ReuseInput type='text' label='अनुमानित क्षेती रकम' name='est_amount' control={control} error={errors.est_amount} />
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+                            <ReuseInput type='text' label='कसरी सवारी दुर्घटना भयो?' name='txt_accident_reason' control={control} error={errors.txt_accident_reason} />
+                        </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput type='text' label='कैफियत' name='remarks' control={control} error={errors.remarks} />
                         </Grid2>
@@ -350,7 +356,7 @@ const AccidentForm = () => {
             </Box >
             <Box sx={{ flexGrow: 1, margin: 2 }}>
                 <AccidentShortTable />
-                <AccidentLongTable />
+                {/* <AccidentLongTable /> */}
             </Box>
         </>
     )

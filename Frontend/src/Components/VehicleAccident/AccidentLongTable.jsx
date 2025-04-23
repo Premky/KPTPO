@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useBaseURL } from "../../Context/BaseURLProvider";
 import {
     Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, TableSortLabel
+    TableHead, TableRow, Paper, TableSortLabel,
+    Button
 } from "@mui/material";
 import axios from "axios";
-
+// import expotLongTable from "ExportLongTable";
+import exportLongTable from "../VehicleAccident/ExportLongTable";
 const AccidentLongTable = () => {
     const BASE_URL = useBaseURL();
     const [data, setData] = useState([]);
@@ -51,11 +53,37 @@ const AccidentLongTable = () => {
         return acc;
     }, {});
 
-
+    const handleExport = () => {
+        const grouped = {};
+        data.forEach(item => {
+            const key = `${item.date}-${item.accident_time}-${item.location}`;
+            if (!grouped[key]) {
+                grouped[key] = {
+                    ...item,
+                    vehicles: {},
+                    reasons: {},
+                };
+            }
+            grouped[key].vehicles[item.vehicle_name] = item.count;
+            grouped[key].reasons[item.accident_reason] = item.count;
+        });
+    
+        const groupedArray = Object.values(grouped);
+        exportLongTable(groupedArray, vehicles, typesAndReasons);  // pass grouped array
+    };
+    
 
     useEffect(() => {
         fetchVehicles();
     }, []);
+
+    const [search, setSearch] = useState("");
+
+    const filteredData = Object.values(data).filter(row =>
+        row.location?.toLowerCase().includes(search.toLowerCase()) ||
+        row.date?.includes(search)
+    );
+
 
 
     const renderTableHeader = () => (
@@ -69,13 +97,33 @@ const AccidentLongTable = () => {
                 <TableCell rowSpan="3">ठाउको नाम</TableCell>
 
                 <TableCell colSpan={vehicles.length + 1} >सवारी साधन</TableCell>
+                <TableCell colSpan='15'> मानव </TableCell>
+                <TableCell rowSpan='2' colSpan={2}> चौपाया </TableCell>
+
+                <TableCell colSpan={6}> दुर्घटना भएको समय </TableCell>
+
                 <TableCell colSpan={Object.keys(groupedReasons).reduce((acc, type) =>
                     acc + groupedReasons[type].length, 0)}>दुर्घटनाको कारण
                 </TableCell>
+                <TableCell rowSpan={3}>जम्मा सवारी दुर्घटना संख्या</TableCell>
+                <TableCell rowSpan={3}>जम्मा सवारी साधन क्षेती</TableCell>
+                <TableCell rowSpan={3}>अनुमानित रकम</TableCell>
+                <TableCell rowSpan={3}>कसरी सवारी दुर्घटना भएको</TableCell>
+                <TableCell rowSpan={3}>कैफियत</TableCell>
             </TableRow>
 
             <TableRow>
                 {vehicles.map(v => <TableCell key={v} rowSpan={2}>{v}</TableCell>)}
+                <TableCell rowSpan={2}>जम्मा</TableCell>
+                <TableCell colSpan={5}>मृत्यु</TableCell>
+                <TableCell colSpan={5}>गम्भिर घाईते</TableCell>
+                <TableCell colSpan={5}>साधारण घाईते</TableCell>
+
+                <TableCell rowSpan={2}>00:06/12:00</TableCell>
+                <TableCell rowSpan={2}>00:12/18:00</TableCell>
+                <TableCell rowSpan={2}>00:18/00:00</TableCell>
+                <TableCell rowSpan={2}>00:/06:00</TableCell>
+                <TableCell rowSpan={2}>समय नखुलेको</TableCell>
                 <TableCell rowSpan={2}>जम्मा</TableCell>
                 {Object.keys(groupedReasons).map((type, i) => (
                     <TableCell key={`${type}-${i}`} colSpan={groupedReasons[type].length}>{type}</TableCell>
@@ -87,6 +135,30 @@ const AccidentLongTable = () => {
                 {/* {Object.keys(groupedReasons).flatMap(type =>
                     groupedReasons[type].map(reason => <th key={reason}>{reason}</th>)
                     )} */}
+                <TableCell>पुरुष</TableCell>
+                <TableCell>महिला</TableCell>
+                <TableCell>बालक</TableCell>
+                <TableCell>बालिका</TableCell>
+                {/* <TableCell>अन्य</TableCell> */}
+                <TableCell>जम्मा</TableCell>
+
+                <TableCell>पुरुष</TableCell>
+                <TableCell>महिला</TableCell>
+                <TableCell>बालक</TableCell>
+                <TableCell>बालिका</TableCell>
+                {/* <TableCell>अन्य</TableCell> */}
+                <TableCell>जम्मा</TableCell>
+
+                <TableCell>पुरुष</TableCell>
+                <TableCell>महिला</TableCell>
+                <TableCell>बालक</TableCell>
+                <TableCell>बालिका</TableCell>
+                {/* <TableCell>अन्य</TableCell> */}
+                <TableCell>जम्मा</TableCell>
+
+                <TableCell>मृत्यु</TableCell>
+                <TableCell>घाईते</TableCell>
+
                 {Object.entries(groupedReasons).map(([type, reasons], i) => (
                     <React.Fragment key={`${type}-${i}`}>
                         {reasons.map((reason, j) => (
@@ -94,6 +166,7 @@ const AccidentLongTable = () => {
                         ))}
                     </React.Fragment>
                 ))}
+
 
 
             </TableRow>
@@ -115,6 +188,7 @@ const AccidentLongTable = () => {
                     road_name: item.road_name,
                     accident_location: item.accident_location,
                     accident_time: item.accident_time,
+
                     death_male: item.death_male,
                     death_female: item.death_female,
                     death_boy: item.death_boy,
@@ -164,6 +238,37 @@ const AccidentLongTable = () => {
                     <TableCell key={v}>{row.vehicles[v] || 0}</TableCell>
                 ))}
                 <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+                <TableCell>{row.death_male}</TableCell>
+                <TableCell>{row.death_female}</TableCell>
+                <TableCell>{row.death_boy}</TableCell>
+                <TableCell>{row.death_girl}</TableCell>
+                <TableCell>{row.death_total}</TableCell>
+
+                <TableCell>{row.gambhir_male}</TableCell>
+                <TableCell>{row.gambhir_female}</TableCell>
+                <TableCell>{row.gambhir_boy}</TableCell>
+                <TableCell>{row.gambhir_girl}</TableCell>
+                <TableCell>{row.gambhir_total}</TableCell>
+
+                <TableCell>{row.general_male}</TableCell>
+                <TableCell>{row.general_female}</TableCell>
+                <TableCell>{row.general_boy}</TableCell>
+                <TableCell>{row.general_girl}</TableCell>
+                <TableCell>{row.general_total}</TableCell>
+
+                <TableCell>{row.animal_death}</TableCell>
+                <TableCell>{row.animal_injured}</TableCell>
+
+                <TableCell>{row.accident_time > "00:06" && row.accident_time < "12:00" ? 1 : 0}</TableCell>
+                <TableCell>{row.accident_time > "12:00" && row.accident_time < "18:00" ? 1 : 0}</TableCell>
+                <TableCell>{row.accident_time > "18:00" && row.accident_time < "00:00" ? 1 : 0}</TableCell>
+                <TableCell>{row.accident_time > "00:00" && row.accident_time < "00:06" ? 1 : 0}</TableCell>
+                <TableCell>{!row.accident_time ? 1 : 0}</TableCell>
+
+                <TableCell>
+                    जम्मा
+                </TableCell>
+
 
                 {Object.entries(groupedReasons).map(([type, reasons], i) => (
                     <React.Fragment key={`${type}-${i}`}>
@@ -173,14 +278,34 @@ const AccidentLongTable = () => {
                     </React.Fragment>
                 ))}
                 {/* <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell> */}
+                {/* <TableCell>x</TableCell> */}
+                <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+                <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+                <TableCell>x</TableCell>
+                <TableCell>x</TableCell>
+                <TableCell>{row.remarks}</TableCell>
             </TableRow>
         ));
     };
 
     return (
         <>
+            <h2>दुर्घटना विवरण तालिका</h2>
+            <Button onClick={handleExport} variant="contained" color="primary" style={{ margin: "10px" }}>
+                Download Excel
+            </Button>
+
+            <input
+                type="text"
+                placeholder="स्थान वा मिति खोज्नुहोस्..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ margin: "10px", padding: "5px", width: "300px" }}
+            />
+
+
             <TableContainer component={Paper} >
-                <Table border={1} textAlign="center" size="small" stickyHeader>
+                <Table border={1} size="small" stickyHeader>
                     {renderTableHeader()}
                     <TableBody>
                         {renderTableRows()}

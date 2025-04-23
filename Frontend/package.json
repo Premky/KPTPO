@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.3",
     "crypto-js": "^4.2.0",
     "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "nepali-datepicker-reactjs": "^1.1.7",
     "nepali-datetime": "^1.4.0",
     "react": "^18.3.1",

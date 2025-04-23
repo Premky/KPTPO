@@ -56,7 +56,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
             key.startsWith("accident_type_")
         );
 
-        console.log("Filtered Entries:", reasonEntries);
+        // console.log("Filtered Entries:", reasonEntries);
 
         if (reasonEntries.length === 0) {
             console.log("No matching accident types found.");
@@ -280,7 +280,7 @@ router.get('/get_accident_records2', verifyToken, async (req, res) => {
 
 
         // console.log(accidentData)
-
+    
         res.json({
             Status: true, data: accidents,
             reasonTypes: reasonTypes.map(rt => rt.name_np),
@@ -296,8 +296,7 @@ router.get("/get_accident_records", async (req, res) => {
     try {
         // Main data
         //   ar.date,
-        //   ar.accident_time,
-
+        //   ar.accident_time,        
         const records = await query(`
                 SELECT 
                 ar.date,
@@ -364,8 +363,8 @@ router.get("/get_accident_records", async (req, res) => {
         FROM accident_reason_type art
         JOIN accident_reasons arsn ON arsn.reason_type = art.id
       `);
-        console.log('records:', records)
-        console.log('types:', typesAndReasons)
+        // console.log('records:', records)
+        // console.log('types:', typesAndReasons)
         res.json({
             Status: true,
             message: "Records fetched successfully.",

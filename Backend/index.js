@@ -55,12 +55,17 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: true, // Set to true if you're using HTTPS in production
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
-    }
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000,
+    }    
 }));
 
 // app.use(morgan('tiny')); // Logs HTTP requests 
+if (process.env.NODE_ENV !== 'production') {
+    app.use(morgan('dev'));
+}else {
+    app.use(morgan('tiny'));
+}
 app.use(compression());
 // app.use(express.urlencoded());
 // app.use(bodyParser());
