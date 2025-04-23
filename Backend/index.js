@@ -56,8 +56,9 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000,
-    }    
+    }
 }));
 
 // app.use(morgan('tiny')); // Logs HTTP requests 
@@ -66,6 +67,7 @@ if (process.env.NODE_ENV !== 'production') {
 }else {
     app.use(morgan('tiny'));
 }
+
 app.use(compression());
 // app.use(express.urlencoded());
 // app.use(bodyParser());
