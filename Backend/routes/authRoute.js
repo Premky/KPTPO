@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
+import verifyToken from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 const query = promisify(con.query).bind(con);
@@ -249,7 +250,7 @@ router.post('/logout', (req, res) => {
 });
 
 // Session Validation Route
-router.get('/session', (req, res) => {
+router.get('/session', verifyToken, (req, res) => {
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ loggedIn: false });
 

@@ -21,6 +21,19 @@ const verifyToken = (req, res, next) => {
         }
 
         req.user = decoded;
+
+        // 🔄 Refresh the token (optional)
+        const refreshedToken = jwt.sign(decoded, process.env.JWT_SECRET, {
+            expiresIn: '1d', // or any duration
+        });
+
+        res.cookie('token', refreshedToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
         next();
     });
 };
