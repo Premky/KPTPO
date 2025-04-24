@@ -39,10 +39,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
+        httpOnly: true,
         secure: process.env.NODE_ENV === 'production', 
         maxAge: 24 * 60 * 60 * 1000, 
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'None',
     }
 }));
 
@@ -81,7 +82,7 @@ const limiter = rateLimit({
     max: 100,
     message: 'Too many requests from this IP, please try again later.'
 });
-app.use(limiter);
+// app.use(limiter);
 
 // Static files
 app.use(express.static('Public'));
