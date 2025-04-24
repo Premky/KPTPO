@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../Context/AuthContext';
 
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
+import DifferenceIcon from '@mui/icons-material/Difference';
 
 const VehicleAccidentMenu = () => {
   const { state } = useAuth();
@@ -19,7 +20,7 @@ const VehicleAccidentMenu = () => {
         <ListItemText primary="AV Dashboard" />
       </ListItemButton>
       <ListItemButton onClick={() => navigate('/va/accident-report')}>
-        <ListItemIcon> <DynamicFormIcon />    </ListItemIcon>
+        <ListItemIcon> <DifferenceIcon />    </ListItemIcon>
         <ListItemText primary="Details" />
       </ListItemButton>
     </List>

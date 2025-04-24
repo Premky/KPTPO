@@ -9,49 +9,42 @@ const AccidentShortTable = () => {
     const BASE_URL = useBaseURL();
     // const BASE_URL = localStorage.getItem('BASE_URL');
     // API fetch function
-    const fetchData = async (url, params, setStateFunction) => {
+    const fetchData = async (url, params = {}) => {
         try {
             const response = await axios.get(url, {
-                // headers: { Authorization: `Bearer ${token}` },
                 params,
                 withCredentials: true,
             });
             const { Status, Result, Error } = response.data;
-
+            // console.log('Response:', response.data);
             if (Status) {
-                if (Result?.length > 0) {
-                    setStateFunction(Result);
-                } else {
-                    console.log('No records found');
-                }
+                return response.data || [];
             } else {
                 console.error(Error || 'Failed to fetch records');
+                return [];
             }
         } catch (error) {
             console.error('Error fetching data:', error);
             alert('An error occurred while fetching data.');
+            return [];
         }
     };
 
     const [accidentRecords, setAccidentRecords] = useState([]); // State to manage accident records
     const [formattedOptions, setFormattedOptions] = useState([]);
-    const fetchAccidentRecords = (data) => {
-        const params = data || {};
-        fetchData(`${BASE_URL}/accident/get_accident_records`, params, (result) => {
-            const formatted = result.map((item, index) => ({
-                ...item,
-                id: item.id || index,
-                sn: index + 1,
-                vehicle_names: item.vehicles?.map(v => v.name_np).join(', ') || ''
-            }));
-            // console.log("Formatted Data:", formatted);
-            setFormattedOptions(formatted);
-            setAccidentRecords(result);
-        });
+
+    const fetchAccidentRecords = async () => {
+        const url = `${BASE_URL}/accident/get_accident_records`;
+        const result = await fetchData(url);        
+        const formatted = result.records.map((item, index) => ({
+            ...item,
+            id: item.id || index,
+            sn: index + 1,            
+        }))
+        // console.log("Vehicles:", formatted);
+        setFormattedOptions(formatted);
+        setAccidentRecords(result);
     };
-
-
-
 
     useEffect(() => {        
         fetchAccidentRecords();
@@ -62,12 +55,13 @@ const AccidentShortTable = () => {
         { field: "sn", headerName: "सि.नं." },
         { field: "date", headerName: "दुर्घटना मिति" },
         { field: "accident_time", headerName: "दुर्घटना समय" },
-        { field: "district_np", headerName: "जिल्ला" },
+        { field: "district", headerName: "जिल्ला" },
         { field: "accident_location", headerName: "दुर्घटना स्थान" },
         { field: "road_name", headerName: "सडकको नाम" },
-        { field: "casualties", headerName: "घाइतेको संख्या" },
-        { field: "fatalities", headerName: "मृतकको संख्या" },
-        { field: "vehicle_names", headerName: "सवारी साधन संलग्न" },
+        { field: "total_general", headerName: "सामान्य घाइतेको संख्या" },
+        { field: "total_gambhir", headerName: "गम्भिर घाइतेको संख्या" },
+        { field: "total_death", headerName: "मृतकको संख्या" },
+        { field: "vehicle_name", headerName: "सवारी साधन संलग्न" },
         { field: "remarks", headerName: "कैफियत" },
     ]
     return (
