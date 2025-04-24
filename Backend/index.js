@@ -3,8 +3,6 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import connectMySQL from 'express-mysql-session';
-const MySQLStore = connectMySQL(session);
-
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import compression from 'compression';
@@ -37,18 +35,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session setup
 app.use(session({
-    secret: process.env.jwt_prem_ko_secret_key || 'jwt_prem_ko_secret_key',
+    secret: process.env.JWT_SECRET || 'jwt_prem_ko_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 24 * 60 * 60 * 1000, 
         httpOnly: true,
         sameSite: 'strict',
     }
 }));
 
-// Logging (optional)
+// Logging
 if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 } else {
@@ -57,18 +55,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(compression());
 
-// Define allowed origins
+// CORS setup
 const hardOrigins = [
     'http://localhost:5173',
-    'http://localhost:5174',
-    'http://192.168.1.21:5173',
     'https://kptpo.onrender.com',
-    'http://192.168.192.250:8211',
-    'http://192.168.165.250:8211',
     'https://kptpo-backend.onrender.com',
 ];
 
-// CORS setup
 app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || hardOrigins;
@@ -79,16 +72,16 @@ app.use(cors({
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // ✅ IMPORTANT for session cookies
+    credentials: true,
 }));
 
 // Rate Limiting
 const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
+    windowMs: 10 * 60 * 1000, 
     max: 100,
     message: 'Too many requests from this IP, please try again later.'
 });
-// app.use(limiter); // Optional, enable as needed
+app.use(limiter);
 
 // Static files
 app.use(express.static('Public'));
