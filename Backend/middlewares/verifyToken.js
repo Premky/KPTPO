@@ -23,8 +23,14 @@ const verifyToken = (req, res, next) => {
         req.user = decoded;
 
         // 🔄 Refresh the token (optional)
-        const refreshedToken = jwt.sign(decoded, process.env.JWT_SECRET, {
-            expiresIn: '1d', // or any duration
+        // const refreshedToken = jwt.sign(decoded, process.env.JWT_SECRET, {
+        //     expiresIn: '1d', // or any duration
+        // });
+
+        const { exp, iat, ...userData } = decoded;
+
+        const refreshedToken = jwt.sign(userData, process.env.JWT_SECRET, {
+            expiresIn: '1d',
         });
 
         res.cookie('token', refreshedToken, {

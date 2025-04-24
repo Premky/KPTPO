@@ -217,14 +217,20 @@ router.post('/login', async (req, res) => {
 
                 const token = jwt.sign(userdetails, process.env.JWT_SECRET, { expiresIn: '1d' });
 
+                // res.cookie('token', token, {
+                //     httpOnly: true,
+                //     secure: process.env.NODE_ENV === 'production' && !process.env.DISABLE_SECURE_COOKIES,
+                //     sameSite: 'strict',
+                //     path: '/',
+                //     maxAge: 86400000
+                // });
                 res.cookie('token', token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production' && !process.env.DISABLE_SECURE_COOKIES,
-                    sameSite: 'strict',
-                    path: '/',
-                    maxAge: 86400000
+                    secure: true, // only over HTTPS
+                    sameSite: 'None', // needed for cross-site cookies
+                    maxAge: 24 * 60 * 60 * 1000,
                 });
-
+                
                 req.session.user = { userdetails };
 
                 return res.json({
@@ -251,16 +257,24 @@ router.post('/logout', (req, res) => {
 
 // Session Validation Route
 router.get('/session', verifyToken, (req, res) => {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ loggedIn: false });
+    if (!req.user) return res.status(401).json({ loggedIn: false });
 
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        return res.json({ loggedIn: true, user: verified });
-    } catch (err) {
-        return res.status(403).json({ loggedIn: false });
-    }
+    const { username, role_np, office_np, branch_name, office_id, branch_id, allowed_apps } = req.user;
+
+    return res.json({
+        loggedIn: true,
+        user: {
+            username,
+            role_np,
+            office_np,
+            branch_name,
+            office_id,
+            branch_id,
+            allowed_apps,
+        }
+    });
 });
+
 
 // Health Check Route
 router.get('/health', (req, res) => {
