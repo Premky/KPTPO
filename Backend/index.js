@@ -34,19 +34,32 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session setup
+// app.use(session({
+//     secret: process.env.JWT_SECRET || 'jwt_prem_ko_secret_key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', 
+//         maxAge: 24 * 60 * 60 * 1000, 
+//         httpOnly: true,
+//         sameSite: 'None',
+//     }
+// }));
+
 app.use(session({
     secret: process.env.JWT_SECRET || 'jwt_prem_ko_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 24 * 60 * 60 * 1000, 
-        httpOnly: true,
-        sameSite: 'None',
+      httpOnly: true,
+      secure: true, // only over HTTPS
+      sameSite: 'none', // allow cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000
     }
-}));
+  }));
 
+  
 // Logging
 if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
