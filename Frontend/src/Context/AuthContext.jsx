@@ -1,11 +1,11 @@
 import { createContext, useContext, useReducer, useEffect, useState } from "react";
-import axios, { all } from "axios";
+import axios from "axios";
 import { useBaseURL } from "./BaseURLProvider";
-// const BASE_URL = localStorage.getItem('BASE_URL') || 'http://192.168.165.250:3003';
-// const BASE_URL = localStorage.getItem('BASE_URL');
 
+// AuthContext for managing authentication state globally
 const AuthContext = createContext();
 
+// Initial state for authentication context
 const initialState = {
     user: null,
     role: null,
@@ -17,10 +17,10 @@ const initialState = {
     valid: false,
 };
 
+// Reducer function to handle authentication actions
 const authReducer = (state, action) => {
     switch (action.type) {
         case "LOGIN":
-            // console.log(action);            
             return {
                 ...state,
                 allowed_apps: action.payload.allowed_apps,
@@ -31,57 +31,68 @@ const authReducer = (state, action) => {
                 role: action.payload.role,
                 user: action.payload.user,
                 valid: action.payload.valid,
-            }; // Save the auth data and sends to CombinedNavBar
+            };
         case "LOGOUT":
-
             return initialState;
         default:
             return state;
     }
 };
 
+// AuthProvider component that provides authentication context to the app
 export const AuthProvider = ({ children }) => {
     const BASE_URL = useBaseURL();
     const [state, dispatch] = useReducer(authReducer, initialState);
     const [loading, setLoading] = useState(true);
 
+    // Function to fetch session data from the backend
     const fetchSession = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/auth/session`, { withCredentials: true });
-            if (response.data.success) {
-                // console.log(response.data);
+            console.log('Session fetch response:', response.data); // Add logging here
+    
+            // Check if loggedIn is true in the response data
+            if (response.data.loggedIn) {
+                // Session is valid, update context state with the response data
                 const authData = {
-                    branch_np: response.data.branch_np,
-                    office_id: response.data.office_id,
-                    office_np: response.data.office_np,
-                    role: response.data.role,
-                    user: response.data.user,
-                    valid: response.data.success,
-                    main_office_id: response.data.main_office_id,
-                    allowed_apps: response.data.allowed_apps,
-                    // app_name_np: response.data.app_name_en,
+                    branch_np: response.data.user.branch_name,
+                    office_id: response.data.user.office_id,
+                    office_np: response.data.user.office_np,
+                    role: response.data.user.role_np,
+                    user: response.data.user.username,
+                    valid: response.data.loggedIn,
+                    main_office_id: response.data.user.branch_id, // Assuming main_office_id is branch_id
+                    allowed_apps: response.data.user.allowed_apps,
                 };
+    
                 dispatch({ type: "LOGIN", payload: authData });
+            } else {
+                // If not logged in, log out
+                console.log("Session invalid or expired, logging out...");
+                dispatch({ type: "LOGOUT" });
             }
         } catch (error) {
             console.error("Session fetch failed:", error);
-            dispatch({ type: 'LOGOUT' })
+            // If session fetch fails, log out
+            dispatch({ type: "LOGOUT" });
         } finally {
             setLoading(false);
         }
     };
+    
 
+    // UseEffect hook to fetch session data when the component mounts
     useEffect(() => {
-        fetchSession(); // always fetch from backend
-    }, []);
+        fetchSession(); // Always fetch from backend to ensure fresh session data
+    }, []); // Empty dependency array ensures this runs once on mount
 
-    // Inside AuthProvider
+    // Inside AuthProvider, providing context to the children components
     return (
         <AuthContext.Provider value={{ state, dispatch, loading, fetchSession }}>
             {children}
         </AuthContext.Provider>
     );
-
 };
 
+// Custom hook to access authentication context in other components
 export const useAuth = () => useContext(AuthContext);

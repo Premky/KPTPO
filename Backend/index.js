@@ -2,7 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import connectMySQL  from 'express-mysql-session';
+import connectMySQL from 'express-mysql-session';
 const MySQLStore = connectMySQL(session);
 
 import bodyParser from 'body-parser';
@@ -15,8 +15,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import errorHandler from './middlewares/errorHandler.js';
 
-
-import {publicRouter} from './routes/publicRoutes.js';
+import { publicRouter } from './routes/publicRoutes.js';
 import { driverRouter } from './routes/driverRoute.js';
 import { authRouter } from './routes/authRoute.js';
 import { adminRouter } from './routes/adminRoute.js';
@@ -30,59 +29,49 @@ const port = process.env.PORT || 3003;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware for security and JSON parsing
+// Middleware
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-const sessionStore = new MySQLStore({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ...(process.env.SSL && {
-        ssl: {
-            rejectUnauthorized: false,
-        }
-    })
-});
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Session setup
 app.use(session({
-    key: 'user_sid',
     secret: process.env.jwt_prem_ko_secret_key || 'jwt_prem_ko_secret_key',
-    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
+        secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000,
     }
 }));
 
-// app.use(morgan('tiny')); // Logs HTTP requests 
+// Logging (optional)
 if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
-}else {
+} else {
     app.use(morgan('tiny'));
 }
 
 app.use(compression());
-// app.use(express.urlencoded());
-// app.use(bodyParser());
+
+// Define allowed origins
+const hardOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://192.168.1.21:5173',
+    'https://kptpo.onrender.com',
+    'http://192.168.192.250:8211',
+    'http://192.168.165.250:8211',
+    'https://kptpo-backend.onrender.com',
+];
 
 // CORS setup
 app.use(cors({
-    origin: (origin, callback) => {        
-        const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
-            'http://localhost:5173',
-            'http://localhost:5174',
-            'http://192.168.1.21:5173',
-            'https://kptpo.onrender.com',
-            'http://192.168.192.250:8211',
-            'http://192.168.165.250:8211',
-        ];
+    origin: (origin, callback) => {
+        const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || hardOrigins;
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -90,17 +79,18 @@ app.use(cors({
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, //Allow credentials (cookies) to be sent
+    credentials: true, // ✅ IMPORTANT for session cookies
 }));
-//Rate Limiting (Request Limiter)
-const limiter=rateLimit({
-    windowMs:10*60*1000, //10 Minutes
-    max:100, 
-    message:'Too many requests from this IP, please try again later.'
-});
-// app.use(limiter);
 
-// Static file serving
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100,
+    message: 'Too many requests from this IP, please try again later.'
+});
+// app.use(limiter); // Optional, enable as needed
+
+// Static files
 app.use(express.static('Public'));
 app.use('/Uploads', express.static(path.join(__dirname, 'Public', 'Uploads')));
 
@@ -112,18 +102,16 @@ app.use('/driver', driverRouter);
 app.use('/av', arrestedVehicleRouter);
 app.use('/accident', accidentRoute);
 
-// Global error handler
+// Error handler
 app.use(errorHandler);
 
-
-
-// Start the server
+// Server start
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`🚀 Server running on port ${port}`);
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-    console.log('Server is shutting down...');
+    console.log('👋 Server shutting down...');
     process.exit();
 });
