@@ -355,7 +355,7 @@ const AccidentForm = () => {
                 </form>
             </Box >
             <Box sx={{ flexGrow: 1, margin: 2 }}>
-                <AccidentShortTable />
+                {/* <AccidentShortTable /> */}
                 {/* <AccidentLongTable /> */}
             </Box>
         </>
