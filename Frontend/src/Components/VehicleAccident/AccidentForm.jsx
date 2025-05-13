@@ -255,7 +255,7 @@ const AccidentForm = () => {
                             <ReuseInput type='number' label='बालक मृतक संख्या' name='death_boy' control={control} error={errors.death_male} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
-                            <ReuseInput type='number' label='बिलका मृतक संख्या' name='death_girl' control={control} error={errors.death_female} />
+                            <ReuseInput type='number' label='बालिका मृतक संख्या' name='death_girl' control={control} error={errors.death_female} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
                             <ReuseInput type='number' label='अन्य मृतक संख्या' name='death_other' control={control} error={errors.death_other} />
@@ -266,16 +266,16 @@ const AccidentForm = () => {
                     </Grid2>
                     <Grid2 container spacing={1} marginTop={2}>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
-                            <ReuseInput type='number' label='बालक गम्भिर घाइते संख्या' name='gambhir_male' control={control} error={errors.gambhir_male} />
+                            <ReuseInput type='number' label='पुरुष गम्भिर घाइते संख्या' name='gambhir_male' control={control} error={errors.gambhir_male} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
-                            <ReuseInput type='number' label='बिलका गम्भिर घाइते संख्या' name='gambhir_female' control={control} error={errors.gambhir_female} />
+                            <ReuseInput type='number' label='महिला गम्भिर घाइते संख्या' name='gambhir_female' control={control} error={errors.gambhir_female} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
                             <ReuseInput type='number' label='बालक गम्भिर घाइते संख्या' name='gambhir_boy' control={control} error={errors.gambhir_male} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
-                            <ReuseInput type='number' label='बिलका गम्भिर घाइते संख्या' name='gambhir_girl' control={control} error={errors.gambhir_female} />
+                            <ReuseInput type='number' label='बालिका गम्भिर घाइते संख्या' name='gambhir_girl' control={control} error={errors.gambhir_female} />
                         </Grid2>
                         <Grid2 size={{ xs: 3, sm: 2, md: 2 }}>
                             <ReuseInput type='number' label='अन्य गम्भिर घाइते संख्या' name='gambhir_other' control={control} error={errors.gambhir_other} />
