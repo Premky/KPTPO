@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
+import { Table } from 'react-bootstrap-icons';
 
 
 const AssignApps = () => {
@@ -40,8 +41,8 @@ const AssignApps = () => {
     const onFormSubmit = async (data) => {
         // console.log('Form Data:', data);
         try {
-            const url = editing ? `${BASE_URL}/accident/update_accident/${currentData.id}` :
-                `${BASE_URL}/accident/create_accident`;
+            const url = editing ? `${BASE_URL}/admin/update_app/${currentData.id}` :
+                `${BASE_URL}/admin/add_app`;
             const method = editing ? 'PUT' : 'POST';
             const response = await axios({
                 method,
@@ -82,9 +83,19 @@ const AssignApps = () => {
         });
     }
 
+    const [assignedapps, setAssignedApps] = useState([]);
+    const fetchAssignedApps = async () => {
+        const params = {};
+        fetchData(`${BASE_URL}/admin/get_assigned_apps`, params, (result) => {
+            console.log(result);
+            setAssignedApps(result);
+        });
+    }
+
     useEffect(() => {
         fetchUsers();
         fetchApps();
+        fetchAssignedApps();
     }, [])
     return (
         <>
@@ -155,9 +166,55 @@ const AssignApps = () => {
                                 )}
                             />
                         </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+                            <Button variant="contained" type="submit" color="primary">
+                                {editing ? 'Update' : 'Assign'}
+                            </Button>
+                        </Grid2>
 
                     </Grid2>
                 </form>
+            </Box>
+
+            <Divider />
+            <Box sx={{ flexGrow: 1, margin: 2 }}>
+                <Grid2>
+                    <h4>Assigned Applications:</h4>
+                </Grid2>
+                <Grid2 container spacing={1}>
+                    <Table className='table table-striped table-bordered'>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Apps</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {assignedapps.map((app) => (
+                                <tr key={app.id}>
+                                    <td>{app.user_name}</td>
+                                    <td>{app.app_name}</td>
+                                    <td>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => {
+                                                setEditing(true);
+                                                reset({
+                                                    user: app.user_id,
+                                                    app: app.app_id,
+                                                });
+                                            }}
+                                        >
+                                            Edit
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </Grid2>
             </Box>
 
         </>

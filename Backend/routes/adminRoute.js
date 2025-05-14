@@ -211,4 +211,51 @@ router.delete('/delete_user/:id', async (req, res) => {
         return res.status(500).json({ Status: false, Error: 'Unexpected error occurred' });
     }
 });
+
+router.post("/add_app", async (req, res) => {
+    console.log("Request Body:", req.body); // Log the request body for debugging
+    try {
+        const { user, app } = req.body;
+        // Check for missing fields
+        if (!user || !app) {
+            return res.status(400).json({ message: "सबै फिल्डहरू आवश्यक छन्।" });
+        }
+        // Check if the username already exists
+        const existingBranch = await query("SELECT id FROM user_apps WHERE user_id = ? AND app_id=?", [user, app]);
+        if (existingBranch.length > 0) {
+            return res.status(400).json({ message: "यो प्रयोगकर्तालाई यो एप पहिल्यै अवस्थित छ।" });
+        }
+        // Insert user into the database
+        const sql = `
+            INSERT INTO user_apps (user_id, app_id) 
+            VALUES (?, ?)`;
+
+        try {
+            const result = await query(sql,[user, app]);
+            return res.json({ Status: true, Result: result, message: "एप सफलता पूर्वक असाइन गरियो।" })
+        } catch (err) {
+            console.error("Database Query Error:", err);
+            res.status(500).json({ Status: false, Error: "Internal Server Error" })
+        }
+    } catch (error) {
+        console.error("User creation error:", error);
+        return res.json({ Status: false, Error: error, message: "सर्भर त्रुटि भयो।" })
+        res.status(500).json({ message: "सर्भर त्रुटि भयो।" });
+    }
+});
+
+router.get('/get_assigned_apps', async (req, res) => {
+    const sql = `SELECT ua.id, u.name AS user_name, a.name_np AS app_name 
+                FROM user_apps ua
+                JOIN users u ON ua.user_id = u.id
+                JOIN apps a ON ua.app_id = a.id`;
+    try {
+        const result = await query(sql);
+        return res.json({ Status: true, Result: result })
+    } catch (err) {
+        console.error("Database Query Error:", err);
+        res.status(500).json({ Status: false, Error: "Internal Server Error" })
+    }
+});
+
 export { router as adminRouter };
