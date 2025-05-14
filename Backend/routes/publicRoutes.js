@@ -406,6 +406,14 @@ router.get('/emp_groups', async (req, res) => {
     })
 })
 
+router.get('/get_apps', async (req, res) => {
+    const sql = `SELECT * from apps`;
+    con.query(sql, (err, result) => {
+        if (err) return res.json({ Status: false, Error: "Query Error" })
+        return res.json({ Status: true, Result: result })
+    })
+})
+
 router.get('/in_change/:pmis', async (req, res) => {
     const { pmis } = req.params;
     const sql = `SELECT a.*, o.office_name

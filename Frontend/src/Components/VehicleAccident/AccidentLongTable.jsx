@@ -21,7 +21,7 @@ const AccidentLongTable = () => {
                 withCredentials: true,
             });
             const { Status, Result, Error } = response.data;
-            console.log('Response:', response.data);
+            // console.log('Response:', response.data);
             if (Status) {
                 return response.data || [];
             } else {
@@ -209,6 +209,9 @@ const AccidentLongTable = () => {
 
                     animal_death: item.animal_death,
                     animal_injured: item.animal_injured,
+                    est_amount: item.est_amount,
+                    txt_accident_reason: item.txt_accident_reason,
+
                     remarks: item.remarks,
                     office_id: item.office_id,
                     created_by: item.created_by,
@@ -281,8 +284,8 @@ const AccidentLongTable = () => {
                 {/* <TableCell>x</TableCell> */}
                 <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
                 <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
-                <TableCell>x</TableCell>
-                <TableCell>x</TableCell>
+                <TableCell>{row.est_amount}</TableCell>
+                <TableCell>{row.txt_accident_reason}</TableCell>
                 <TableCell>{row.remarks}</TableCell>
             </TableRow>
         ));

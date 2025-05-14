@@ -15,6 +15,7 @@ import DriverMenu from './DriverMenu';
 import axios from 'axios';
 import VehicleAccidentMenu from './Menues/VehicleAccidentMenu';
 import { useBaseURL } from '../../Context/BaseURLProvider'; // Import the custom hook for base URL
+import SuperUserMenu from './Menues/SuperUserMenu';
 
 const drawerWidth = 240;
 
@@ -115,6 +116,7 @@ export default function CombinedNavBar() {
     if (location.pathname.includes('/admin/driver')) return 'dv';
     if (location.pathname.includes('/av')) return 'av';
     if (location.pathname.includes('/va')) return 'va';
+    if (location.pathname.includes('/su')) return 'su';
     return '';
   }, [location.pathname]);
   const [appType, setAppType] = React.useState(appCurrType);
@@ -125,6 +127,8 @@ export default function CombinedNavBar() {
       navigate('/admin/driver');
     } else if (val === 'av') {
       navigate('/av');
+    } else if (val === 'su') {
+      navigate('/su');
     } else {
       navigate('/');
     }
@@ -151,6 +155,7 @@ export default function CombinedNavBar() {
       );
     }
     if (type === 'va') return <VehicleAccidentMenu />;
+    if (type === 'su') return <SuperUserMenu/>;
     return null;
   };
 
@@ -183,11 +188,13 @@ export default function CombinedNavBar() {
               <MenuItem disabled>
                 {state?.user} ({state?.role})
               </MenuItem>
+
               {state?.allowed_apps?.map((app) => (
                 <MenuItem key={app.app_id} onClick={() => changeAppOptions(app.app_short_name)}>
                   {app.app_name_np}, {app.app_short_name}
                 </MenuItem>
               ))}
+
               <MenuItem onClick={handleLogout}>
                 Logout &nbsp;<LogoutIcon fontSize="small" />
               </MenuItem>

@@ -26,6 +26,8 @@ import SuperAdmin from './Components/Auth/middlewares/SuperAdmin';
 import AdminCheck from './Components/Auth/middlewares/AdminCheck';
 import UserCheck from './Components/Auth/middlewares/UserCheck';
 import AccidentLongTable from './Components/VehicleAccident/AccidentLongTable';
+import CreateUser from './Components/AdminPanel/User/CreateUser';
+import AssignApps from './Components/AdminPanel/User/AssignApps';
 
 function App() {
   return (
@@ -43,6 +45,11 @@ function App() {
                   <Route path='branch' element={<OfficeBranchPage />} />
                   <Route path='users' element={<Users />} />
                   <Route path='office' element={<Office />} />
+                </Route>
+
+                <Route path ='/su' element={<SuperAdmin />}>
+                  <Route index element={<CreateUser/>} />
+                  <Route path='apps' element={<AssignApps/>}/>
                 </Route>
 
                 <Route path='/admin' element={<AdminCheck />}>

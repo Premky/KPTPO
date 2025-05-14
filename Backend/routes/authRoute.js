@@ -99,14 +99,14 @@ router.put('/update_user/:userid', async (req, res) => {
         return res.status(400).json({ message: "पासवर्डहरू मिलेन।" });
     }
 
-    const existingUser = await query("SELECT id FROM users WHERE id = ?", [userid]);
+    const existingUser = await query("SELECT id FROM users WHERE username = ?", [userid]);
     if (existingUser.length === 0) {
         return res.status(400).json({ message: "यो प्रयोगकर्ता अवस्थित छैन।" });
     }
 
     const hashedPassword = await hashPassword(password);
     const sql = `
-        UPDATE users SET name=?, username=?, usertype=?, password=?, office_id=?, branch_id=?, is_active=? WHERE id=?`;
+        UPDATE users SET name=?, username=?, usertype=?, password=?, office_id=?, branch_id=?, is_active=? WHERE username=?`;
 
     try {
         const result = await query(sql, [name_np, username, usertype, hashedPassword, office, branch, is_active, userid]);
