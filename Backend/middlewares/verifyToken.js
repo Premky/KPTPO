@@ -28,7 +28,7 @@ const verifyToken = (req, res, next) => {
         // });
 
         const { exp, iat, ...userData } = decoded;
-
+        // console.log("User Data:", userData);
         const refreshedToken = jwt.sign(userData, process.env.JWT_SECRET, {
             expiresIn: '1d',
         });
