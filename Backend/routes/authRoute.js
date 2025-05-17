@@ -226,8 +226,8 @@ router.post('/login', async (req, res) => {
                 // });
                 res.cookie('token', token, {
                     httpOnly: true,
-                    secure: true, // only over HTTPS
-                    sameSite: 'None', // needed for cross-site cookies
+                    secure: process.env.NODE_ENV === 'production', // only over HTTPS
+                    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // needed for cross-site cookies
                     maxAge: 24 * 60 * 60 * 1000,
                 });
                 

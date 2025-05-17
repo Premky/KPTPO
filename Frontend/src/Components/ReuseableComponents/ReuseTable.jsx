@@ -56,13 +56,13 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
     // Add "sn" column only if it does not already exist
     ...(!columns.some(col => col.field === "sn")
       ? [{
-          field: "id",
-          headerName: "S.No",
-          width: 70,
-          renderCell: (params) => params.rowIndex + 1, // Dynamic row number
-        }]
+        field: "id",
+        headerName: "S.No",
+        width: 70,
+        renderCell: (params) => params.rowIndex + 1, // Dynamic row number
+      }]
       : []),
-    
+
     ...columns.map(col => ({
       ...col,
       flex: 1,
@@ -83,7 +83,7 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
       ) : undefined,
     })),
   ];
-  
+
   return (
     <div style={{ height, width }}>
       {enableExport && (
@@ -129,7 +129,7 @@ const ReusableTable = ({ columns, rows, height, width, showEdit, showDelete, onE
             columns: {
               columnVisibilityModel: Object.fromEntries(
                 columns.map((column) => [
-                  column.field, 
+                  column.field,
                   !column.hide // Ensure columns with `hide` false are visible
                 ])
               ),

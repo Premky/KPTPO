@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { Autocomplete, Box, Button, Divider, Grid2, IconButton, InputLabel, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Divider, Grid2, IconButton, InputLabel, Paper, TextField, Typography } from '@mui/material'
 import { useBaseURL } from '../../../Context/BaseURLProvider';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
 import { Table } from 'react-bootstrap-icons';
+import { DataGrid } from "@mui/x-data-grid";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 
 const AssignApps = () => {
@@ -83,20 +88,99 @@ const AssignApps = () => {
         });
     }
 
+    const columns = [
+        { field: "id", headerName: "सि.नं." },
+        { field: "name", headerName: "नाम" },
+        { field: "username", headerName: "प्रयोगकर्ता नाम" },
+        { field: "usertype", headerName: "प्रकार" },
+        { field: "office_id", headerName: "कार्यालय" },
+        { field: "branch_id", headerName: "शाखा" },
+        { field: "is_active", headerName: "सक्रय" },
+    ];
+
     const [assignedapps, setAssignedApps] = useState([]);
+    const [formattedOptions, setFormattedOptions] = useState([]);
     const fetchAssignedApps = async () => {
         const params = {};
         fetchData(`${BASE_URL}/admin/get_assigned_apps`, params, (result) => {
             console.log(result);
             setAssignedApps(result);
+
+            if (Array.isArray(result) && result.length > 0) {
+                const formatted = result.map((opt, index) => ({
+                    sn: `${opt.id ?? `app-${index}`}`,  // Unique key generation
+                    id: index + 1,
+                    name: opt.name,
+                    username: opt.username,
+                    usertype: opt.en_usertype,
+                    office_id: opt.office,
+                    branch_id: opt.branch,
+                    is_active: opt.is_active ? 'छ' : 'छैन',
+                }));
+
+                setFormattedOptions(formatted);
+            } else {
+                console.log('No records found.');
+            }
+
         });
     }
+
+    // 🔹 Export to Excel
+    const handleExportExcel = async () => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Data");
+
+        // Add headers
+        worksheet.addRow(columns.map(col => col.headerName));
+
+        // Add rows
+        rows.forEach(row => {
+            worksheet.addRow(columns.map(col => row[col.field]));
+        });
+
+        // Save file
+        const buffer = await workbook.xlsx.writeBuffer();
+        saveAs(new Blob([buffer]), "table_data.xlsx");
+    };
 
     useEffect(() => {
         fetchUsers();
         fetchApps();
         fetchAssignedApps();
     }, [])
+
+    const updatedColumns = [
+        // Add "sn" column only if it does not already exist
+        ...(!columns.some(col => col.field === "sn")
+            ? [{
+                field: "id",
+                headerName: "S.No",
+                width: 70,
+                renderCell: (params) => params.rowIndex + 1, // Dynamic row number
+            }]
+            : []),
+
+        ...columns.map(col => ({
+            ...col,
+            flex: 1,
+            sortable: true,
+            hideable: true,
+            hide: col.hide || false,
+            renderCell: col.field === "driverphoto" ? (params) => (
+                params.value ? (
+                    <img
+                        src={params.value}
+                        alt="Driver"
+                        style={{ width: 50, height: 50, borderRadius: "5px", objectFit: "cover" }}
+                        onClick={() => previewImage(params.value)}
+                    />
+                ) : (
+                    "No Image"
+                )
+            ) : undefined,
+        })),
+    ];
     return (
         <>
             <Box sx={{ flexGrow: 1, margin: 2 }}>
@@ -181,39 +265,47 @@ const AssignApps = () => {
                 <Grid2>
                     <h4>Assigned Applications:</h4>
                 </Grid2>
+
                 <Grid2 container spacing={1}>
-                    <Table className='table table-striped table-bordered'>
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Apps</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {assignedapps.map((app) => (
-                                <tr key={app.id}>
-                                    <td>{app.user_name}</td>
-                                    <td>{app.app_name}</td>
-                                    <td>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => {
-                                                setEditing(true);
-                                                reset({
-                                                    user: app.user_id,
-                                                    app: app.app_id,
-                                                });
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                    <Paper sx={{ height: 400, width: '100%' }} style={{ overflowX: 'auto' }}>
+                        <DataGrid
+                            sx={{ border: 0 }}
+                            columns={[
+                                ...updatedColumns,
+                                {
+                                    field: "actions",
+                                    headerName: "Actions",
+                                    renderCell: (params) => (
+                                        <div>
+                                            {/* {showEdit && (
+                                                <Button variant="contained" color="primary" size="small" onClick={() => onEdit(params.row)}>
+                                                    Edit
+                                                </Button>
+                                            )}
+                                            {showDelete && (
+                                                <Button variant="contained" color="secondary" size="small" onClick={() => onDelete(params.row.id)}>
+                                                    Delete
+                                                </Button>
+                                            )} */}
+                                        </div>
+                                    ),
+                                    width: 150,
+                                },
+                            ]}
+                            rows={formattedOptions}
+                            pageSize={10}
+                            initialState={{
+                                columns: {
+                                    columnVisibilityModel: Object.fromEntries(
+                                        columns.map((column) => [
+                                            column.field,
+                                            !column.hide // Ensure columns with `hide` false are visible
+                                        ])
+                                    ),
+                                },
+                            }}
+                        />
+                    </Paper>
                 </Grid2>
             </Box>
 
