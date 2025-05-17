@@ -222,14 +222,14 @@ router.get("/get_accident_records", verifyToken, async (req, res) => {
         `;
 
         // Add condition if not superuser
-        if (role_en !== "superuser") {
+        if (role_en !== "Superuser") {
             queryStr += ` WHERE ar.office_id = ?`;
         }
 
         queryStr += ` GROUP BY ar.id ORDER BY ar.date DESC`;
 
         // Run query with appropriate values
-        const records = role_en === "superuser"
+        const records = role_en === "Superuser"
             ? await query(queryStr)
             : await query(queryStr, [office_id]);
 
