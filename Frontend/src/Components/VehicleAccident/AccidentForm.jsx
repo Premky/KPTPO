@@ -18,6 +18,7 @@ import AccidentShortTable from './AccidentShortTable'
 import AccidentLongTable from './AccidentLongTable'
 import { useBaseURL } from '../../Context/BaseURLProvider'
 import ReuseCountry from '../ReuseableComponents/ReuseCountry'
+import ReuseVehicleCategory from '../ReuseableComponents/ReuseVehcileCategory'
 
 const AccidentForm = () => {
     // const BASE_URL = localStorage.getItem('BASE_URL');
@@ -154,16 +155,16 @@ const AccidentForm = () => {
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseInput type='number' label='वडा नं.' name='ward' control={control} error={errors.driverward} />
+                            <ReuseInput type='number' label='वडा नं.' name='ward' control={control} error={errors.driverward} required/>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseInput type='text' label='सडकको नाम' name='road_name' control={control} error={errors.road_name} />
+                            <ReuseInput type='text' label='सडकको नाम' name='road_name' control={control} error={errors.road_name} required />
                         </Grid2>
                         <Grid2>
-                            <ReuseInput type='text' label='दुर्घटनाको स्थान' name='accident_location' control={control} error={errors.accidentlocation} />
+                            <ReuseInput type='text' label='दुर्घटनाको स्थान' name='accident_location' control={control} error={errors.accidentlocation} required />
                         </Grid2>
                         <Grid2>
-                            <ReuseInput type='time' label='दुर्घटनाको समय' name='accident_time' control={control} error={errors.accidenttime} />
+                            <ReuseInput type='time' label='दुर्घटनाको समय' name='accident_time' control={control} error={errors.accidenttime} required />
                         </Grid2>
 
                     </Grid2>
@@ -190,8 +191,10 @@ const AccidentForm = () => {
                                     options={''}
                                 />
                             </Grid2>
+
                             <Grid2 size={{ xs: 6, sm: 3, md: 2 }}>
-                                <ReuseVehicles
+                                
+                                <ReuseVehicleCategory
                                     name={`vehicle_category_${index + 1}`}
                                     label={
                                         <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -336,10 +339,10 @@ const AccidentForm = () => {
                     </Grid2>
                     <Grid2 container spacing={1} marginTop={2}>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseInput type='text' label='अनुमानित क्षेती रकम' name='est_amount' control={control} error={errors.est_amount} />
+                            <ReuseInput type='text' label='अनुमानित क्षेती रकम' name='est_amount' control={control} error={errors.est_amount} required/>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <ReuseInput type='text' label='कसरी सवारी दुर्घटना भयो?' name='txt_accident_reason' control={control} error={errors.txt_accident_reason} />
+                            <ReuseInput type='text' label='कसरी सवारी दुर्घटना भयो?' name='txt_accident_reason' control={control} error={errors.txt_accident_reason} required/>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput type='text' label='कैफियत' name='remarks' control={control} error={errors.remarks} />

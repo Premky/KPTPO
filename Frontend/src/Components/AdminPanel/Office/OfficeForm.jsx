@@ -31,7 +31,7 @@ const OfficeForm = () => {
     const onFormSubmit = async (data) => {
         setLoading(true);
         try {
-            console.log(data)
+            // console.log(data)
             const url = editing ? `${BASE_URL}/admin/update_office/${editableData.id}` : `${BASE_URL}/admin/add_office`;
             const method = editing ? 'PUT' : 'POST';
             const response = await axios({
@@ -43,7 +43,7 @@ const OfficeForm = () => {
                 withCredentials: true
             })
             const { Status, Result, Error } = response.data;
-            // console.log(response.data.message)
+            console.log(response)
             if (Status) {
                 Swal.fire({
                     title: `Office ${editing ? 'updated' : 'created'} successfully!`,
@@ -53,17 +53,18 @@ const OfficeForm = () => {
                 reset();
                 setEditing(false);
                 fetchOffices();
-            }else{
+            } else {
                 Swal.fire({
-                    title: response.data.message,
+                    title: response.data.nerr,
                     icon: 'error',
                     draggable: true
                 });
             }
+
         } catch (err) {
             console.error(err);
             Swal.fire({
-                title: err.response.message,
+                title: err?.response?.data?.nerr || err.message || "सर्भरमा समस्या आयो।",
                 icon: 'error',
                 draggable: true
             });
@@ -72,8 +73,8 @@ const OfficeForm = () => {
         }
     }
 
-    const [office, setOffice]=useState([]);
-    const fetchOffices = async() => {
+    const [office, setOffice] = useState([]);
+    const fetchOffices = async () => {
         try {
             const url = `${BASE_URL}/admin/get_offices`;
             const response = await axios.get(url, {
@@ -163,7 +164,7 @@ const OfficeForm = () => {
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput
                                 name='ward'
-                                label='वडा नं.'
+                                label='वडा नं.(In English)'
                                 control={control}
                                 error={errors.ward}
                             />
@@ -208,7 +209,7 @@ const OfficeForm = () => {
                 </form>
             </Box>
             <Box>
-                <OfficeTable/>
+                <OfficeTable />
             </Box>
         </>
     )

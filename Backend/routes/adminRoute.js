@@ -25,7 +25,7 @@ router.post("/add_branch_name", async (req, res) => {
             VALUES (?, ?,0)`;
 
         try {
-            const result = await query(sql,[name_np, name_en]);
+            const result = await query(sql, [name_np, name_en]);
             return res.json({ Status: true, Result: result, message: "प्रयोगकर्ता सफलतापूर्वक सिर्जना गरियो।" })
         } catch (err) {
             console.error("Database Query Error:", err);
@@ -39,7 +39,7 @@ router.post("/add_branch_name", async (req, res) => {
 });
 
 router.put("/update_branch_name/:id", async (req, res) => {
-    const id=req.params.id;
+    const id = req.params.id;
     try {
         const { name_np, name_en } = req.body;
         // Check for missing fields
@@ -54,9 +54,9 @@ router.put("/update_branch_name/:id", async (req, res) => {
         // Insert user into the database
         const sql = `
             UPDATE branch SET name_np=? , name_en=?, updated_by=0 WHERE id=?`;
-        const values=[name_np, name_en, id];
+        const values = [name_np, name_en, id];
         try {
-            const result = await query(sql,values);
+            const result = await query(sql, values);
             return res.json({ Status: true, Result: result, message: "प्रयोगकर्ता सफलतापूर्वक अद्यावधिक गरियो।" })
         } catch (err) {
             console.error("Database Query Error:", err);
@@ -114,7 +114,7 @@ router.post("/add_office", async (req, res) => {
     try {
         const { name_np, name_en, state, district, municipality, ward, email, contact, headoffice } = req.body;
         // Check for missing fields
-        if (!name_np ) {
+        if (!name_np) {
             return res.status(400).json({ message: "सबै फिल्डहरू आवश्यक छन्।" });
         }
         // Check if the name_np already exists
@@ -127,13 +127,22 @@ router.post("/add_office", async (req, res) => {
             INSERT INTO office (name_np, name_en, state_id, district_id, municipality_id, ward, email, 
             contact, headoffice, created_by) 
             VALUES (?)`;
-        const values=[name_np, name_en, state, district, municipality, ward, email, contact, headoffice, 0]
+        const values = [name_np, name_en, state, district, municipality, ward, email, contact, headoffice, 0]
         try {
-            const result = await query(sql,[values]);
+            const result = await query(sql, [values]);
             return res.json({ Status: true, Result: result, message: "कार्यालयको विवरण सफलता पुर्वक प्रविष्ट गरियो।" })
         } catch (err) {
             console.error("Database Query Error:", err);
-            res.status(500).json({ Status: false, Error: "Internal Server Error" })
+
+            // Return custom error for incorrect integer values (e.g., Nepali digits)
+            if (err.sqlMessage && err.sqlMessage.includes("Incorrect integer value")) {
+                return res.status(500).json({
+                    Status: false,
+                    message: err.sqlMessage,                                       
+                    Error: err.sqlMessage
+                });
+            }
+            // res.status(500).json({ Status: false, Error: err })
         }
     } catch (error) {
         console.error("User creation error:", error);
@@ -143,7 +152,7 @@ router.post("/add_office", async (req, res) => {
 });
 
 router.put("/update_branch_name/:id", async (req, res) => {
-    const id=req.params.id;
+    const id = req.params.id;
     try {
         const { name_np, name_en } = req.body;
         // Check for missing fields
@@ -158,9 +167,9 @@ router.put("/update_branch_name/:id", async (req, res) => {
         // Insert user into the database
         const sql = `
             UPDATE branch SET name_np=? , name_en=?, updated_by=0 WHERE id=?`;
-        const values=[name_np, name_en, id];
+        const values = [name_np, name_en, id];
         try {
-            const result = await query(sql,values);
+            const result = await query(sql, values);
             return res.json({ Status: true, Result: result, message: "प्रयोगकर्ता सफलतापूर्वक अद्यावधिक गरियो।" })
         } catch (err) {
             console.error("Database Query Error:", err);
@@ -231,7 +240,7 @@ router.post("/add_app", async (req, res) => {
             VALUES (?, ?)`;
 
         try {
-            const result = await query(sql,[user, app]);
+            const result = await query(sql, [user, app]);
             return res.json({ Status: true, Result: result, message: "एप सफलता पूर्वक असाइन गरियो।" })
         } catch (err) {
             console.error("Database Query Error:", err);
