@@ -64,14 +64,16 @@ const AccidentLongTable = () => {
                     reasons: {},
                 };
             }
+            // grouped[key].vehicles[item.vehicle_name] =
+            //     (grouped[key].vehicles[item.vehicle_name] || 0) + item.count;
             grouped[key].vehicles[item.vehicle_name] = item.count;
             grouped[key].reasons[item.accident_reason] = item.count;
         });
-    
+
         const groupedArray = Object.values(grouped);
         exportLongTable(groupedArray, vehicles, typesAndReasons);  // pass grouped array
     };
-    
+
 
     useEffect(() => {
         fetchVehicles();
@@ -114,6 +116,7 @@ const AccidentLongTable = () => {
 
             <TableRow>
                 {vehicles.map(v => <TableCell key={v} rowSpan={2}>{v}</TableCell>)}
+
                 <TableCell rowSpan={2}>जम्मा</TableCell>
                 <TableCell colSpan={5}>मृत्यु</TableCell>
                 <TableCell colSpan={5}>गम्भिर घाईते</TableCell>
@@ -131,10 +134,6 @@ const AccidentLongTable = () => {
             </TableRow>
 
             <TableRow>
-
-                {/* {Object.keys(groupedReasons).flatMap(type =>
-                    groupedReasons[type].map(reason => <th key={reason}>{reason}</th>)
-                    )} */}
                 <TableCell>पुरुष</TableCell>
                 <TableCell>महिला</TableCell>
                 <TableCell>बालक</TableCell>
@@ -224,7 +223,7 @@ const AccidentLongTable = () => {
                     reasons: {}
                 };
             }
-
+            // {vehicles.map(v => <TableCell key={v} rowSpan={2}>{v}</TableCell>)}
             grouped[key].vehicles[item.vehicle_name] = item.count;
             grouped[key].reasons[item.accident_reason] = item.count;
         });
@@ -238,10 +237,17 @@ const AccidentLongTable = () => {
                 <TableCell>{row.accident_location}</TableCell>
                 <TableCell>{row.road_name}</TableCell>
                 <TableCell>{row.location}</TableCell>
+
                 {vehicles.map(v => (
-                    <TableCell key={v}>{row.vehicles[v] || 0}</TableCell>
+                    <TableCell key={v}>
+                        {row.vehicles && row.vehicles[v] ? row.vehicles[v] : 0}
+                    </TableCell>
                 ))}
-                <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+
+                <TableCell>
+                    {Object.values(row.vehicles || {}).reduce((sum, val) => sum + (Number(val) || 0), 0)}
+                </TableCell>
+
                 <TableCell>{row.death_male}</TableCell>
                 <TableCell>{row.death_female}</TableCell>
                 <TableCell>{row.death_boy}</TableCell>
