@@ -210,6 +210,7 @@ const AccidentLongTable = () => {
                     animal_death: item.animal_death,
                     animal_injured: item.animal_injured,
                     est_amount: item.est_amount,
+                    damage_vehicle: item.damage_vehicle,
                     txt_accident_reason: item.txt_accident_reason,
 
                     remarks: item.remarks,

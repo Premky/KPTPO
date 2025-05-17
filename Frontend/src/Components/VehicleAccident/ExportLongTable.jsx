@@ -14,7 +14,7 @@ export async function exportLongTable(data, vehicles, accidentReasonList) {
     let col = 1;
 
     // Static fields
-    const staticFields = ["सि.नं.", "मिति", "समय", "स्थान", "सडक", "ठाउँको नाम"];
+    const staticFields = ["सि.नं.","जिल्ला", "मिति", "समय", "स्थान", "सडक", "ठाउँको नाम"];
     staticFields.forEach(field => {
         mergeSafe(1, col, 2, col, field);
         col++;
@@ -122,6 +122,7 @@ export async function exportLongTable(data, vehicles, accidentReasonList) {
 
         const rowData = [
             index + 1,
+            row.district,
             row.date,
             row.accident_time,
             row.accident_location,
