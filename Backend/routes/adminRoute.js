@@ -245,7 +245,7 @@ router.post("/add_app", async (req, res) => {
 });
 
 router.get('/get_assigned_apps', async (req, res) => {
-    const sql = `SELECT ua.id, u.name AS user_name, a.name_np AS app_name 
+    const sql = `SELECT ua.id, u.name AS user_name, u.username, a.name_np AS app_name 
                 FROM user_apps ua
                 JOIN users u ON ua.user_id = u.id
                 JOIN apps a ON ua.app_id = a.id`;

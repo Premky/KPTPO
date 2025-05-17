@@ -50,6 +50,9 @@ function App() {
                 <Route path ='/su' element={<SuperAdmin />}>
                   <Route index element={<CreateUser/>} />
                   <Route path='apps' element={<AssignApps/>}/>
+                  <Route path='branch' element={<OfficeBranchPage />} />
+                  <Route path='office' element={<Office />} />
+                  <Route path='users' element={<Users />} />
                 </Route>
 
                 <Route path='/admin' element={<AdminCheck />}>

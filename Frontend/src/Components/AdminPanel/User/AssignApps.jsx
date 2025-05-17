@@ -1,39 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import { Autocomplete, Box, Button, Divider, Grid2, IconButton, InputLabel, Paper, TextField, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react';
+import {
+    Autocomplete, Box, Button, Divider, Grid2, InputLabel, Paper,
+    TextField, Typography
+} from '@mui/material';
+// import Grid2 from '@mui/material/Unstable_Grid2';
+
 import { useBaseURL } from '../../../Context/BaseURLProvider';
-import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
-import ReuseSelect from '../../ReuseableComponents/ReuseSelect';
-import { Table } from 'react-bootstrap-icons';
 import { DataGrid } from "@mui/x-data-grid";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-
 
 const AssignApps = () => {
     const BASE_URL = useBaseURL();
-    const { register, handleSubmit, reset, watch, formState: { errors }, control } = useForm();
+    const { handleSubmit, reset, control } = useForm();
     const [editing, setEditing] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [apps, setApps] = useState([]);
+    const [assignedApps, setAssignedApps] = useState([]);
+    const [formattedRows, setFormattedRows] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
-    // API fetch function
     const fetchData = async (url, params, setStateFunction) => {
         try {
-            const response = await axios.get(url, {
-                // headers: { Authorization: `Bearer ${token}` },
-                params,
-                withCredentials: true,
-            });
+            const response = await axios.get(url, { params, withCredentials: true });
             const { Status, Result, Error } = response.data;
-
             if (Status) {
-                if (Result?.length > 0) {
-                    setStateFunction(Result);
-                } else {
-                    console.log('No records found');
-                }
+                setStateFunction(Result);
             } else {
                 console.error(Error || 'Failed to fetch records');
             }
@@ -43,274 +37,150 @@ const AssignApps = () => {
         }
     };
 
-    const onFormSubmit = async (data) => {
-        // console.log('Form Data:', data);
-        try {
-            const url = editing ? `${BASE_URL}/admin/update_app/${currentData.id}` :
-                `${BASE_URL}/admin/add_app`;
-            const method = editing ? 'PUT' : 'POST';
-            const response = await axios({
-                method,
-                url,
-                data,
-                // headers: {Authorization: `Bearer ${token}`,"Content-Type": "multipart/form-data",},
-                withCredentials: true
-            });
-            const { Status, Result, Error } = response.data;
-            if (Status) {
-                alert('Data submitted successfully!');
+    const fetchUsers = () => {
+        fetchData(`${BASE_URL}/auth/get_users`, {}, setUsers);
+    };
 
-                reset(); // Reset the form after successful submission
-                setEditing(false); // Reset editing state
-                fetchAccidentRecords(); // Fetch updated records
+    const fetchApps = () => {
+        fetchData(`${BASE_URL}/public/get_apps`, {}, setApps);
+    };
+
+    const fetchAssignedApps = async (user_id = null) => {
+        const params = user_id ? { user_id } : {};
+        fetchData(`${BASE_URL}/admin/get_assigned_apps`, params, (result) => {
+            setAssignedApps(result);
+            const formatted = result.map((item, index) => ({
+                id: index + 1,
+                user_name: `${item.user_name} (${item.username})`,
+                app_name: item.app_name
+            }));
+            setFormattedRows(formatted);
+        });
+    };
+
+    const onFormSubmit = async (data) => {
+        try {
+            const response = await axios.post(`${BASE_URL}/admin/add_app`, data, { withCredentials: true });
+            const { Status } = response.data;
+            if (Status) {
+                alert('App assigned successfully!');
+                reset();
+                fetchAssignedApps(selectedUserId);
             }
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('An error occurred while submitting the form.');
         }
-    }
+    };
 
-    const [users, setUsers] = useState([]);
-    const fetchUsers = async () => {
-        const params = {};
-        fetchData(`${BASE_URL}/auth/get_users`, params, (result) => {
-            // console.log(result);
-            setUsers(result);
-        });
-    }
-
-    const [apps, setApps] = useState([]);
-    const fetchApps = async () => {
-        const params = {};
-        fetchData(`${BASE_URL}/public/get_apps`, params, (result) => {
-            console.log(result);
-            setApps(result);
-        });
-    }
-
-    const columns = [
-        { field: "id", headerName: "सि.नं." },
-        { field: "name", headerName: "नाम" },
-        { field: "username", headerName: "प्रयोगकर्ता नाम" },
-        { field: "usertype", headerName: "प्रकार" },
-        { field: "office_id", headerName: "कार्यालय" },
-        { field: "branch_id", headerName: "शाखा" },
-        { field: "is_active", headerName: "सक्रय" },
-    ];
-
-    const [assignedapps, setAssignedApps] = useState([]);
-    const [formattedOptions, setFormattedOptions] = useState([]);
-    const fetchAssignedApps = async () => {
-        const params = {};
-        fetchData(`${BASE_URL}/admin/get_assigned_apps`, params, (result) => {
-            console.log(result);
-            setAssignedApps(result);
-
-            if (Array.isArray(result) && result.length > 0) {
-                const formatted = result.map((opt, index) => ({
-                    sn: `${opt.id ?? `app-${index}`}`,  // Unique key generation
-                    id: index + 1,
-                    name: opt.name,
-                    username: opt.username,
-                    usertype: opt.en_usertype,
-                    office_id: opt.office,
-                    branch_id: opt.branch,
-                    is_active: opt.is_active ? 'छ' : 'छैन',
-                }));
-
-                setFormattedOptions(formatted);
-            } else {
-                console.log('No records found.');
-            }
-
-        });
-    }
-
-    // 🔹 Export to Excel
     const handleExportExcel = async () => {
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Data");
+        const worksheet = workbook.addWorksheet("Assigned Apps");
 
-        // Add headers
-        worksheet.addRow(columns.map(col => col.headerName));
+        worksheet.addRow(["सि.नं.", "प्रयोगकर्ता नाम", "नाम"]);
 
-        // Add rows
-        rows.forEach(row => {
-            worksheet.addRow(columns.map(col => row[col.field]));
+        formattedRows.forEach((row, index) => {
+            worksheet.addRow([index + 1, row.user_name, row.app_name]);
         });
 
-        // Save file
         const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), "table_data.xlsx");
+        saveAs(new Blob([buffer]), "assigned_apps.xlsx");
     };
 
     useEffect(() => {
         fetchUsers();
         fetchApps();
         fetchAssignedApps();
-    }, [])
+    }, []);
 
-    const updatedColumns = [
-        // Add "sn" column only if it does not already exist
-        ...(!columns.some(col => col.field === "sn")
-            ? [{
-                field: "id",
-                headerName: "S.No",
-                width: 70,
-                renderCell: (params) => params.rowIndex + 1, // Dynamic row number
-            }]
-            : []),
-
-        ...columns.map(col => ({
-            ...col,
-            flex: 1,
-            sortable: true,
-            hideable: true,
-            hide: col.hide || false,
-            renderCell: col.field === "driverphoto" ? (params) => (
-                params.value ? (
-                    <img
-                        src={params.value}
-                        alt="Driver"
-                        style={{ width: 50, height: 50, borderRadius: "5px", objectFit: "cover" }}
-                        onClick={() => previewImage(params.value)}
-                    />
-                ) : (
-                    "No Image"
-                )
-            ) : undefined,
-        })),
+    const columns = [
+        { field: "id", headerName: "सि.नं.", width: 100 },
+        { field: "user_name", headerName: "नाम", flex: 1 },
+        { field: "app_name", headerName: "प्रयोगकर्ता नाम", flex: 1 }
     ];
+
     return (
-        <>
-            <Box sx={{ flexGrow: 1, margin: 2 }}>
-                <form onSubmit={handleSubmit(onFormSubmit)}>
-                    <Grid2>
-                        <h4>Assign Applications:</h4>
-                    </Grid2>
-                    <Grid2 container spacing={1}>
-                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <InputLabel>Username:</InputLabel>
-                            <Controller
-                                name="user"  // Fix 1: Give proper name
-                                control={control}
-                                render={({ field: { onChange, value, ref } }) => (
-                                    <Autocomplete
-                                        options={Array.isArray(users) ? users : []}
-                                        autoHighlight
-                                        getOptionLabel={(option) => `${option.name} (${option.username})`}
-                                        value={users.find((user) => user.id === value) || null}
-                                        onChange={(_, newValue) => {
-                                            onChange(newValue ? newValue.id : ''); // Fix 2: Use id not value
-                                        }}
-                                        sx={{ width: '100%' }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                inputRef={ref}
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                                margin="normal"
-                                                required
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </Grid2>
-
-                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <InputLabel>Apps:</InputLabel>
-                            <Controller
-                                name="app"  // Fix 1: Give proper name
-                                control={control}
-                                render={({ field: { onChange, value, ref } }) => (
-                                    <Autocomplete
-                                        options={Array.isArray(apps) ? apps : []}
-                                        autoHighlight
-                                        getOptionLabel={(option) => `${option.name_np} (${option.short_name})`}
-                                        value={apps.find((app) => app.id === value) || null}
-                                        onChange={(_, newValue) => {
-                                            onChange(newValue ? newValue.id : ''); // Fix 2: Use id not value
-                                        }}
-                                        sx={{ width: '100%' }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                inputRef={ref}
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                                margin="normal"
-                                                required
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </Grid2>
-                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
-                            <Button variant="contained" type="submit" color="primary">
-                                {editing ? 'Update' : 'Assign'}
-                            </Button>
-                        </Grid2>
-
-                    </Grid2>
-                </form>
-            </Box>
-
-            <Divider />
-            <Box sx={{ flexGrow: 1, margin: 2 }}>
-                <Grid2>
-                    <h4>Assigned Applications:</h4>
-                </Grid2>
-
+        <Box sx={{ flexGrow: 1, margin: 2 }}>
+            <form onSubmit={handleSubmit(onFormSubmit)}>
                 <Grid2 container spacing={1}>
-                    <Paper sx={{ height: 400, width: '100%' }} style={{ overflowX: 'auto' }}>
-                        <DataGrid
-                            sx={{ border: 0 }}
-                            columns={[
-                                ...updatedColumns,
-                                {
-                                    field: "actions",
-                                    headerName: "Actions",
-                                    renderCell: (params) => (
-                                        <div>
-                                            {/* {showEdit && (
-                                                <Button variant="contained" color="primary" size="small" onClick={() => onEdit(params.row)}>
-                                                    Edit
-                                                </Button>
-                                            )}
-                                            {showDelete && (
-                                                <Button variant="contained" color="secondary" size="small" onClick={() => onDelete(params.row.id)}>
-                                                    Delete
-                                                </Button>
-                                            )} */}
-                                        </div>
-                                    ),
-                                    width: 150,
-                                },
-                            ]}
-                            rows={formattedOptions}
-                            pageSize={10}
-                            initialState={{
-                                columns: {
-                                    columnVisibilityModel: Object.fromEntries(
-                                        columns.map((column) => [
-                                            column.field,
-                                            !column.hide // Ensure columns with `hide` false are visible
-                                        ])
-                                    ),
-                                },
-                            }}
+                    <Grid2 xs={12}>
+                        <Typography variant="h6">Assign Applications:</Typography>
+                    </Grid2>
+
+                    <Grid2 xs={12} sm={6} md={3}>
+                        <InputLabel>Username:</InputLabel>
+                        <Controller
+                            name="user"
+                            control={control}
+                            render={({ field: { onChange, value, ref } }) => (
+                                <Autocomplete
+                                    options={users}
+                                    autoHighlight
+                                    getOptionLabel={(option) => `${option.name} (${option.username})`}
+                                    value={users.find((u) => u.id === value) || null}
+                                    onChange={(_, newVal) => {
+                                        const userId = newVal?.id || '';
+                                        onChange(userId);
+                                        setSelectedUserId(userId);
+                                        fetchAssignedApps(userId);
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField {...params} inputRef={ref} variant="outlined" size="small" required />
+                                    )}
+                                />
+                            )}
                         />
-                    </Paper>
+                    </Grid2>
+
+                    <Grid2 xs={12} sm={6} md={3}>
+                        <InputLabel>Apps:</InputLabel>
+                        <Controller
+                            name="app"
+                            control={control}
+                            render={({ field: { onChange, value, ref } }) => (
+                                <Autocomplete
+                                    options={apps}
+                                    autoHighlight
+                                    getOptionLabel={(option) => `${option.name_np} (${option.short_name})`}
+                                    value={apps.find((a) => a.id === value) || null}
+                                    onChange={(_, newVal) => onChange(newVal?.id || '')}
+                                    renderInput={(params) => (
+                                        <TextField {...params} inputRef={ref} variant="outlined" size="small" required />
+                                    )}
+                                />
+                            )}
+                        />
+                    </Grid2>
+
+                    <Grid2 xs={12} sm={6} md={3}>
+                        <Button variant="contained" type="submit" color="primary" sx={{ mt: 3 }}>
+                            Assign
+                        </Button>
+                    </Grid2>
                 </Grid2>
-            </Box>
+            </form>
 
-        </>
-    )
-}
+            <Divider sx={{ my: 3 }} />
 
-export default AssignApps
+            <Typography variant="h6" sx={{ mb: 1 }}>
+                Assigned Applications:
+            </Typography>
+
+            <Button variant="outlined" onClick={handleExportExcel} sx={{ mb: 2 }}>
+                Export to Excel
+            </Button>
+
+            <Paper sx={{ height: 400, width: '100%' }}>
+                <DataGrid
+                    rows={formattedRows}
+                    columns={columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    disableRowSelectionOnClick
+                />
+            </Paper>
+        </Box>
+    );
+};
+
+export default AssignApps;
