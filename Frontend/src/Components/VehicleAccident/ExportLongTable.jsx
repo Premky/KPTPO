@@ -152,8 +152,13 @@ export async function exportLongTable(data, vehicles, accidentReasonList) {
             row.animal_injured,
 
             ...timeSlotsFinal,
-
+            
             ...Object.values(groupedReasons).flat().map(reason => row.reasons?.[reason] || 0),
+            1,
+            row.damage_vehicle,
+            row.est_amount, 
+            row.txt_accident_reason,
+            row.remarks,
         ];
 
         worksheet.addRow(rowData);

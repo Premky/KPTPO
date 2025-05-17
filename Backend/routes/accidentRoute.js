@@ -138,13 +138,14 @@ router.get("/get_accident_records", async (req, res) => {
                 SUM(ar.general_male + ar.general_female + ar.general_boy + ar.general_girl + ar.general_other) AS total_general,
 
                 ar.animal_death, ar.animal_injured,
-                ar.est_amount, ar.txt_accident_reason,
+                ar.est_amount, ar.damage_vehicle, ar.txt_accident_reason,
                 ar.remarks,
                 ar.office_id,  ar.created_by,  ar.updated_by,
                 CONCAT(c.name_np, ', ', d.name_np, ', ', s.name_np) AS location,
                 art.name_np AS accident_type,
                 arsn.name_np AS accident_reason,
                 v.name_np AS vehicle_name,
+
                 COUNT(*) AS count
                 FROM accident_records ar
 
@@ -172,7 +173,7 @@ router.get("/get_accident_records", async (req, res) => {
                 ar.death_male,  ar.death_female, ar.death_boy, ar.death_girl, ar.death_other,
                 ar.gambhir_male,  ar.gambhir_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
                 ar.general_male,  ar.general_female, ar.gambhir_boy, ar.gambhir_girl, ar.gambhir_other,
-                ar.animal_death, ar.animal_injured, ar.est_amount, ar.txt_accident_reason,
+                ar.animal_death, ar.animal_injured, ar.est_amount, ar.damage_vehicle, ar.txt_accident_reason,
                 ar.remarks,
                 ar.office_id,  ar.created_by,  ar.updated_by
 

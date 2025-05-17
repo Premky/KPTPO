@@ -282,8 +282,8 @@ const AccidentLongTable = () => {
                 ))}
                 {/* <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell> */}
                 {/* <TableCell>x</TableCell> */}
-                <TableCell>{Object.values(row.reasons || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
-                <TableCell>{Object.values(row.vehicles || {}).reduce((sum, count) => sum + count, 0)}</TableCell>
+                <TableCell>1</TableCell>
+                <TableCell>{row.damage_vehicle}</TableCell>
                 <TableCell>{row.est_amount}</TableCell>
                 <TableCell>{row.txt_accident_reason}</TableCell>
                 <TableCell>{row.remarks}</TableCell>
