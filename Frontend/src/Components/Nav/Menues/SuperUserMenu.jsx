@@ -3,9 +3,12 @@ import { List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../Context/AuthContext';
 
-import DynamicFormIcon from '@mui/icons-material/DynamicForm';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import DifferenceIcon from '@mui/icons-material/Difference';
+import HomeWorkIcon from '@mui/icons-material/HomeWork';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 
+HomeWorkIcon
 const SuperUserMenu = () => {
   const { state } = useAuth();
   const navigate = useNavigate();
@@ -16,11 +19,19 @@ const SuperUserMenu = () => {
   return (
     <List>
       <ListItemButton onClick={() => navigate('/su')}>
-        <ListItemIcon> <DynamicFormIcon />    </ListItemIcon>
+        <ListItemIcon> <PersonAddAltIcon />    </ListItemIcon>
         <ListItemText primary="USER FORM" />
       </ListItemButton>
       <ListItemButton onClick={() => navigate('/su/apps')}>
         <ListItemIcon> <DifferenceIcon />    </ListItemIcon>
+        <ListItemText primary="Assign Apps" />
+      </ListItemButton>
+      <ListItemButton onClick={() => navigate('/su/office')}>
+        <ListItemIcon> <HomeWorkIcon />    </ListItemIcon>
+        <ListItemText primary="Office" />
+      </ListItemButton>
+      <ListItemButton onClick={() => navigate('/su/branch')}>
+        <ListItemIcon> <AddBusinessIcon />    </ListItemIcon>
         <ListItemText primary="Assign Apps" />
       </ListItemButton>
     </List>

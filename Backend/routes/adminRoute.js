@@ -245,22 +245,26 @@ router.post("/add_app", async (req, res) => {
 });
 
 router.get('/get_assigned_apps', async (req, res) => {
-    // console.log("Request Query:", req.query); // Log the request query for debugging
     const { user_id } = req.query;
-    
-    const sql = `SELECT ua.id, u.name AS user_name, u.username, a.name_np AS app_name 
-                FROM user_apps ua
-                JOIN users u ON ua.user_id = u.id
-                JOIN apps a ON ua.app_id = a.id
-                WHERE ua.user_id = ?
-                `;
+
+    const baseSql = `
+        SELECT ua.id, u.name AS user_name, u.username, a.name_np AS app_name 
+        FROM user_apps ua
+        JOIN users u ON ua.user_id = u.id
+        JOIN apps a ON ua.app_id = a.id
+    `;
+
+    const sql = user_id ? `${baseSql} WHERE ua.user_id = ?` : baseSql;
+    const values = user_id ? [user_id] : [];
+
     try {
-        const result = await query(sql,[user_id]);
-        return res.json({ Status: true, Result: result })
+        const result = await query(sql, values);
+        res.json({ Status: true, Result: result });
     } catch (err) {
         console.error("Database Query Error:", err);
-        res.status(500).json({ Status: false, Error: "Internal Server Error" })
+        res.status(500).json({ Status: false, Error: "Internal Server Error" });
     }
 });
+
 
 export { router as adminRouter };
