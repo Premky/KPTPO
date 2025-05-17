@@ -46,7 +46,7 @@ const AssignApps = () => {
     };
 
     const fetchAssignedApps = async (user_id = null) => {
-        const params = user_id ? { user_id } : {};
+        const params = user_id ? { user_id } : {};         
         fetchData(`${BASE_URL}/admin/get_assigned_apps`, params, (result) => {
             setAssignedApps(result);
             const formatted = result.map((item, index) => ({
@@ -143,7 +143,7 @@ const AssignApps = () => {
                                     autoHighlight
                                     getOptionLabel={(option) => `${option.name_np} (${option.short_name})`}
                                     value={apps.find((a) => a.id === value) || null}
-                                    onChange={(_, newVal) => onChange(newVal?.id || '')}
+                                    onChange={(_, newVal) => onChange(newVal?.id || '')                                    }
                                     renderInput={(params) => (
                                         <TextField {...params} inputRef={ref} variant="outlined" size="small" required />
                                     )}
