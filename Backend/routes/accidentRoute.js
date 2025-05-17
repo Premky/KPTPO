@@ -24,7 +24,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
         accident_location, accident_time, death_male, death_female, death_boy, death_girl, death_other,
         gambhir_male, gambhir_female, gambhir_boy, gambhir_girl, gambhir_other,
         general_male, general_female, general_boy, general_girl, general_other,
-        animal_death, animal_injured, est_amount, txt_accident_reason, remarks
+        animal_death, animal_injured, est_amount, damage_vehicle, txt_accident_reason, remarks
     } = req.body;
 
     const accidentRecord = [
@@ -32,7 +32,7 @@ router.post("/create_accident", verifyToken, async (req, res) => {
         accident_location, accident_time, death_male, death_female, death_boy, death_girl, death_other,
         gambhir_male, gambhir_female, gambhir_boy, gambhir_girl, gambhir_other,
         general_male, general_female, general_boy, general_girl, general_other,
-        animal_death, animal_injured, est_amount, txt_accident_reason, remarks, office_id, username
+        animal_death, animal_injured, est_amount, damage_vehicle, txt_accident_reason, remarks, office_id, username
     ];
 
     try {

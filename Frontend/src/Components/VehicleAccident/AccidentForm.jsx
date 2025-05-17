@@ -342,6 +342,9 @@ const AccidentForm = () => {
                             <ReuseInput type='text' label='अनुमानित क्षेती रकम' name='est_amount' control={control} error={errors.est_amount} required/>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
+                            <ReuseInput type='text' label='सवारी क्षेती संख्या' name='damage_vehicle' control={control} error={errors.damage_vehicle} required/>
+                        </Grid2>
+                        <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                             <ReuseInput type='text' label='कसरी सवारी दुर्घटना भयो?' name='txt_accident_reason' control={control} error={errors.txt_accident_reason} required/>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
